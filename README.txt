@@ -10,7 +10,9 @@ Group Members & Email Addresses:
 Versioning
 ==========
 
-Github Link: 
+Github Link: https://github.com/jthoward64/cs371-project1.git
+
+To get a copy run `git clone https://github.com/jthoward64/cs371-project1.git` or download the zip file from the github page.
 
 General Info
 ============
