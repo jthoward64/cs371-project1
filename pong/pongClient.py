@@ -10,6 +10,7 @@ import pygame
 import tkinter as tk
 import sys
 import socket
+import json
 
 from assets.code.helperCode import *
 
@@ -84,7 +85,48 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # where the ball is and the current score.
         # Feel free to change when the score is updated to suit your needs/requirements
         
+        ''' Last Modified October 8th, 2023 ************************************************************************************************ '''
         
+        '''
+            Notes:
+            1) Look up playerPaddleObj
+            2) What is the variable holding the position of the ball
+            3) What is the current score variable
+            4) Remember syncing
+        '''
+
+        informationToSend = {
+            # Type of Information: 0 = Game Start, 1 = Update Game, 2 = Server Update
+            'Request': 1,
+
+            # Paddle Information
+            'paddleX': playerPaddleObj.rect.x,
+            'paddleY': playerPaddleObj.rect.y,
+            'paddleMoving': playerPaddleObj.moving,
+
+            # Ball Information
+            'ballX': ball.rect.x,
+            'ballY': ball.rect.y,
+            
+            # Score Information
+            'scoreLeft':lScore,
+            'scoreRight':rScore,
+            
+            # Sync Status
+            'sync':sync
+        }
+
+        # Bundle it into JSON
+        packageDump = json.dump(informationToSend).encode()
+
+        # Send the information
+        try:
+            client.send(packageDump)
+        except socket.error as errorMessage:
+            print(f'Error on client update to server: {errorMessage}')
+        
+        ''' Last Modified October 8th, 2023 ************************************************************************************************ '''
+
         # =========================================================================================
 
         # Update the player paddle and opponent paddle's location on the screen
@@ -156,6 +198,50 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # Send your server update here at the end of the game loop to sync your game with your
         # opponent's game
 
+        # Inform the server we want an update
+        client.send(json.dump({'Request':2}).encode())
+
+        # Our updated information
+        responsePackage = client.recv(4096).decode()
+        newInfo = json.loads(responsePackage)
+
+        '''Opponent Information Example
+        
+        newInfo = {
+            # Type of Information: 0 = Game Start, 1 = Update Game, 2 = Server Update
+            'Request': 3,
+            
+            # Paddle Information
+            'paddleX': playerPaddleObj.rect.x,
+            'paddleY': playerPaddleObj.rect.y,
+            'paddleMoving': playerPaddleObj.moving,
+
+            # Ball Information
+            'ballX': ball.rect.x,
+            'ballY': ball.rect.y,
+            
+            # Score Information
+            'scoreLeft':lScore,
+            'scoreRight':rScore,
+            
+            # Sync Status
+            'sync':sync
+        }
+        
+        '''
+        # Update opponent paddle information
+        opponentPaddleObj.rect.x = newInfo['paddleX']
+        opponentPaddleObj.rect.y = newInfo['paddleY']
+        opponentPaddleObj.moving = newInfo['paddleMoving']
+
+        # Check if we need to update the ball and score
+        if newInfo['sync'] > sync:
+            ball.rect.x = newInfo['ballX']
+            ball.rect.y = newInfo['ballY']
+            lScore = newInfo['scoreLeft']
+            rScore = newInfo['scoreRight']
+            sync = newInfo['sync']
+
         # =========================================================================================
 
 
@@ -177,19 +263,48 @@ def joinServer(ip:str, port:str, errorLabel:tk.Label, app:tk.Tk) -> None:
     # You don't have to use SOCK_STREAM, use what you think is best
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    # Get the required information from your server (screen width, height & player paddle, "left or "right)
+    ''' Last Modified October 8th, 2023 ************************************************************************************************ '''
+    # Attempt to connect to server
+    try:
+        client.connect(ip, port)
+    except socket.error as errorMessage:
+        errorLabel.config(text=f"Failure to connect to server: IP{ip}, Port: {port}")
+        print(f'Error: {errorMessage}')
 
+    # Get the required information from your server (screen width, height & player paddle, "left or "right)
+    
+    # Request the starter information from the server
+    package = json.dump({'Request': 0})
+    try:
+        client.send(package.encode())
+    except socket.error as errorMessage:
+        errorLabel.config(f'Starter Information Failed: {errorMessage}')
+
+    # Server will use JSON to send information to unpack
+    responseJSON = client.recv(4096).decode()
+    response = json.loads(responseJSON)
+
+    # Example of a server response
+    '''
+    response = {
+        'screenWidth':0,
+        'screenHeight':0,
+        'playerPaddle': "",
+    }
+    '''
 
     # If you have messages you'd like to show the user use the errorLabel widget like so
-    errorLabel.config(text=f"Some update text. You input: IP: {ip}, Port: {port}")
+    errorLabel.config(text=f"Connected to game. IP: {ip}, Port: {port}")
+
     # You may or may not need to call this, depending on how many times you update the label
-    errorLabel.update()     
+    # errorLabel.update(text=f'Game Start')     
 
     # Close this window and start the game with the info passed to you from the server
-    #app.withdraw()     # Hides the window (we'll kill it later)
-    #playGame(screenWidth, screenHeight, ("left"|"right"), client)  # User will be either left or right paddle
-    #app.quit()         # Kills the window
-
+    app.withdraw()     # Hides the window (we'll kill it later)
+    playGame(response['screenWidth'], response['screenHeight'], response['playerPaddle'], client)  # User will be either left or right paddle
+    client.close()     # Client disconnects from the server on game end
+    app.quit()         # Kills the window
+    ''' Last Modified October 8th, 2023 ************************************************************************************************ '''
 
 # This displays the opening screen, you don't need to edit this (but may if you like)
 def startScreen():
