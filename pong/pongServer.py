@@ -15,9 +15,9 @@ import socket, threading, json
 # I suggest you use the sync variable in pongClient.py to determine how out of sync your two
 # clients are and take actions to resync the games
 
-''' Last Modified October 8th, 2023 ************************************************************************************************ '''
+''' Last Modified October 9th, 2023 ************************************************************************************************ '''
 '''
-    Information Example from Client on Game Update and Server to Client
+    Information Example from Client on Game Update
     
     newInfo = {
         # Type of Information: 0 = Game Start, 1 = Update Game
@@ -42,16 +42,8 @@ import socket, threading, json
     
     Example of Server Information
 '''
-
+# Use Lock when updating this information
 gameInfo = {
-    # Left Paddle
-    'leftPaddleX': 0,
-    'leftPaddleY': 0,
-
-    # Right Paddle
-    'rightPaddleX': 0,
-    'rightPaddleY': 0,
-
     # Ball Information
     'ballX': 0,
     'ballY': 0,
@@ -62,6 +54,20 @@ gameInfo = {
 
     # Sync Status
     'sync':0
+}
+
+# Free to update
+leftInfo = {
+    'paddleX': 0,
+    'paddleY': 0,
+    'paddleMoving':"",
+}
+
+# Free to update
+rightInfo = {
+    'paddleX': 0,
+    'paddleY': 0,
+    'paddleMoving':"",
 }
 
 # Game Settings
@@ -85,6 +91,11 @@ def clientHandler(client:socket.socket, clientNumber:int):
 
     # Begin receiving information
     while not shutdownClients.is_set():
+        # Check if score is greater than 4?
+        if gameInfo['scoreLeft'] > 3 or gameInfo['scoreRight'] > 3:
+            ''' Need to Modify ************************************************************************************************* '''
+            pass
+
         # Receive Infomation
         package = json.loads(client.recv(4096).decode())
 
@@ -96,14 +107,54 @@ def clientHandler(client:socket.socket, clientNumber:int):
         # Sending us an update?
         if package['Request'] == 1:
             # Update information
-            ''' Need to Modify ******************************************************************************************************************************** '''
-            pass
+            if clientNumber == 0:
+                # Left is updating
+                leftInfo['paddleMoving'] = package['paddleMoving']
+                leftInfo['paddleX'] = package['paddleX']
+                leftInfo['paddleY'] = package['paddleY']
+            else:
+                # Right is updating
+                rightInfo['paddleMoving'] = package['paddleMoving']
+                rightInfo['paddleX'] = package['paddleX']
+                rightInfo['paddleY'] = package['paddleY']
+            
+            # Update Sync if ahead
+            if package['sync'] > gameInfo['sync']:
+                with lockClients():
+                    # Update information
+                    gameInfo['sync'] = package['sync']
+                    gameInfo['ballX'] = package['ballX']
+                    gameInfo['ballY'] = package['ballY']
+                    gameInfo['scoreLeft'] = package['scoreLeft']
+                    gameInfo['scoreRight'] = package['scoreRight']
 
         # Requesting an update?
         if package['Request'] == 2:
             # Send Updated Information
-            ''' Need to Modify ******************************************************************************************************************************** '''
-            pass
+            if clientNumber == 0:
+                # Left Paddle, need to send Right's Information
+                client.send(json.dump({
+                    'paddleMoving':rightInfo['paddleMoving'],
+                    'paddleX':rightInfo['paddleX'],
+                    'paddleY':rightInfo['paddleY'],
+                    'ballX':gameInfo['ballX'],
+                    'ballY':gameInfo['ballY'],
+                    'scoreLeft':gameInfo['scoreLeft'],
+                    'scoreRight':gameInfo['scoreRight'],
+                    'sync':gameInfo['sync']
+                }).encode())
+            else:
+                # Right Paddle, need to send Left's Information
+                client.send(json.dump({
+                    'paddleMoving':leftInfo['paddleMoving'],
+                    'paddleX':leftInfo['paddleX'],
+                    'paddleY':leftInfo['paddleY'],
+                    'ballX':gameInfo['ballX'],
+                    'ballY':gameInfo['ballY'],
+                    'scoreLeft':gameInfo['scoreLeft'],
+                    'scoreRight':gameInfo['scoreRight'],
+                    'sync':gameInfo['sync']
+                }).encode())
 
     # Close the client, end the thread
     client.close()
@@ -144,4 +195,4 @@ def startServer():
     
 if __name__ == "__main__":
     startServer()
-''' Last Modified October 8th, 2023 ************************************************************************************************ '''
+''' Last Modified October 9th, 2023 ************************************************************************************************ '''

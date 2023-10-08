@@ -212,9 +212,9 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
             'Request': 3,
             
             # Paddle Information
-            'paddleX': playerPaddleObj.rect.x,
-            'paddleY': playerPaddleObj.rect.y,
-            'paddleMoving': playerPaddleObj.moving,
+            'paddleX': opponentPaddleObj.rect.x,
+            'paddleY': opponentPaddleObj.rect.y,
+            'paddleMoving': opponentPaddleObj.moving,
 
             # Ball Information
             'ballX': ball.rect.x,
