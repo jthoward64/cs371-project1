@@ -117,7 +117,7 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         }
 
         # Bundle it into JSON
-        packageDump = json.dump(informationToSend).encode()
+        packageDump = json.dumps(informationToSend).encode()
 
         # Send the information
         try:
@@ -199,7 +199,7 @@ def playGame(screenWidth:int, screenHeight:int, playerPaddle:str, client:socket.
         # opponent's game
 
         # Inform the server we want an update
-        client.send(json.dump({'Request':2}).encode())
+        client.send(json.dumps({'Request':2}).encode())
 
         # Our updated information
         responsePackage = client.recv(4096).decode()
@@ -274,7 +274,7 @@ def joinServer(ip:str, port:str, errorLabel:tk.Label, app:tk.Tk) -> None:
     # Get the required information from your server (screen width, height & player paddle, "left or "right)
     
     # Request the starter information from the server
-    package = json.dump({'Request': 0})
+    package = json.dumps({'Request': 0})
     try:
         client.send(package.encode())
     except socket.error as errorMessage:

@@ -102,7 +102,7 @@ def clientHandler(client:socket.socket, clientNumber:int):
         # Asking for starter information?
         if package['Request'] == 0:
             # Send our game starter information
-            client.send(json.dump(newInfo).encode())
+            client.send(json.dumps(newInfo).encode())
         
         # Sending us an update?
         if package['Request'] == 1:
@@ -133,7 +133,7 @@ def clientHandler(client:socket.socket, clientNumber:int):
             # Send Updated Information
             if clientNumber == 0:
                 # Left Paddle, need to send Right's Information
-                client.send(json.dump({
+                client.send(json.dumps({
                     'paddleMoving':rightInfo['paddleMoving'],
                     'paddleX':rightInfo['paddleX'],
                     'paddleY':rightInfo['paddleY'],
@@ -145,7 +145,7 @@ def clientHandler(client:socket.socket, clientNumber:int):
                 }).encode())
             else:
                 # Right Paddle, need to send Left's Information
-                client.send(json.dump({
+                client.send(json.dumps({
                     'paddleMoving':leftInfo['paddleMoving'],
                     'paddleX':leftInfo['paddleX'],
                     'paddleY':leftInfo['paddleY'],
