@@ -131,30 +131,18 @@ def clientHandler(client:socket.socket, clientNumber:int):
         # Requesting an update?
         if package['Request'] == 2:
             # Send Updated Information
-            if clientNumber == 0:
-                # Left Paddle, need to send Right's Information
-                client.send(json.dumps({
-                    'paddleMoving':rightInfo['paddleMoving'],
-                    'paddleX':rightInfo['paddleX'],
-                    'paddleY':rightInfo['paddleY'],
-                    'ballX':gameInfo['ballX'],
-                    'ballY':gameInfo['ballY'],
-                    'scoreLeft':gameInfo['scoreLeft'],
-                    'scoreRight':gameInfo['scoreRight'],
-                    'sync':gameInfo['sync']
-                }).encode())
-            else:
-                # Right Paddle, need to send Left's Information
-                client.send(json.dumps({
-                    'paddleMoving':leftInfo['paddleMoving'],
-                    'paddleX':leftInfo['paddleX'],
-                    'paddleY':leftInfo['paddleY'],
-                    'ballX':gameInfo['ballX'],
-                    'ballY':gameInfo['ballY'],
-                    'scoreLeft':gameInfo['scoreLeft'],
-                    'scoreRight':gameInfo['scoreRight'],
-                    'sync':gameInfo['sync']
-                }).encode())
+            # Left Paddle, need to send Right's Information
+            # Right Paddle, need to send Left's Information
+            client.send(json.dumps({
+                'paddleMoving':rightInfo['paddleMoving'] if clientNumber == 0 else leftInfo['paddleMoving'],
+                'paddleX':rightInfo['paddleX'] if clientNumber == 0 else leftInfo['paddleX'],
+                'paddleY':rightInfo['paddleY'] if clientNumber == 0 else leftInfo['paddleY'],
+                'ballX':gameInfo['ballX'],
+                'ballY':gameInfo['ballY'],
+                'scoreLeft':gameInfo['scoreLeft'],
+                'scoreRight':gameInfo['scoreRight'],
+                'sync':gameInfo['sync']
+            }).encode())
 
     # Close the client, end the thread
     client.close()
