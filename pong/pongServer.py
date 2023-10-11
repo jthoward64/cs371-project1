@@ -119,7 +119,7 @@ def clientHandler(client: socket.socket, clientNumber: int):
 
             # Update Sync if ahead
             if package["sync"] > gameInfo["sync"]:
-                with lockClients():
+                with lockClients:
                     # Update information
                     gameInfo["sync"] = package["sync"]
                     gameInfo["ballX"] = package["ballX"]
@@ -161,7 +161,7 @@ def clientHandler(client: socket.socket, clientNumber: int):
 def startServer():
     # Set up the socket
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind("localhost", 400)
+    server.bind(("localhost", 400))
     server.listen()
 
     # Max Players: 2
@@ -177,7 +177,7 @@ def startServer():
         clientSocket, clientAddress = server.accept()
 
         # Create a new thread to handle the client's incoming information
-        newHandler = threading.Threat(
+        newHandler = threading.Thread(
             target=clientHandler,
             args=(
                 clientSocket,

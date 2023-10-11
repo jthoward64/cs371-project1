@@ -25,7 +25,7 @@ def joinServer(ip: str, port: str, errorLabel: tk.Label, app: tk.Tk) -> None:
     """ Last Modified October 8th, 2023 ************************************************************************************************ """
     # Attempt to connect to server
     try:
-        client.connect(ip, port)
+        client.connect((ip, int(port)))
     except socket.error as errorMessage:
         errorLabel.config(text=f"Failure to connect to server: IP{ip}, Port: {port}")
         print(f"Error: {errorMessage}")
@@ -40,7 +40,7 @@ def joinServer(ip: str, port: str, errorLabel: tk.Label, app: tk.Tk) -> None:
         errorLabel.config(f"Starter Information Failed: {errorMessage}")
 
     # Server will use JSON to send information to unpack
-    responseJSON = client.recv(4096).decode()
+    responseJSON = client.recv(4096).decode()  # Client gets stuck here
     response = json.loads(responseJSON)
 
     # Example of a server response

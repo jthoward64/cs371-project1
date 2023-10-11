@@ -143,7 +143,8 @@ def playGame(
             winText = "Player 1 Wins! " if lScore > 4 else "Player 2 Wins! "
             textSurface = winFont.render(winText, False, WHITE, (0, 0, 0))
             textRect = textSurface.get_rect()
-            textRect.center = ((screenWidth / 2), screenHeight / 2)
+            textRect.centerx = int(screenWidth / 2)
+            textRect.centery = int(screenHeight / 2)
             winMessage = screen.blit(textSurface, textRect)
         else:
             # ==== Ball Logic =====================================================================
@@ -172,7 +173,7 @@ def playGame(
                 bounceSound.play()
                 ball.hitWall()
 
-            pygame.draw.rect(screen, WHITE, ball)
+            pygame.draw.rect(screen, WHITE, ball.rect)
             # ==== End Ball Logic =================================================================
 
         # Drawing the dotted line in the center
@@ -181,13 +182,21 @@ def playGame(
 
         # Drawing the player's new location
         for paddle in [playerPaddleObj, opponentPaddleObj]:
-            pygame.draw.rect(screen, WHITE, paddle)
+            pygame.draw.rect(screen, WHITE, paddle.rect)
 
         pygame.draw.rect(screen, WHITE, topWall)
         pygame.draw.rect(screen, WHITE, bottomWall)
         scoreRect = updateScore(lScore, rScore, screen, WHITE, scoreFont)
         pygame.display.update(
-            [topWall, bottomWall, ball, leftPaddle, rightPaddle, scoreRect, winMessage]
+            [
+                topWall,
+                bottomWall,
+                ball.rect,
+                leftPaddle.rect,
+                rightPaddle.rect,
+                scoreRect,
+                winMessage,
+            ]
         )
         clock.tick(60)
 
