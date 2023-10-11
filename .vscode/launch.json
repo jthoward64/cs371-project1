@@ -5,13 +5,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Current File",
+      "name": "Start Server",
+      "cwd": "${workspaceFolder}/pong",
       "type": "python",
       "request": "launch",
-      "program": "${file}",
-      "console": "integratedTerminal",
+      "program": "${workspaceFolder}/pong/pongServer.py"
+    },
+    {
+      "name": "Start Client",
       "cwd": "${workspaceFolder}/pong",
-      "justMyCode": true
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/pong/pongClient.py"
     }
   ]
 }
