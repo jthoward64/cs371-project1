@@ -98,6 +98,9 @@ def clientHandler(client: socket.socket, clientNumber: int):
         # Receive Infomation
         package = json.loads(client.recv(4096).decode())
 
+        # Print Information
+        print(f"Client {clientNumber} Information: {package}")
+
         # Asking for starter information?
         if package["Request"] == 0:
             # Send our game starter information
@@ -181,11 +184,12 @@ def startServer():
             target=clientHandler,
             args=(
                 clientSocket,
-                clientAddress,
+                # clientAddress,
                 clientNumber,
             ),
         )
         threadList.append(newHandler)
+        newHandler.start()
 
     # Lock server from incoming connections
     server.close()
