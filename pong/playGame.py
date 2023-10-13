@@ -212,7 +212,7 @@ def playGame(
         client.send(json.dumps({"Request": 2}).encode())
 
         # Our updated information
-        responsePackage = client.recv(4096).decode()
+        responsePackage = client.recv(512).decode()
         newInfo = json.loads(responsePackage)
 
         """Opponent Information Example

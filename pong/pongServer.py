@@ -96,10 +96,10 @@ def clientHandler(client: socket.socket, clientNumber: int):
             pass
 
         # Receive Infomation
-        package = json.loads(client.recv(4096).decode())
+        package = json.loads(client.recv(512).decode())
 
         # Print Information
-        print(f"Client {clientNumber} Information: {package}")
+        #print(f"Client {clientNumber} Information: {package}")
 
         # Asking for starter information?
         if package["Request"] == 0:
@@ -164,7 +164,7 @@ def clientHandler(client: socket.socket, clientNumber: int):
 def startServer():
     # Set up the socket
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(("localhost", 400))
+    server.bind(("localhost", 4000))
     server.listen()
 
     # Max Players: 2
@@ -184,10 +184,14 @@ def startServer():
             target=clientHandler,
             args=(
                 clientSocket,
-                # clientAddress,
+                #clientAddress,
                 clientNumber,
             ),
         )
+        # Increase client number 
+        clientNumber += 1
+
+        # Add to array handler
         threadList.append(newHandler)
         newHandler.start()
 

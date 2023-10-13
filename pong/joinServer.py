@@ -40,7 +40,7 @@ def joinServer(ip: str, port: str, errorLabel: tk.Label, app: tk.Tk) -> None:
         errorLabel.config(f"Starter Information Failed: {errorMessage}")
 
     # Server will use JSON to send information to unpack
-    responseJSON = client.recv(4096).decode()  # Client gets stuck here
+    responseJSON = client.recv(512).decode()  # Client gets stuck here
     response = json.loads(responseJSON)
 
     # Example of a server response
