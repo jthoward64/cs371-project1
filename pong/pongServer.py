@@ -6,71 +6,15 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
-import socket, threading, json
-
 # Use this file to write your server logic
 # You will need to support at least two clients
 # You will need to keep track of where on the screen (x,y coordinates) each paddle is, the score
 # for each player and where the ball is, and relay that to each client
 # I suggest you use the sync variable in pongClient.py to determine how out of sync your two
 # clients are and take actions to resync the games
-
-""" Last Modified October 9th, 2023 ************************************************************************************************ """
-"""
-    Information Example from Client on Game Update
-    
-    newInfo = {
-        # Type of Information: 0 = Game Start, 1 = Update Game
-        'Request': 1,
-
-        # Paddle Information
-        'paddleX': playerPaddleObj.rect.x,      -- Integer
-        'paddleY': playerPaddleObj.rect.y,      -- Integer
-        'paddleMoving': playerPaddleObj.moving, -- String
-
-        # Ball Information
-        'ballX': ball.rect.x,                   -- Integer
-        'ballY': ball.rect.y,                   -- Integer
-            
-        # Score Information
-        'scoreLeft':lScore,                     -- Integer
-        'scoreRight':rScore,                    -- Integer
-            
-        # Sync Status
-        'sync':sync                             -- Integer
-        }
-    
-    Example of Server Information
-"""
-# Use Lock when updating this information
-gameInfo = {
-    # Ball Information
-    "ballX": 0,
-    "ballY": 0,
-    # Score
-    "scoreLeft": 0,
-    "scoreRight": 0,
-    # Sync Status
-    "sync": 0,
-}
-
-# Free to update
-leftInfo = {
-    "ready": False,
-    "exitStatus": False,
-    "paddleX": 0,
-    "paddleY": 0,
-    "paddleMoving": "",
-}
-
-# Free to update
-rightInfo = {
-    "ready": False,
-    "exitStatus": False,
-    "paddleX": 0,
-    "paddleY": 0,
-    "paddleMoving": "",
-}
+from connectionHandler import *
+import socket
+import threading
 
 # Game Settings
 screenWidth = 640
@@ -82,163 +26,179 @@ shutdownClients = threading.Event()
 # Create a lock to protect information updates
 lockClients = threading.Lock()
 
-# Our thread instance when we have a new client
-def clientHandler(client: socket.socket, clientNumber: int) -> None:
-    global screenWidth, screenHeight, leftInfo, rightInfo
-    # Information on Starter Information when Client Sends: "starterPack"
-    newInfo = {
+# Our game information, atomic transactions (do not search if a key exist)
+gameInfo = {
+    0: {
         "ready": False,
+        "Moving": "",
+        "X": 0,
+        "Y": 0,
+    },
+    1: {
+        "ready": False,
+        "Moving": "",
+        "X": 0,
+        "Y": 0,
+    },
+    "Ball": {
+        "X": 0,
+        "Y": 0,
+    },
+    "Score": {
+        "lScore": 0,
+        "rScore": 0
+    },
+    "Sync": 0,
+}
+
+def clientControl(client:socket.socket, player:int) -> None:
+    clientInfo = {
+        "startGame": False,
+        "player": "left" if player == 0 else "right",
         "screenWidth": screenWidth,
         "screenHeight": screenHeight,
-        "playerPaddle": "left" if clientNumber == 0 else "right",
     }
 
-    # Begin receiving information
+    opponentPlayer = 0 if player == 1 else 1
+
+    # Continue running until we shut down
     while not shutdownClients.is_set():
-        # Check if score is greater than 4? Do we need to actually do anything here?
-        if gameInfo["scoreLeft"] > 4 or gameInfo["scoreRight"] > 5:
-            """Need to Modify *************************************************************************************************"""
-            pass
-
-        # Receive Infomation
-        receivedInfo = client.recv(512).decode()
-
-        # Did a client disconnect (empty data)
-        if not receivedInfo:
-            print(f"Client {clientNumber} disconnected.")
-            
-            # Notify the other client to exit the game
-            if clientNumber == 0:
-                leftInfo["exitStatus"] = True
-            else:
-                rightInfo["exitStatus"] = True
-            break
-
-        # Attempt to load our data, failed
         try:
-            package = json.loads(receivedInfo)
-        except json.JSONDecodeError:
-            print(f"Error, could not decode JSON from client {clientNumber}: {receivedInfo}")
+            # Grab our clients request
+            request = client.recv(512).decode()
+
+        # Did we get an error?
+        except ConnectionResetError:
+            request = False
+
+        # If it doesn't exist, client closed connection
+        if not request:
+            print("Client Exited Early")
+            shutdownClients.set()
             continue
 
-        # Asking for starter information?
-        if package["Request"] == 0:
-            # Which client is ready?
-            if clientNumber == 0:
-                leftInfo["ready"] = True
-            else:
-                rightInfo["ready"] = True
+        # Did we successfully unpack our information?
+        success, newInfo = unpackInfo(request)
+        if not success:
+            continue
+        
+        # Client is checking if it can start
+        if newInfo["Type"] == "Start":
+            # Notify our client is ready to start
+            gameInfo[player]["ready"] = True
 
-            # Do we inform the clients to start?
-            if leftInfo["ready"] == True and rightInfo["ready"] == True:
-                newInfo["ready"] = True
+            # Is the other client ready to start?
+            if gameInfo[0]["ready"] and gameInfo[1]["ready"]:
+                clientInfo["startGame"] = True
 
-            # Send our game starter information
-            client.send(json.dumps(newInfo).encode())
+            # Send information to client
+            success = sendInfo(client, clientInfo)
 
-        # Sending us an update?
-        if package["Request"] == 1:
-            # Update information
-            if clientNumber == 0:
-                # Left is updating
-                leftInfo["paddleMoving"] = package["paddleMoving"]
-                leftInfo["paddleX"] = package["paddleX"]
-                leftInfo["paddleY"] = package["paddleY"]
-            else:
-                # Right is updating
-                rightInfo["paddleMoving"] = package["paddleMoving"]
-                rightInfo["paddleX"] = package["paddleX"]
-                rightInfo["paddleY"] = package["paddleY"]
+            # End connection/game, timed out
+            if not success:
+                print(f"Client {player} timed out, game shutting down")
+                shutdownClients.set()
 
-            # Update Sync if ahead
-            if package["sync"] > gameInfo["sync"]:
+        '''
+        Example of Update
+        
+        update = {
+            "Type": "Update",
+            "Paddle": {
+                "Moving":"",
+                "X": 0,
+                "Y": 1,
+            }
+            "Score": {
+                "lScore":0,
+                "rScore":0,
+            }
+            "Ball": {
+                "X":0,
+                "Y":0,
+            }
+            "Sync": 0,
+        }
+        '''
+
+        # Client is updating the server
+        if newInfo["Type"] == "Update":
+            # Update the Players' Information
+            gameInfo[player]["Moving"] = newInfo["Paddle"]["Moving"]
+            gameInfo[player]["X"] = newInfo["Paddle"]["X"]
+            gameInfo[player]["Y"] = newInfo["Paddle"]["Y"]
+
+            # Do we update the ball and score?
+            if newInfo["Sync"] > gameInfo["Sync"]:
                 with lockClients:
-                    # Update information
-                    gameInfo["sync"] = package["sync"]
-                    gameInfo["ballX"] = package["ballX"]
-                    gameInfo["ballY"] = package["ballY"]
-                    gameInfo["scoreLeft"] = package["scoreLeft"]
-                    gameInfo["scoreRight"] = package["scoreRight"]
+                    gameInfo["Sync"] = newInfo["Sync"]
+                    gameInfo["Ball"] = newInfo["Ball"]
+                    gameInfo["Score"] = newInfo["Score"]
 
-        # Requesting an update?
-        if package["Request"] == 2:
-            # Send Updated Information
-            # Left Paddle, need to send Right's Information
-            # Right Paddle, need to send Left's Information
-            client.send(
-                json.dumps(
-                    {
-                        # Did the other player disconnect?
-                        "exitStatus": rightInfo["exitStatus"] if clientNumber == 0 else leftInfo["exitStatus"],
+        # Client is grabbing information
+        if newInfo["Type"] == "Grab":
+            toSend = {
+                "Type": "Grab",
+                "Paddle": gameInfo[opponentPlayer],
+                "Ball": gameInfo["Ball"],
+                "Score": gameInfo["Score"],
+                "Sync": gameInfo["Sync"]
+            }
 
-                        # Which way is other player's paddle moving? And its location?
-                        "paddleMoving": rightInfo["paddleMoving"] if clientNumber == 0 else leftInfo["paddleMoving"],
-                        "paddleX": rightInfo["paddleX"] if clientNumber == 0 else leftInfo["paddleX"],
-                        "paddleY": rightInfo["paddleY"] if clientNumber == 0 else leftInfo["paddleY"],
+            # Send the information, did we succeed?
+            success = sendInfo(client, toSend)
+            if not success:
+                # Can modify to attempt to send again, if we reach so many failed attempts shut down the game
+                pass
 
-                        # Where is the ball?
-                        "ballX": gameInfo["ballX"],
-                        "ballY": gameInfo["ballY"],
-
-                        # What is the score?
-                        "scoreLeft": gameInfo["scoreLeft"],
-                        "scoreRight": gameInfo["scoreRight"],
-
-                        # Update the sync to sync the client
-                        "sync": gameInfo["sync"],
-                    }
-                ).encode()
-            )
-
-    # Close the client, end the thread
     client.close()
 
 
-# Our main function to grab connections
-def startServer():
-    # Set up the socket
+def create_server(host='localhost', port=4000) -> socket.socket:
+    # Creates a socket and binds it to a host/port
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(("localhost", 4000))
+    server.bind((host, port))
+
+    # Listens for clients
     server.listen()
+    return server
 
-    # Max Players: 2
-    maxClientAllowed = 2
-    clientNumber = 0
+def main() -> None:
+    print("Server Start")
 
-    # Thread Control
-    threadList = []
+    # Create our server
+    server = create_server()
 
-    # Open a path for new connections
-    while clientNumber < maxClientAllowed:
-        # Accept a new client
-        clientSocket, clientAddress = server.accept() # Ignored clientAddress, not needed
+    # Only allow 2 players to connect
+    maxPlayers = 2
+    currentPlayers = 0
 
-        # Create a new thread to handle the client's incoming information
-        newHandler = threading.Thread(
-            target=clientHandler,
-            args=(
-                clientSocket,
-                #clientAddress, Not Needed
-                clientNumber,
-            ),
-        )
-        # Increase client number 
-        clientNumber += 1
+    # Hold our client threads
+    clientThreads = []
 
-        # Add to array handler
-        threadList.append(newHandler)
-        newHandler.start()
+    # Grab the incoming client connections
+    while currentPlayers < maxPlayers:
+        # Accept our new client
+        client, _ = server.accept()
 
-    # Lock server from incoming connections
+        # Create a new thread
+        newThread = threading.Thread(target=clientControl, args=(client, currentPlayers))
+        newThread.start()
+
+        # Add to our list of threads
+        clientThreads.append(newThread)
+
+        # Increment our currentPlayers
+        currentPlayers += 1
+
+    # Close our server to incoming connections
     server.close()
 
-    # Wait for clients to disconnect
-    for thread in threadList:
+    # Wait for our threads to finish (clients all close)
+    for thread in clientThreads:
         thread.join()
 
     print("Server Shutdown")
 
-
 if __name__ == "__main__":
-    startServer()
-""" Last Modified October 9th, 2023 ************************************************************************************************ """
+    main()

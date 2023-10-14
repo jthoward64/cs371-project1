@@ -6,15 +6,85 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
-from joinServer import joinServer
-
-import tkinter as tk
-
 from assets.code.helperCode import *
+from connectionHandler import *
+from playGame import playGame
+import tkinter as tk
+import socket
 
+# Updates our errorLabel
+def updateLabel(errorLabel: tk.Label, message:str, app: tk.Tk) -> None:
+    errorLabel.config(text=message)
+    app.update()
+
+# This is where you will connect to the server to get the info required to call the game loop.  Mainly
+# the screen width, height and player paddle (either "left" or "right")
+# If you want to hard code the screen's dimensions into the code, that's fine, but you will need to know
+# which client is which
+def joinServer(ip: str, port: str, errorLabel: tk.Label, app: tk.Tk) -> None:
+    success, client = clientJoin(ip, port)
+    if not success:
+        # errorLabel, Message = client error, app
+        updateLabel(errorLabel, f"Error, unable to connect to {ip}, port: {port}", app)
+
+    # Ensure we have a client connected
+    if type(client) == socket.socket:
+
+        startGame = False
+        pingFails = 0
+
+        updateLabel(errorLabel, f"Waiting for Opponent to Join", app)
+
+        while not startGame and pingFails < 10:
+            # Ask the server to tell us when to start the game
+            success = sendInfo(client, {"Type": "Start"})
+
+            # Begin waiting to play
+            try:
+                unpackedResponse = client.recv(512).decode()
+            # Did we get an error?
+            except ConnectionResetError:
+                unpackedResponse = False
+
+            # Check if the server quit
+            if not unpackedResponse:
+                # Exit, server disconnected
+                print("Server Error: Did not respond")
+                pingFails += 1
+                continue
+
+            # Unpack the response
+            unpacked, response = unpackInfo(unpackedResponse)
+
+            # Did we error in unpacking?
+            if not unpacked:
+                continue
+            
+            if response["startGame"]:
+                # Don't loop again
+                startGame = True
+
+                # Hide window and start the game
+                app.withdraw()
+                playGame(
+                    response["screenWidth"],
+                    response["screenHeight"],
+                    response["player"],
+                    client,
+                )
+
+        # Disconnect from client
+        client.close()
+        
+        # Did we disconnect due to pingFails?
+        if pingFails == 10:
+            updateLabel(errorLabel, "Server Failed to Respond after 10 Attempts", app)
+        else:
+            # Quit the app, game is over
+            app.quit()
 
 # This displays the opening screen, you don't need to edit this (but may if you like)
-def startScreen():
+def startScreen() -> None:
     app = tk.Tk()
     app.title("Server Info")
 

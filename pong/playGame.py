@@ -6,21 +6,14 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
-import pygame
-import tkinter as tk
-import sys
-import socket
-import json
-
+from connectionHandler import *
 from assets.code.helperCode import *
-
+import pygame, sys, socket
 
 # This is the main game loop.  For the most part, you will not need to modify this.  The sections
 # where you should add to the code are marked.  Feel free to change any part of this project
 # to suit your needs.
-def playGame(
-    screenWidth: int, screenHeight: int, playerPaddle: str, client: socket.socket
-) -> None:
+def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: socket.socket) -> None:
     # Pygame inits
     pygame.mixer.pre_init(44100, -16, 2, 2048)
     pygame.init()
@@ -88,44 +81,54 @@ def playGame(
         # Your code here to send an update to the server on your paddle's information,
         # where the ball is and the current score.
         # Feel free to change when the score is updated to suit your needs/requirements
+        """ Last Modified October 14th, 2023 ************************************************************************************************ """
 
-        """ Last Modified October 8th, 2023 ************************************************************************************************ """
+        '''
+        Example of Update
+        
+        update = {
+            "Type": "Update",
+            "Paddle": {
+                "Moving":"",
+                "X": 0,
+                "Y": 1,
+            }
+            "Score": {
+                "lScore":0,
+                "rScore":0,
+            }
+            "Ball": {
+                "X":0,
+                "Y":0,
+            }
+            "Sync": 0,
+        }
+        '''
 
-        """
-            Notes:
-            1) Look up playerPaddleObj
-            2) What is the variable holding the position of the ball
-            3) What is the current score variable
-            4) Remember syncing
-        """
-
-        informationToSend = {
-            # Type of Information: 0 = Game Start, 1 = Update Game, 2 = Server Update
-            "Request": 1,
-            # Paddle Information
-            "paddleX": playerPaddleObj.rect.x,
-            "paddleY": playerPaddleObj.rect.y,
-            "paddleMoving": playerPaddleObj.moving,
-            # Ball Information
-            "ballX": ball.rect.x,
-            "ballY": ball.rect.y,
-            # Score Information
-            "scoreLeft": lScore,
-            "scoreRight": rScore,
-            # Sync Status
-            "sync": sync,
+        update = {
+            "Type": "Update",
+            "Paddle": {
+                "Moving": playerPaddleObj.moving,
+                "X": playerPaddleObj.rect.x,
+                "Y": playerPaddleObj.rect.y,
+            },
+            "Score": {
+                "lScore": lScore,
+                "rScore": rScore,
+            },
+            "Ball": {
+                "X": ball.rect.x,
+                "Y": ball.rect.y,
+            },
+            "Sync": sync
         }
 
-        # Bundle it into JSON
-        packageDump = json.dumps(informationToSend).encode()
+        success = sendInfo(client, update)
+        if not success:
+            # Add an option here in case it fails to send to the server
+            pass
 
-        # Send the information
-        try:
-            client.send(packageDump)
-        except socket.error as errorMessage:
-            print(f"Error on client update to server: {errorMessage}")
-
-        """ Last Modified October 8th, 2023 ************************************************************************************************ """
+        """ Last Modified October 14th, 2023 ************************************************************************************************ """
 
         # =========================================================================================
 
@@ -208,11 +211,20 @@ def playGame(
         # Send your server update here at the end of the game loop to sync your game with your
         # opponent's game
 
-        # Inform the server we want an update
-        client.send(json.dumps({"Request": 2}).encode())
+        """ Last Modified October 14th, 2023 ************************************************************************************************ """
 
-        # Our updated information
-        responsePackage = client.recv(512).decode()
+        success = sendInfo(client, {"Type": "Grab"})
+
+        if not success:
+            # What do we do when there isn't a success?
+            # I suggest continue or looping until we get a success
+            pass
+        
+        try:
+            # Our updated information
+            responsePackage = client.recv(512).decode()
+        except ConnectionResetError:
+            responsePackage = False
 
         # Did our server disconnect?
         if not responsePackage:
@@ -221,58 +233,46 @@ def playGame(
             exit()
 
         # Try opening the JSON
-        try:
-            newInfo = json.loads(responsePackage)
-        except json.JSONDecodeError:
-            print("Error failed to grab Server Info using Request 2")
+        success, newInfo = unpackInfo(responsePackage)
+
+        if not success:
+            # Failed to unpack, skip because we can't grab info
+            # Can also add a loop here to attempt again a few times
             continue
-
-        """Opponent Information Example
         
-        newInfo = {
-            # Type of Information: 0 = Game Start, 1 = Update Game, 2 = Server Update
-            'Request': 3,
-
-            # Did the opponent quit?
-            'exitStatus': False,
-            
-            # Paddle Information
-            'paddleX': opponentPaddleObj.rect.x,
-            'paddleY': opponentPaddleObj.rect.y,
-            'paddleMoving': opponentPaddleObj.moving,
-
-            # Ball Information
-            'ballX': ball.rect.x,
-            'ballY': ball.rect.y,
-            
-            # Score Information
-            'scoreLeft':lScore,
-            'scoreRight':rScore,
-            
-            # Sync Status
-            'sync':sync
+        '''
+        Example of Update
+        
+        update = {
+            "Type": "Grab",
+            "Paddle": {
+                "Moving":"",
+                "X": 0,
+                "Y": 1,
+            }
+            "Score": {
+                "lScore":0,
+                "rScore":0,
+            }
+            "Ball": {
+                "X":0,
+                "Y":0,
+            }
+            "Sync": 0,
         }
-        
-        """
+        '''
 
-        '''################################ MODIFY FOR WHEN OPPONENT EXIT (exitStatus) ################################'''
-        if newInfo["exitStatus"] == True:
-            print("Opponent Quit")
-            pygame.quit()
-            exit()
-        '''################################ MODIFY FOR WHEN OPPONENT EXIT (exitStatus) ################################'''
-        
         # Update opponent paddle information
-        opponentPaddleObj.rect.x = newInfo["paddleX"]
-        opponentPaddleObj.rect.y = newInfo["paddleY"]
-        opponentPaddleObj.moving = newInfo["paddleMoving"]
+        opponentPaddleObj.rect.x = newInfo["Paddle"]["X"]
+        opponentPaddleObj.rect.y = newInfo["Paddle"]["Y"]
+        opponentPaddleObj.moving =newInfo["Paddle"]["Moving"]
 
         # Check if we need to update the ball and score
-        if newInfo["sync"] > sync:
-            ball.rect.x = newInfo["ballX"]
-            ball.rect.y = newInfo["ballY"]
-            lScore = newInfo["scoreLeft"]
-            rScore = newInfo["scoreRight"]
-            sync = newInfo["sync"]
+        if newInfo["Sync"] > sync:
+            ball.rect.x = newInfo["Ball"]["X"]
+            ball.rect.y = newInfo["Ball"]["Y"]
+            lScore = newInfo["Score"]["lScore"]
+            rScore = newInfo["Score"]["rScore"]
+            sync = newInfo["Sync"]
 
-        # =========================================================================================
+        """ Last Modified October 14th, 2023 ************************************************************************************************ """
