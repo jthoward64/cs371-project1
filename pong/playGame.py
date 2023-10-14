@@ -6,7 +6,7 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
-from connectionHandler import *
+from connectionHandler import sendInfo, unpackInfo
 from assets.code.helperCode import *
 import pygame, sys, socket
 

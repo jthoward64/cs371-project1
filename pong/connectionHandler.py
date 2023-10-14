@@ -34,6 +34,16 @@ def unpackInfo(request:str) -> Tuple[bool, dict]:
     
     return True, requestInfo
 
+# Creates a server
+def createServer(host='localhost', port=4000) -> socket.socket:
+    # Creates a socket and binds it to a host/port
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind((host, port))
+
+    # Listens for clients
+    server.listen()
+    return server
+
 # Attempts to join the server
 def clientJoin(ip: str, port: str) -> Tuple[bool, Union[socket.socket, socket.error]]:
     # Create our client socket

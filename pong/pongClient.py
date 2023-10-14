@@ -7,7 +7,7 @@
 # =================================================================================================
 
 from assets.code.helperCode import *
-from connectionHandler import *
+from connectionHandler import clientJoin, unpackInfo, sendInfo
 from playGame import playGame
 import tkinter as tk
 import socket

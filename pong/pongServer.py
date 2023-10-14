@@ -124,9 +124,10 @@ def clientControl(client:socket.socket, player:int) -> None:
         # Client is updating the server
         if newInfo["Type"] == "Update":
             # Update the Players' Information
-            gameInfo[player]["Moving"] = newInfo["Paddle"]["Moving"]
-            gameInfo[player]["X"] = newInfo["Paddle"]["X"]
-            gameInfo[player]["Y"] = newInfo["Paddle"]["Y"]
+            with lockClients:
+                gameInfo[player]["Moving"] = newInfo["Paddle"]["Moving"]
+                gameInfo[player]["X"] = newInfo["Paddle"]["X"]
+                gameInfo[player]["Y"] = newInfo["Paddle"]["Y"]
 
             # Do we update the ball and score?
             if newInfo["Sync"] > gameInfo["Sync"]:
@@ -154,7 +155,7 @@ def clientControl(client:socket.socket, player:int) -> None:
     client.close()
 
 
-def create_server(host='localhost', port=4000) -> socket.socket:
+def createServer(host='localhost', port=4000) -> socket.socket:
     # Creates a socket and binds it to a host/port
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((host, port))
@@ -167,7 +168,7 @@ def main() -> None:
     print("Server Start")
 
     # Create our server
-    server = create_server()
+    server = createServer()
 
     # Only allow 2 players to connect
     maxPlayers = 2
@@ -197,7 +198,7 @@ def main() -> None:
     # Wait for our threads to finish (clients all close)
     for thread in clientThreads:
         thread.join()
-
+    
     print("Server Shutdown")
 
 if __name__ == "__main__":
