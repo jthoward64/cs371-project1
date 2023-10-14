@@ -12,7 +12,7 @@
 # for each player and where the ball is, and relay that to each client
 # I suggest you use the sync variable in pongClient.py to determine how out of sync your two
 # clients are and take actions to resync the games
-from connectionHandler import *
+from connectionHandler import sendInfo, createServer, unpackInfo
 import socket
 import threading
 
@@ -52,9 +52,11 @@ gameInfo = {
 }
 
 def clientControl(client:socket.socket, player:int) -> None:
+    global gameInfo, shutdownClients, lockClients, screenWidth, screenHeight
+
     clientInfo = {
         "startGame": False,
-        "player": "left" if player == 0 else "right",
+        "player": "left" if player == 1 else "right",
         "screenWidth": screenWidth,
         "screenHeight": screenHeight,
     }
@@ -138,31 +140,22 @@ def clientControl(client:socket.socket, player:int) -> None:
 
         # Client is grabbing information
         if newInfo["Type"] == "Grab":
-            toSend = {
-                "Type": "Grab",
-                "Paddle": gameInfo[opponentPlayer],
-                "Ball": gameInfo["Ball"],
-                "Score": gameInfo["Score"],
-                "Sync": gameInfo["Sync"]
-            }
+            with lockClients:
+                toSend = {
+                    "Type": "Grab",
+                    "Paddle": gameInfo[opponentPlayer],
+                    "Ball": gameInfo["Ball"],
+                    "Score": gameInfo["Score"],
+                    "Sync": gameInfo["Sync"]
+                }
 
-            # Send the information, did we succeed?
-            success = sendInfo(client, toSend)
-            if not success:
-                # Can modify to attempt to send again, if we reach so many failed attempts shut down the game
-                pass
+                # Send the information, did we succeed?
+                success = sendInfo(client, toSend)
+                if not success:
+                    # Can modify to attempt to send again, if we reach so many failed attempts shut down the game
+                    pass
 
     client.close()
-
-
-def createServer(host='localhost', port=4000) -> socket.socket:
-    # Creates a socket and binds it to a host/port
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((host, port))
-
-    # Listens for clients
-    server.listen()
-    return server
 
 def main() -> None:
     print("Server Start")

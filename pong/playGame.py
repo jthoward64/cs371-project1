@@ -18,6 +18,9 @@ def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: soc
     pygame.mixer.pre_init(44100, -16, 2, 2048)
     pygame.init()
 
+    currentPlayer = 1 if playerPaddle == "left" else 2
+    pygame.display.set_caption(f"Player: {currentPlayer}")
+
     # Constants
     WHITE = (255, 255, 255)
     clock = pygame.time.Clock()
