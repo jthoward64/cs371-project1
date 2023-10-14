@@ -213,13 +213,28 @@ def playGame(
 
         # Our updated information
         responsePackage = client.recv(512).decode()
-        newInfo = json.loads(responsePackage)
+
+        # Did our server disconnect?
+        if not responsePackage:
+            print("Server Disconnected")
+            pygame.quit()
+            exit()
+
+        # Try opening the JSON
+        try:
+            newInfo = json.loads(responsePackage)
+        except json.JSONDecodeError:
+            print("Error failed to grab Server Info using Request 2")
+            continue
 
         """Opponent Information Example
         
         newInfo = {
             # Type of Information: 0 = Game Start, 1 = Update Game, 2 = Server Update
             'Request': 3,
+
+            # Did the opponent quit?
+            'exitStatus': False,
             
             # Paddle Information
             'paddleX': opponentPaddleObj.rect.x,
@@ -239,6 +254,14 @@ def playGame(
         }
         
         """
+
+        '''################################ MODIFY FOR WHEN OPPONENT EXIT (exitStatus) ################################'''
+        if newInfo["exitStatus"] == True:
+            print("Opponent Quit")
+            pygame.quit()
+            exit()
+        '''################################ MODIFY FOR WHEN OPPONENT EXIT (exitStatus) ################################'''
+        
         # Update opponent paddle information
         opponentPaddleObj.rect.x = newInfo["paddleX"]
         opponentPaddleObj.rect.y = newInfo["paddleY"]

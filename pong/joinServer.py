@@ -33,27 +33,70 @@ def joinServer(ip: str, port: str, errorLabel: tk.Label, app: tk.Tk) -> None:
     # Get the required information from your server (screen width, height & player paddle, "left or "right)
 
     # Request the starter information from the server
-    package = json.dumps({"Request": 0})
+    package = json.dumps({"Request": 0}).encode()
     try:
-        client.send(package.encode())
+        client.send(package)
     except socket.error as errorMessage:
-        errorLabel.config(f"Starter Information Failed: {errorMessage}")
+        errorLabel.config(text=f"Starter Information Failed: {errorMessage}")
+        app.update()
 
-    # Server will use JSON to send information to unpack
-    responseJSON = client.recv(512).decode()  # Client gets stuck here
-    response = json.loads(responseJSON)
+    # Await response from server
+    errorLabel.config(text=f"Waiting for Opponent to Join")
+    app.update()
 
     # Example of a server response
     """
     response = {
+        'ready': False,
         'screenWidth':0,
         'screenHeight':0,
         'playerPaddle': "",
     }
     """
 
+    # Server will use JSON to send information to unpack
+    responseJSON = client.recv(512).decode()
+    
+    try:
+        response = json.loads(responseJSON)
+    except json.JSONDecodeError:
+        print("Server Disconnected")
+
+        # Disconnect and Quit
+        client.close()
+        app.quit()
+
+        # Exit the program
+        exit()
+
+    # Wait until the server informs us to play
+    while response["ready"] == False:
+
+        # Request the server for an update again
+        try:
+            client.send(package)
+        except socket.error as errorMessage:
+            errorLabel.config(text=f"Starter Information Failed: {errorMessage}")
+            app.update()
+            continue
+
+        responseJSON = client.recv(512).decode()
+
+        try:
+            # Reload data
+            response = json.loads(responseJSON)
+        except json.JSONDecodeError:
+            print("Server Disconnected")
+
+            # Disconnect and Quit
+            client.close()
+            app.quit()
+
+            # Exit the program
+            exit()
+
     # If you have messages you'd like to show the user use the errorLabel widget like so
-    errorLabel.config(text=f"Connected to game. IP: {ip}, Port: {port}")
+    #errorLabel.config(text=f"Connected to game. IP: {ip}, Port: {port}")
 
     # You may or may not need to call this, depending on how many times you update the label
     # errorLabel.update(text=f'Game Start')
