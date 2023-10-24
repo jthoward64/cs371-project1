@@ -8,6 +8,9 @@
 | John Stacy    | j.stacy@uky.edu |
 | Juliann Hyatt | jnhy222@uky.edu |
 
+## Current Version | Release: 3.0 | pong
+## Experimental Version | Releases: 4.0 | newpong
+
 ## Versioning
 
 Github Link: https://github.com/jthoward64/cs371-project1.git
