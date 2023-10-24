@@ -6,7 +6,7 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
-from connectionHandler import sendInfo, unpackInfo
+from handler.connectionHandler import sendInfo, unpackInfo
 from assets.code.helperCode import *
 import pygame, socket
 
@@ -153,6 +153,7 @@ def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: soc
             textRect.centerx = int(screenWidth / 2)
             textRect.centery = int(screenHeight / 2)
             winMessage = screen.blit(textSurface, textRect)
+            ''' ---------------------------------------------------------------- Modify for Game Restart ---------------------------------------------------------------- '''
         else:
             # ==== Ball Logic =====================================================================
             ball.updatePos()

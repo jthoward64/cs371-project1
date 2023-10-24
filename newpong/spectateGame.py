@@ -6,7 +6,7 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
-from connectionHandler import sendInfo, unpackInfo
+from handler.connectionHandler import sendInfo, unpackInfo
 from assets.code.helperCode import *
 import pygame, socket
 
@@ -49,8 +49,6 @@ def playGame(screenWidth: int, screenHeight: int, client: socket.socket) -> None
 
     lScore = 0
     rScore = 0
-
-    sync = 0
 
     while True:
         # Wiping the screen

@@ -12,14 +12,11 @@
 # for each player and where the ball is, and relay that to each client
 # I suggest you use the sync variable in pongClient.py to determine how out of sync your two
 # clients are and take actions to resync the games
-from connectionHandler import sendInfo, createServer, unpackInfo
+from handler.connectionHandler import sendInfo, createServer, unpackInfo
+from handler.gameConfigure import screenWidth, screenHeight
 from typing import Union, Dict
 import socket
 import threading
-
-# Game Settings
-screenWidth:int = 640
-screenHeight:int = 480
 
 # Create an event to shutdown
 shutdownClients:threading.Event = threading.Event()

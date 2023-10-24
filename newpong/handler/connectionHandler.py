@@ -7,6 +7,7 @@
 # =================================================================================================
 
 from typing import Tuple, Union
+from gameConfigure import ip, port
 import json, socket
 
 # Attempts to send a message to the client
@@ -35,17 +36,17 @@ def unpackInfo(request:str) -> Tuple[bool, dict]:
     return True, requestInfo
 
 # Creates a server
-def createServer(host:str='localhost', port:str='4000') -> socket.socket:
+def createServer() -> socket.socket:
     # Creates a socket and binds it to a host/port
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((host, port))
+    server.bind((ip, int(port)))
 
     # Listens for clients
     server.listen()
     return server
 
 # Attempts to join the server
-def clientJoin(ip: str, port: str) -> Tuple[bool, Union[socket.socket, socket.error]]:
+def clientJoin() -> Tuple[bool, Union[socket.socket, socket.error]]:
     # Create our client socket
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

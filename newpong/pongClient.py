@@ -6,13 +6,15 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
-from connectionHandler import clientJoin, unpackInfo, sendInfo
+from handler.connectionHandler import clientJoin, unpackInfo, sendInfo
+from handler.gameConfigure import *
+from handler.frameHandler import *
+from handler.appHandler import *
+
 from assets.code.helperCode import *
-from playGame import playGame
-from appHandler import *
-from frameHandler import *
-from gameConfigure import *
 import socket, time, threading
+
+from playGame import playGame
 
 # Updates our errorLabel
 def updateLabel(errorLabel: tk.Label, message:str, app: tk.Tk) -> None:
@@ -31,11 +33,11 @@ def makeAccount(username:str, password:str, passwordConfirm:str, errorLabel:tk.L
 
 # Takes us to our registration page
 def accountMenu(app:mainApp) -> None:
-    app.changeFrame("createAccount")
+    app.changeFrame("accountCreation")
 
 # Takes us back to our regular login page
 def mainMenu(app:mainApp) -> None:
-    app.changeFrame("mainScreen")
+    app.changeFrame("loginScreen")
 
 # Countdown timer
 def sleepWait(timeOut:int, errorLabel:tk.Label) -> None:
@@ -61,7 +63,7 @@ def connectServer(errorLabel:tk.Label, app:mainApp) -> None:
             sleepWait(2**(numTries), errorLabel)
     
         # Start our client
-        success, client = clientJoin(ip, port)
+        success, client = clientJoin()
         if success and type(client) == socket.socket:
             app.client = client
             app.changeFrame("loginScreen")
@@ -84,10 +86,6 @@ def onClose(app) -> None:
     app.root.destroy()
 
 def startScreen() -> None:
-    # Window information
-    screenWidth = 640
-    screenHeight = 480
-
     # Create our Application
     # def __init__(self:object, screenWidth:int, screenHeight:int) -> None:
     app = mainApp()
