@@ -10,6 +10,10 @@
 ip:str = 'localhost'
 port:str = '4000'
 
+# Leaderboard Information
+leaderboardip:str = 'localhost'
+leaderboardport:str = '4500'
+
 # Window information
 screenWidth:int = 640
 screenHeight:int = 480

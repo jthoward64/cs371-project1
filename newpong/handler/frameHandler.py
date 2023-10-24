@@ -6,7 +6,7 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
-from appHandler import *
+from newpong.handler.appHandler import *
 from pongClient import loginServer, mainMenu, makeAccount, accountMenu
 
 def loginScreen(app:mainApp) -> frameHolder:

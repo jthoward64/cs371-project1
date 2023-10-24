@@ -7,7 +7,7 @@
 # =================================================================================================
 
 from typing import Tuple, Union
-from gameConfigure import ip, port
+from newpong.handler.gameConfigure import ip, port
 import json, socket
 
 # Attempts to send a message to the client
