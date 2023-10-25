@@ -9,7 +9,10 @@
 | Juliann Hyatt | jnhy222@uky.edu |
 
 ## Current Version | Release: 3.0 | pong
-## Experimental Version | Releases: 4.0 | newpong
+This is the current active version of the Pong Game
+
+## Experimental Version | Releases: 5.0 | pong-v5
+This is the experimental version of the Pong Game
 
 ## Versioning
 
@@ -27,7 +30,5 @@ Run the following line to install the required libraries for this project:
 
 `pip3 install -r requirements.txt`
 
-## Known Bugs
-
-- The server doesn't work because the logic isn't yet written.
-- The client doesn't speak to the server
+## Deprecated
+- Version 4.0 (pong-v4) is deprecated
