@@ -8,7 +8,7 @@
 
 from typing import Tuple, Union
 from configureSettings import serverIP, serverPort
-import json, socket
+import json, socket, ssl
 
 # Attempts to send a message to the client
 def sendInfo(client:socket.socket, infoToSend:dict) -> bool:
@@ -35,6 +35,25 @@ def unpackInfo(request:str) -> Tuple[bool, dict]:
     
     return True, requestInfo
 
+# Attempts to join the server
+def clientJoin() -> Tuple[bool, Union[socket.socket, socket.error]]:
+    # Create our client socket
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    ## We Need To Add Encryption ##
+    ## We Need To Add Encryption ##
+    ## We Need To Add Encryption ##
+    ## We Need To Add Encryption ##
+    ## We Need To Add Encryption ##
+
+    # Attempt to connect to server
+    try:
+        client.connect((serverIP, int(serverPort)))
+    except socket.error as errorMessage:
+        return False, errorMessage
+
+    return True, client
+
 # Creates a server
 def createServer() -> socket.socket:
     # Creates a socket and binds it to a host/port
@@ -50,16 +69,3 @@ def createServer() -> socket.socket:
     # Listens for clients
     server.listen()
     return server
-
-# Attempts to join the server
-def clientJoin() -> Tuple[bool, Union[socket.socket, socket.error]]:
-    # Create our client socket
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # Attempt to connect to server
-    try:
-        client.connect((serverIP, int(serverPort)))
-    except socket.error as errorMessage:
-        return False, errorMessage
-
-    return True, client

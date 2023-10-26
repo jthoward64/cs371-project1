@@ -1,62 +1,52 @@
+# Socket Helper
+from Helpers.connectionHandler import sendInfo, unpackInfo, createServer
+
+# Server Settings
+from Helpers.configureSettings import receiverSize, serverIP, serverPort
+
+# Database
 from Database.dbHandler import Database
 
-from Helpers.configureSettings import receiverSize
-from Helpers.connectionHandler import *
-
-from typing import Optional
+# Type Hinting
+from typing import Dict, Union, Optional, List
 from types import FrameType
-import threading, signal, errno
+from threading import Lock
+
+# Processing/Threads/Sockets/Random/Error Handling/Signals
+import multiprocessing, threading, socket, random, errno, signal
+
+# Our gameInstances
+from gameInstance import gameInstance
+
+# Do we shut down our server?
+serverShutdown = threading.Event()
 
 # Connect to our database
 playerDatabase = Database()
 
-# Our gameHolder is a dictionary containing game instances. 
-# Each game instance is a different game going on at the same time.
-# Each game instance contains:
-    # Running: Is the game running?
-    # leftPlayer and rightPlayer: Is the player "Ready" to play? Is the player wanting to "playAgain"?
+# List of all gameInstance objects
+gameManager = multiprocessing.Manager()
+gameInstances = gameManager.dict()
 
-gameHolder = {
-    'exampleInstance': {
-        'Running': False, # Is there a current game running?
-        'leftPlayer': {
-            'Ready': False, # Player is ready for first game
-            'playAgain': False, # Does the player wish to play again?
-            'paddleInfo': {
-                'X':0, # Position X
-                'Y':0, # Position Y
-                'Moving': '', # Which direction is the paddle moving
-            }
-        },
-        'rightPlayer': {
-            'Ready': False, # Player is ready for first game
-            'playAgain': False, # Does the player wish to play again?
-            'paddleInfo': {
-                'X':0, # Position X
-                'Y':0, # Position Y
-                'Moving': '', # Which direction is the paddle moving
-            }
-        },
-        'ballInfo': {
-            'X':0, # Ball Poisition X
-            'Y':0, # Ball Position Y
-        },
-        'scoreInfo': {
-            'lScore':0, # Current game score of left
-            'rScore':0, # Current game score of right
-        },
-        'gameHistory': {
-            'leftPlayer':0, # How many times the leftPlayer has won
-            'rightPlayer':0, # How many times the rightPlayer has won
-        },
-        'syncNumber': 0, # Used to identify the current syncing (who is ahead)
-        'gameEnd': threading.Event(), # Used to notify all clients to exit the game instance back to main menu
-        'gameLock': threading.Lock() # Used when updating the instance settings
-    },
-}
+# multiprocessing.Process(target=newInstance, args=(gameInstances, clientSocket, clientInfo['Username']))
+def newInstance(gamesList:dict, Creator:socket.socket, Username:str) -> None:
+    
+    # Grab new gameInstances
+    newName = f'IG{random.randint(1,9999)}'
+    while newName in gamesList:
+        newName = f'IG{random.randint(1,9999)}'
+    
+    # Create new gameInstance
+    newGame = gameInstance(newName, Username)
 
-# Mechanism to shutdown the server
-serverShutdown = threading.Event()
+    # Add to gameInstances
+    gameInstances[newName] = newGame
+
+    # Join Game
+    newGame.joinGame(Username, Creator, True)
+
+    # Game has Ended, remove from gameInstances
+    gameInstances.pop(newName)
 
 def clientControl(clientSocket:socket.socket, addressInfo:socket._RetAddress) -> None:
 
@@ -64,9 +54,8 @@ def clientControl(clientSocket:socket.socket, addressInfo:socket._RetAddress) ->
         # We logged in?
         'loggedIn': False,
 
-        # We playing game or spectating? If so, which gameHolder instance?
+        # We playing game? If so, which gameHolder instance?
         'playingGame': False,
-        'spectating': False,
         'gameInstance': None,
 
         # The username and initals of the player
@@ -78,6 +67,8 @@ def clientControl(clientSocket:socket.socket, addressInfo:socket._RetAddress) ->
 
         # Grab the next data packet from the client
         unpackedSuccess, newData = unpackInfo(clientSocket.recv(receiverSize).decode())
+        if not unpackedSuccess:
+            sendInfo(clientSocket, {'Request': 'sendAgain'})
 
         # Logging in
         if newData['Request'] == 'Login':
@@ -133,68 +124,29 @@ def clientControl(clientSocket:socket.socket, addressInfo:socket._RetAddress) ->
             if not success:
                 print('Failure to send error data to client')
                 continue
+        
+        # Do they want to create a server?
+        if newData['Request'] == 'createGame':
 
-        # Check if we need to start a game
-        if newData['Request'] == 'startGame':
-            # Return game instance info for ready status
-            pass
+            # Create a new game
+            newGame = multiprocessing.Process(target=newInstance, args=(gameInstances, clientSocket, clientInfo['Username']))
+            newGame.start()
 
-        # Create Game Instance
-        if newData['Request'] == 'newInstance':
-            # Generate random key for instance
-            # Set player as leftPlayer
-            # Set player ready status
-            # Set clientInfo for instance
-            # Set clientInfo for playinggame
-            pass
+            # Wait for client to exit process
+            newGame.join()
 
-        # Delete Game Instance
-        if newData['Request'] == 'deleteInstance':
-            # Check that our Instance exists
-            # Check that the client is one of the players in that instance
-            # Use gameEnd.set()
-            pass
+        # Do they want an updated list of servers?
+        if newData['Request'] == 'grabServers':
+            # Grab our list of servers
+            returnData = {'Request': 'grabServers', 'Servers': gameInstances.keys()}
+            sendInfo(clientSocket, returnData)
 
-        # Start Game Instance
+        # Do they want to join a server?
         if newData['Request'] == 'joinGame':
-            # Check if instance exist
-            # Check if there is only one player
-            # Set player ready status
-            # Set clientInfo for instance
-            # Set clientInfo for playinggame
-            pass
-        
-        # Client request to restart game
-        if newData['Request'] == 'restartGame':
-            # Check if instance still exists
-            # Check if other player exists still
-            # Set player again status
-            pass
-        
-        # Spectate a game?
-        if newData['Request'] == 'spectateGame':
-            # Check if instance exists
-            # Check if there is are two players
-            # Set clientInfo for spectating
-            # Set clientInfo for instance
-            pass
+            if newData['gameName'] in gameInstances:
+                # Start gaming!
+                gameInstances[newData['gameName']].joinGame(clientInfo['Username'], clientSocket, newData['toPlay'])
 
-        # Leave Game Instance
-        if newData['Request'] == 'leaveGame':
-            # Leave the game. Reset clientInfo
-            pass
-
-        if newData['Request'] == 'updateGame':
-            # Check if the client is a player
-            # Check if instance exists
-            # Update player paddle info
-            # Check if sync > game instance sync
-                # Update Ball and Score
-            pass
-
-        if newData['Request'] == 'grabGame':
-            # Return game information about an instance
-            pass
 
 def shutdownSignal(signalNumber:int, frame:Optional[FrameType]) -> None:
     print('Server will now shut down')

@@ -11,7 +11,7 @@ from Client.pongClient import loginServer, mainMenu, makeAccount, accountMenu
 
 def loginScreen(app:mainApp) -> frameHolder:
     # Create our Frame
-    # def __init__(self:object, app:object, name:str, widgets:dict):
+    # def __init__(self:object, app:object, name:str):
     mainFrame = frameHolder(app.root, app, "loginScreen")
 
     # Load our Image into mainFrame
@@ -38,7 +38,7 @@ def loginScreen(app:mainApp) -> frameHolder:
 
 def accountCreation(app:mainApp) -> frameHolder:
     # Create our Frame
-    # def __init__(self:object, app:object, name:str, widgets:dict):
+    # def __init__(self:object, app:object, name:str):
     mainFrame = frameHolder(app.root, app, "accountCreation")
 
     # Load our Image into mainFrame
@@ -66,7 +66,7 @@ def accountCreation(app:mainApp) -> frameHolder:
 
 def loadingPage(app:mainApp) -> frameHolder:
     # Create our Frame
-    # def __init__(self:object, app:object, name:str, widgets:dict):
+    # def __init__(self:object, app:object, name:str):
     mainFrame = frameHolder(app.root, app, "loadingPage")
 
     # Load our Image into mainFrame
@@ -88,6 +88,41 @@ def loadingPage(app:mainApp) -> frameHolder:
 # Two Buttons "Join Game" and "Spectate" on each Game Instances
 # Reload Scrolling Frame with refreshed Instances using a "Refresh" button.
 # When you click "Join Game" or "Spectate" and the Instance no longer exists, configure the errorLabel to say something like "Game Full"
+'''
+    Note: We will need a Canvas inside the Frame to enable a scrollable section.
+    tk.Canvas
+    tk.Scrollbar
+
+    Makeup Diagram:
+
+    -> App
+        -> instancePage
+            -> Canvas
+                -> innerFrame
+                    -> instanceFrame
+                        -> Attribute: gameInstanceID, Grid Location or (X/Y)
+                        -> Instance Name Label, Join Button, Spectate Button
+                    -> instanceFrame
+                        -> Attribute: gameInstanceID, Grid Location or (X/Y)
+                        -> Instance Name Label, Join Button, Spectate Button
+                    -> instanceFrame
+                        -> Attribute: gameInstanceID, Grid Location (or X/Y)
+                        -> Instance Name Label, Join Button, Spectate Button
+                    ...
+'''
+def instancePage(app:mainApp) -> frameHolder:
+    # Create a Frame
+    # def __init__(self:object, app:object, name:str)
+    mainFrame = frameHolder(app.root, app, "instancePage")
+
+    return mainFrame
 
 # 2. Create a button in Client's playGame and spectateGame for "Replay" and "Exit". "Exit" should be in both playGame and spectateGame. "Replay" should only be in playGame.
 # When both clients are ready to replay, turn their replay's off and restart the game. Possibly use a threading event?
+'''-----------------------------Need to complete in playGame.py and spectateGame.py-----------------------------------
+    Suggestions:
+        Revamp and Modify playGame.py and spectateGame.py to be more efficient/optimized to current solution.
+        Add Reply and Exit as needed to both files.
+        On click button, send server a request to replay.
+        Make sure to gracefully exit the Pygame Window and return to Tkinter "instancePage" in the event that a player client exits the game
+'''
