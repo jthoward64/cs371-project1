@@ -7,7 +7,7 @@
 # =================================================================================================
 
 from typing import Tuple, Union
-from Helpers.configureSettings import serverIP, serverPort
+from configureSettings import serverIP, serverPort
 import json, socket
 
 # Attempts to send a message to the client
@@ -40,6 +40,12 @@ def createServer() -> socket.socket:
     # Creates a socket and binds it to a host/port
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((serverIP, int(serverPort)))
+
+    ## We Need To Add Encryption ##
+    ## We Need To Add Encryption ##
+    ## We Need To Add Encryption ##
+    ## We Need To Add Encryption ##
+    ## We Need To Add Encryption ##
 
     # Listens for clients
     server.listen()

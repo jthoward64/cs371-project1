@@ -1,7 +1,7 @@
 from Database.dbHandler import Database
 
 from Helpers.configureSettings import receiverSize
-from Helpers.socketHandler import *
+from Helpers.connectionHandler import *
 
 from typing import Optional
 from types import FrameType
