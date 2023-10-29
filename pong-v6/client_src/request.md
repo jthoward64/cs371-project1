@@ -1,91 +1,94 @@
-'''
-** Possible ** MAIN SERVER ** Responses (server.py):
-------------------------------------------------------------------------------------------------
-Type: login
+# Main Responses (server.py):
+## Type: login
 Description: A request from the Client to Validate their Login Credentials to the Server
 
 Required Parameters: new_message['username'], new_message['password']
 
-Success: {'request':'login', 'return':True, 'message':None}
-Failure: {'request':'login', 'return':False, 'message':message}
-------------------------------------------------------------------------------------------------
-Type: join_game
+Success: `{'request':'login', 'return':True, 'message':None}`
+
+Failure: `{'request':'login', 'return':False, 'message':message}`
+
+## Type: join_game
 Description: A request from the Client to join a game server (using code) by requesting which Port the Server is Listening to
 
 Required Parameters: new_message['code']
 
-Success: {'request':'join_game', 'return':True, 'message':self.game_codes[new_message['code']]}
-Failure: {'request':'join_game', 'return':False, 'message':'Game does not exist'}
+Success: `{'request':'join_game', 'return':True, 'message':self.game_codes[new_message['code']]}`
+
+Failure: `{'request':'join_game', 'return':False, 'message':'Game does not exist'}`
 
 Return Parameters:
 Success: integer port number to connect with
 Failure: 'Game does not exist'
-------------------------------------------------------------------------------------------------
-Type: create_game
+
+## Type: create_game
 Description: A request from the Client to create a new game server
 
-Success: {'request':'create_game', 'return':True, 'message':new_port}
+Success: `{'request':'create_game', 'return':True, 'message':new_port}`
+
 Failure: None Listed
 
 Return Parameters:
 Success: 'message' = integer port number to connect with
 Failure: None Listed
-------------------------------------------------------------------------------------------------
 
 
 
-** Possible ** GAME SERVER ** Responses (game.py):
-------------------------------------------------------------------------------------------------
-Type: join_game
+# Game (game.py):
+## Type: join_game
 Description: A request from the Client to validate their login and join into playing or spectating the game
 
 Required Parameters: new_message['username], new_message['password]
 
-Success: {'request': 'join_game', 'return':True, 'message':player}
-Failure: {'request': 'join_game', 'return':False, 'message': message}
+Success: `{'request': 'join_game', 'return':True, 'message':player}`
+
+Failure: `{'request': 'join_game', 'return':False, 'message': message}`
 
 
 Return Parameters:
 Success: 'player' = 'spectate' or 'left_player' or 'right_player'
 Failure: 'message' = 'Account does not exists' or 'Incorrect Password'
-------------------------------------------------------------------------------------------------
-Type: game_info
+
+## Type: game_info
 Description: A request from the Client to obtain information on game
 
-Success:{'request': 'game_info', 'return':True, 'message':message}
+Success:`{'request': 'game_info', 'return':True, 'message':message}`
 
 Return Parameters:
-message = {
+`message = {
     'left_player':self.information.left_initial,
     'right_player':self.information.right_initial,
     'client_number':self.information.client_number,
     'game_code':self.code
-}
-------------------------------------------------------------------------------------------------
-Type: start_game
+}`
+
+## Type: start_game
 Description: A request from the Client to start the game
 Note: Keep calling this function until the return is True before beginning the game UI-Run
 
-Success: {'request': 'ready', 'return':start, 'message':message}
+Success: `{'request': 'ready', 'return':start, 'message':message}`
 
 Return Parameters:
 return: True if we start, False if we are waiting to start
-message = {
+
+`message = {
     'left_player':self.information.left_initial,
     'right_player':self.information.right_initial,
     'client_number':self.information.client_number,
     'game_code':self.code
-}
-------------------------------------------------------------------------------------------------
-Type: grab_game
+}`
+
+## Type: grab_game
 Description: A request from Client to grab the game information.
 Note: If return is False, the game is over and we are waiting to either Exit or Replay the game
 
-Success: {'request': 'grab_game', 'return':True, 'message':game_info}
-Failure: {'request': 'grab_game', 'return':False, 'message':None}
+Success: `{'request': 'grab_game', 'return':True, 'message':game_info}`
+
+Failure: `{'request': 'grab_game', 'return':False, 'message':None}`
 
 Return Parameters:
-game_info = {
+
+`game_info = {
     'left_player': {
         'X':integer,
         'Y':integer,
@@ -101,14 +104,15 @@ game_info = {
         'rScore':integer,
     },
     'sync':integer
-}
-------------------------------------------------------------------------------------------------
-Type: update_game
+}`
+
+## Type: update_game
 Description: A method to update the game on the current progress
 Note: Will return False if Game is Over, Spectate Players cannot Call this Method
 
 Required Parameters:
-'message': {
+
+`'message': {
     'Paddle':{
         'X':integer,
         'Y':integer,
@@ -123,9 +127,8 @@ Required Parameters:
         'Y':integer,
     }
     'sync':integer
-}
+}`
 
-Success: {'request': 'update_game', 'return':True, 'message':None}
-Failure: {'request': 'update_game', 'return':False, 'message':None}
-------------------------------------------------------------------------------------------------
-'''
+Success: `{'request': 'update_game', 'return':True, 'message':None}`
+
+Failure: `{'request': 'update_game', 'return':False, 'message':None}`
