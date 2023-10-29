@@ -1,3 +1,10 @@
+# =================================================================================================
+# Contributing Authors:	    Michael Stacy, Name Here, Name Here
+# Email Addresses:          jmst231@uky.edu, Email Here, Email Here
+# Date:                     October 29th, 2023
+# Purpose:                  How we connect to the Database in Multilabs
+# Misc:                     Documentation: https://dev.mysql.com/doc/connector-python/en/connector-python-coding.html
+# =================================================================================================
 
 # Needed to control the database
 import mysql.connector as connector

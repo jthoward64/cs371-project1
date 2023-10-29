@@ -1,3 +1,11 @@
+# =================================================================================================
+# Contributing Authors:	    Michael Stacy, Name Here, Name Here
+# Email Addresses:          jmst231@uky.edu, Email Here, Email Here
+# Date:                     October 29th, 2023
+# Purpose:                  Our Main Server that spawns new Game Instances and validates incoming Clients
+# Misc:                     
+# =================================================================================================
+
 # SSLSocket
 from ssl import SSLSocket
 

@@ -1,3 +1,11 @@
+# =================================================================================================
+# Contributing Authors:	    Michael Stacy, Name Here, Name Here
+# Email Addresses:          jmst231@uky.edu, Email Here, Email Here
+# Date:                     October 29th, 2023
+# Purpose:                  How we handle our SSLSocket Client Connection
+# Misc:                     Documentation: https://docs.python.org/3/library/ssl.html
+# =================================================================================================
+
 # Module to understand SSLSockets
 from ssl import SSLSocket
 

@@ -1,10 +1,10 @@
 # =================================================================================================
-# Contributing Authors:	    Michael Stacy
-# Email Addresses:          jmst231@uky.edu
-# Date:                     October 26th, 2023
+# Contributing Authors:	    Michael Stacy, Name Here, Name Here
+# Email Addresses:          jmst231@uky.edu, Email Here, Email Here
+# Date:                     October 29th, 2023
 # Purpose:                  A configuration file for the Server Source
 # Misc:                     Main  Configuration File
-#                           Random Port: https://learn.microsoft.com/en-us/mem/configmgr/core/plan-design/hierarchy/ports
+#                           Documentation for Port Ranges: https://learn.microsoft.com/en-us/mem/configmgr/core/plan-design/hierarchy/ports
 # =================================================================================================
 
 from socket import AF_INET, SOCK_STREAM
@@ -36,4 +36,5 @@ CONFIG:dict = {
     'database': 'CS371',
 }
 
+# Error List for Connections
 ERROR_LIST:set = {BrokenPipeError, EOFError, ConnectionError, JSONDecodeError, UnicodeDecodeError}

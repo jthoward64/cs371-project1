@@ -1,6 +1,13 @@
+# =================================================================================================
+# Contributing Authors:	    Michael Stacy, Name Here, Name Here
+# Email Addresses:          jmst231@uky.edu, Email Here, Email Here
+# Date:                     October 29th, 2023
+# Purpose:                  Implements the Game Server to allow incoming connections
+# Misc:                     
+# =================================================================================================
 
 # For Database Handling
-from typing import Optional, List
+from typing import List
 from .database import Database as db
 
 # Import our Server creation
