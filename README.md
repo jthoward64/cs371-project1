@@ -11,7 +11,7 @@
 ## Current Version | Release: 3.0 | pong
 This is the current active version of the Pong Game
 
-## Experimental Version | Releases: 5.0 | pong-v5
+## Experimental Version | Releases: 6.0 | pong-v6
 This is the experimental version of the Pong Game
 
 ## Versioning
@@ -32,3 +32,4 @@ Run the following line to install the required libraries for this project:
 
 ## Deprecated
 - Version 4.0 (pong-v4) is deprecated
+- Version 5.0 (pong-v5) is deprecated
