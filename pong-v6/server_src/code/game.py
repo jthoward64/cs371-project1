@@ -252,7 +252,7 @@ class Game:
                         'rScore':self.score.right_score,
                     }
                 with self.information.Lock:
-                    game_info['score'] = self.information.sync
+                    game_info['sync'] = self.information.sync
 
                 # Send it
                 control.send({'request': 'grab_game', 'return':True, 'message':game_info})
