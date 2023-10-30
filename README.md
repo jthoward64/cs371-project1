@@ -11,7 +11,7 @@
 ## Current Version | Release: 3.0 | pong
 This is the current active version of the Pong Game
 
-## Experimental Version | Releases: 6.1.2 | pong-v6
+## Experimental Version | Releases: 6.1.3 | pong-v6
 This is the experimental version of the Pong Game
 
 ## Versioning
