@@ -63,7 +63,7 @@ class Information:
         self.sync:int = 0
 
 class Game:
-    def __init__(self, port:int, code:str, shut_down:Event):
+    def __init__(self, port:int, code:str, shut_down:Event) -> None:
         
         # Game Information
         self.information = Information()

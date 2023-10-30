@@ -16,8 +16,8 @@ MAIN_PORT:int = 4000
 RECEIVER_SIZE:int = 1024
 
 # Settings for the Server Creation
-ADDRESS_FAMILY = AF_INET
-SOCKET_KIND = SOCK_STREAM
+ADDRESS_FAMILY = AF_INET # IPv4
+SOCKET_KIND = SOCK_STREAM # TCP
 
 # Settings for the Server Encryption
 CERTFILE:str='./certs/cert.pem'

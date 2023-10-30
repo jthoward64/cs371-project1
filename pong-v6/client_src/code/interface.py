@@ -26,6 +26,11 @@ class Application:
         self.code_menu()
         self.create_menu()
 
+        # Add a variable for our menus
+        self.main_frame = self.app.children['main_frame']
+        self.code_frame = self.app.children['code_frame']
+        self.create_frame = self.app.children['create_frame']
+
         # Select the main_frame to present
         self.change_frame('main_frame')
 
@@ -54,8 +59,25 @@ class Application:
         pass
 
     def try_login(self, username:str, password:str) -> None:
+        # Send the server our login
+        self.server_socket.send({'request':'login', 'username':username, 'password':password})
 
-        # Go to the code_frame if the correct username and password are provided
+        # Grab the return message
+        success, new_message = self.server_socket.recv()
+
+        # Check if we have a success
+        if not success:
+            # Check if our connection is closed, if so inform user the server isn't connected
+            return
+        
+        # Impossible for new_message to be an error, success would be False
+        assert isinstance(new_message, dict), f'Expected dict, got {type(new_message)}'
+
+        if new_message['return'] == False:
+            # Inform the user the login failed
+            return
+        
+        # Login Successful, go to code_frame
         self.change_frame('code_frame')
         pass
 
@@ -194,3 +216,4 @@ class Application:
         # Create our error label
         error_label = tk.Label(new_frame, name='error_label')
         error_label.grid(column=0, row=5, columnspan=2)
+

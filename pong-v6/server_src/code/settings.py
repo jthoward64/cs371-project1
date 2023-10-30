@@ -29,6 +29,7 @@ KEYFILE:str='./certs/key.pem'
 PASSWORD:str='' # Removed for Security Reasons
 
 # Settings for the Database
+'''Use SQLLite'''
 CONFIG:dict = {
     'host': 'mysql.cs.uky.edu',
     'user': '', # Removed for Security Reasons
