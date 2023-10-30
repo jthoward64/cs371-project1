@@ -24,8 +24,8 @@ ADDRESS_FAMILY = AF_INET
 SOCKET_KIND = SOCK_STREAM
 
 # Settings for the Server Encryption
-CERTFILE:str='../certs/cert.pem'
-KEYFILE:str='../certs/key.pem'
+CERTFILE:str='./certs/cert.pem'
+KEYFILE:str='./certs/key.pem'
 PASSWORD:str='' # Removed for Security Reasons
 
 # Settings for the Database
