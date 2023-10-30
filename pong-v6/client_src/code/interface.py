@@ -7,6 +7,10 @@
 # =================================================================================================
 import tkinter as tk
 
+from .socketHelper import ClientSocket
+
+from .settings import MAIN_PORT
+
 class Application:
     def __init__(self):
         # Create our application window
@@ -24,10 +28,22 @@ class Application:
         # Select the main_frame to present
         self.change_frame('main_frame')
 
+        # Create our Socket Interface for the Main Server
+        self.server_socket:ClientSocket = ClientSocket(MAIN_PORT)
+
         # Run the main_loop
         self.app.mainloop()
 
     def create_account(self, username:str, password:str, confirm:str) -> None:
+        # Validate if the confirm and password are the same
+        if password != confirm:
+            pass
+        
+        # Request the server to create a new account
+        self.server_socket.send({'request':'', 'username':'', 'password':''})
+
+        # Grab the return message
+        success, new_message = self.server_socket.recv()
         pass
 
     def create_game(self) -> None:
