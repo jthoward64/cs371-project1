@@ -40,7 +40,7 @@ class Application:
             pass
         
         # Request the server to create a new account
-        self.server_socket.send({'request':'', 'username':'', 'password':''})
+        self.server_socket.send({'request':'', 'username':username, 'password':password})
 
         # Grab the return message
         success, new_message = self.server_socket.recv()
