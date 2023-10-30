@@ -129,3 +129,16 @@ Success: {'request': 'update_game', 'return':True, 'message':None}
 Failure: {'request': 'update_game', 'return':False, 'message':None}
 ------------------------------------------------------------------------------------------------
 '''
+
+# Our user interface
+from code.interface import Application
+
+# Our game interface for players
+#from code.gameplay import Game
+
+# Our spectate interface for spectators
+#from code.spectate import Spectator
+
+if __name__ == '__main__':
+   # Load our main Application
+   run = Application()
