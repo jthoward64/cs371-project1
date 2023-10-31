@@ -30,15 +30,19 @@ import multiprocessing as mp
 import threading as th
 
 # Server and Port Information
-from code.sockethelper import Connection, EncodeMessage, DecodeMessage, Client
-from code.settings import MAIN_PORT, LOWER_PORT, UPPER_PORT, ERROR_LIST
+from code.sockethelper import Connection, EncodeMessage, Client
+from code.settings import MAIN_PORT, LOWER_PORT, UPPER_PORT
 
 # To see which ports are in use
 import psutil
 
+# For database management
+from code.database import Database as db
+
 def check_port(port:int) -> bool:
     '''Return True if Port is in Use'''
     for conn in psutil.net_connections(kind='inet'):
+        assert conn.laddr, 'Connections should not be empty'
         if conn.laddr.port == port:
             return True
     
@@ -144,10 +148,21 @@ class Lobby:
                 validated, message = database.validate_user(new_message['username'], new_message['password'])
                 if validated:
                     logged_in = True
-                    connection.send(EncodeMessage({'request':'login', 'return':True, 'message':'Incorrect Login'}))
+                    connection.send(EncodeMessage({'request':'login', 'return':True, 'message':'Success'}))
                     continue
 
-                connection.send(EncodeMessage({'request':'login', 'return':False, 'message':'Success'}))
+                connection.send(EncodeMessage({'request':'login', 'return':False, 'message':'Incorrect Login'}))
+                continue
+
+            # Requesting to Create Account
+            if new_message['request'] == 'create_account':
+                validated = database.create_user(new_message['username'], new_message['password'], new_message['initials'])
+                if validated:
+                    logged_in = True
+                    connection.send(EncodeMessage({'request':'login', 'return':True, 'message':'Success'}))
+                    continue
+
+                connection.send(EncodeMessage({'request':'login', 'return':False, 'message':'Incorrect Login'}))
                 continue
             
             # Prevent accessing games

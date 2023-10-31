@@ -8,6 +8,8 @@
 
 import tkinter as tk
 
+from typing import cast
+
 from .sockethelper import Connection, EncodeMessage, DecodeMessage
 
 from .settings import MAIN_PORT
@@ -31,9 +33,11 @@ class Application:
         self.code_frame = self.app.children['code_frame']
         self.create_frame = self.app.children['create_frame']
 
-        self.main_error = self.app.children['main_frame'].children['error_label']
-        self.code_error = self.app.children['code_frame'].children['error_label']
-        self.create_error = self.app.children['create_frame'].children['error_label']
+        # Grab our text labels
+        self.main_error = tk.Label, self.app.children['main_frame'].children['error_label']
+        self.code_error = tk.Label, self.app.children['code_frame'].children['error_label']
+        self.create_error = tk.Label, self.app.children['create_frame'].children['error_label']
+
         # Select the main_frame to present
         self.change_frame('main_frame')
 
@@ -43,14 +47,15 @@ class Application:
         # Run the main_loop
         self.app.mainloop()
 
-    def create_account(self, username:str, password:str, confirm:str) -> None:
+    def create_account(self, username:str, password:str, confirm:str, initials:str) -> None:
         # Validate if the confirm and password are the same
         if password != confirm:
             self.create_error.configure(text='Passwords do not match')
             pass
         
         # Request the server to create a new account
-        self.server_socket.send(EncodeMessage({'request':'', 'username':username, 'password':password}))
+        # new_message['username'], new_message['password'], new_message['initials']
+        self.server_socket.send(EncodeMessage({'request':'create_account', 'username':username, 'password':password, 'initials':initials}))
 
         # Grab the return message
         data = self.server_socket.recv()
@@ -60,7 +65,7 @@ class Application:
         new_message = data.message
     
         if new_message['return'] == False:
-            self.create_frame.children['error_label'].configure(text='Failed to create account')
+            self.create_error.configure(text='Failed to create account')
             return
     
         self.change_frame('code_frame')
@@ -186,17 +191,25 @@ class Application:
         password_box_confirm = tk.Entry(new_frame)
         password_box_confirm.grid(column=1, row=3, columnspan=1, sticky='e')
 
+        # Load our initials label
+        initials_label = tk.Label(new_frame, text='Initials:')
+        initials_label.grid(column=0, row=4, columnspan=1, sticky='e')
+
+        # Load our initials box
+        initials_box = tk.Entry(new_frame)
+        initials_box.grid(column=1, row=4, columnspan=1, sticky='e')
+
         # Load our button
-        login_button = tk.Button(new_frame, text='Create Account', command=lambda:self.create_account(username_box.get(), password_box.get(), password_box_confirm.get()))
-        login_button.grid(column=1, row=4, columnspan=1, sticky='ew')
+        login_button = tk.Button(new_frame, text='Create Account', command=lambda:self.create_account(username_box.get(), password_box.get(), password_box_confirm.get(), initials_box.get()))
+        login_button.grid(column=1, row=5, columnspan=1, sticky='ew')
 
         # Load our button
         create_button = tk.Button(new_frame, text='Back', command=lambda:self.change_frame('main_frame'))
-        create_button.grid(column=0, row=4, columnspan=1, sticky='ew')
+        create_button.grid(column=0, row=5, columnspan=1, sticky='ew')
 
         # Create our error label
         error_label = tk.Label(new_frame, name='error_label')
-        error_label.grid(column=0, row=5, columnspan=2)
+        error_label.grid(column=0, row=6, columnspan=2)
 
     def code_menu(self) -> None:
         '''Our code menu to enter a code'''

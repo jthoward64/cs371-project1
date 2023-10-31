@@ -7,14 +7,13 @@
 # =================================================================================================
 
 # Needed to control the database
-import mysql.connector as connector
-from mysql.connector import errorcode
+import sqlite3 as connector
+from sqlite3 import Error
 
 # For Type Hinting
 from typing import Tuple, Optional
 
-# For the Configuration File
-from .settings import CONFIG
+DATABASE_PATH:str = './database/holder.db'
 
 class Entity:
     username:Optional[str] = None
@@ -25,15 +24,10 @@ class Entity:
 class Connection:
     def __init__(self) -> None:
         try:
-            self.connection = connector.connect(**CONFIG)
-        except connector.Error as e:
-            if e.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                print('Database Access Denied')
-            elif e.errno == errorcode.ER_BAD_DB_ERROR:
-                print('Database does not exist')
-            else:
-                print(e)
-        
+            self.connection = connector.connect(DATABASE_PATH)
+        except Error as e:
+            print('Database Error: ', e)
+
         self.cursor = self.connection.cursor()
 
     def close(self) -> None:
@@ -44,7 +38,7 @@ class Connection:
         '''Grabs the Entity Object from the Database'''
 
         # Our select statement
-        new_query = 'SELECT password, initials, wins FROM users WHERE username = %s;'
+        new_query = 'SELECT password, initials, wins FROM users WHERE username = ?'
 
         # Execute the query
         self.cursor.execute(new_query, (username,))
@@ -62,13 +56,13 @@ class Connection:
     def create_entity(self, entity:Entity) -> bool:
         '''Attempts to create a new entity'''
 
-        insert_query = 'INSERT INTO users (username, password, initials, wins) VALUES (%s, %s, %s, %s);'
+        insert_query = 'INSERT INTO users (username, password, initials, wins) VALUES (?, ?, ?, ?)'
 
         try:
             self.cursor.execute(insert_query, (entity.username, entity.password, entity.initials, entity.wins))
             self.connection.commit()
             return True
-        except connector.Error:
+        except Error:
             print('Failed to create user')
 
             # Rollback in the event of an error
@@ -79,14 +73,14 @@ class Connection:
         '''Attempts to Update the Entity Object in the Database'''
         try:
             # New Query
-            update_query = 'UPDATE users SET wins = %s WHERE username = %s;'
+            update_query = 'UPDATE users SET wins = ? WHERE username = ?'
 
             # Execute and Commit
             self.cursor.execute(update_query, (entity.wins, entity.username))
             self.connection.commit()
 
             return True
-        except connector.Error:
+        except Error:
             # Failed
             print('Failed to Update')
             self.connection.rollback()

@@ -21,5 +21,3 @@ SOCKET_KIND = SOCK_STREAM # TCP
 # Settings for the Server Encryption
 CERTFILE:str='./certs/cert.pem'
 
-# Error List for Connections
-ERROR_LIST:set = {BrokenPipeError, EOFError, ConnectionError, JSONDecodeError, UnicodeDecodeError}

@@ -17,7 +17,8 @@ from .sockethelper import Connection, SSLSocket, Client, EncodeMessage, DecodeMe
 import threading as th
 from multiprocessing.synchronize import Event
 
-from .settings import ERROR_LIST
+# For database management
+from .database import Database as db
 
 class Paddle:
     Lock:th.Lock = th.Lock()

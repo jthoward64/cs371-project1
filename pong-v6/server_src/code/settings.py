@@ -8,7 +8,6 @@
 # =================================================================================================
 
 from socket import AF_INET, SOCK_STREAM
-from json import JSONDecodeError
 
 # Settings Folder to Contain Globals
 MAIN_ADDRESS:str = 'localhost'
@@ -27,15 +26,3 @@ SOCKET_KIND = SOCK_STREAM
 CERTFILE:str='./certs/cert.pem'
 KEYFILE:str='./certs/key.pem'
 PASSWORD:str='' # Removed for Security Reasons
-
-# Settings for the Database
-'''Use SQLLite'''
-CONFIG:dict = {
-    'host': 'mysql.cs.uky.edu',
-    'user': '', # Removed for Security Reasons
-    'password': '', # Removed for Security Reasons
-    'database': 'CS371',
-}
-
-# Error List for Connections
-ERROR_LIST:set = {BrokenPipeError, EOFError, ConnectionError, JSONDecodeError, UnicodeDecodeError}
