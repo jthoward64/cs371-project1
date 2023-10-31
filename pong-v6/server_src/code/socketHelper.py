@@ -10,81 +10,130 @@
 import socket, ssl
 from ssl import SSLSocket
 
+# Need json for encoding/decoding dictionary
+import json
+
 # For Typing
-from typing import Tuple, Optional, Union
+from typing import Optional
 
 # Our Address Family and Socket Type
 from .settings import MAIN_ADDRESS, ADDRESS_FAMILY, SOCKET_KIND, CERTFILE, KEYFILE, PASSWORD
 
-class Server:
-    # The socket
-    server_socket:socket.socket
+class EncodeMessage:
+    def __init__(self, message:dict):
+        try:
+            # Convert to Binary
+            self.binary = json.dumps(message).encode('utf-8')
 
-    # The SSL Encryption Context
-    context:ssl.SSLContext
+        except UnicodeEncodeError as new_error:
+            print('Encoding Error: ', new_error)
+            return
+        
+class DecodeMessage:
+    # The original bytes
+    def __init__(self, incoming:bytes) -> None:
+        try:
+            # Decode
+            self.message = json.loads(incoming.decode('utf-8'))
 
-    # Server Port Number
+        except UnicodeDecodeError as new_error:
+            print('Decoding Error: ', new_error)
+            return
+        except json.JSONDecodeError as new_error:
+            print('JSON Loading Error: ', new_error)
+            return
+
+class Client:
+    connection_open:bool = True
+    def __init__(self, connection:SSLSocket) -> None:
+        self.client = connection
+
+    def send(self, message:EncodeMessage) -> bool:
+        '''Attempts to Send the Message to the Server'''
+        try:
+            self.client.send(message.binary)
+        except ssl.SSLError as new_error:
+            print('Error on Send: ', new_error)
+            self.client.close()
+            self.connection_open = False
+            return False
+        
+        return True
+    
+    def recv(self) -> Optional[DecodeMessage]:
+        '''Attempts to Send the Message to the Server'''
+        try:
+            new_message = DecodeMessage(self.client.recv())
+        except ssl.SSLError as new_error:
+            print('Error on Send: ', new_error)
+            self.client.close()
+            self.connection_open = False
+            return None
+        except socket.timeout as new_error:
+            print('Recv Timed Out')
+            return None
+        
+        return new_message
+
+    def close(self) -> None:
+        self.client.close()
+        self.connection_open = False
+
+class Connection:
+    # Is our connection open?
+    connection_open:bool = False
+
+    # Our port number
     port:int
 
-    # Is the server open and listening for new clients?
-    is_listening:bool = False
-
     def __init__(self, port:int) -> None:
-        '''This class creates a Server to handle incoming Client Connections'''
-        # Grab our Address Family and Socket Stream
-        self.server_socket = socket.socket(ADDRESS_FAMILY, SOCKET_KIND)
-        
-        # Bind the Server, load the SSL Context
-        self.bind_server(port)
-        self.load_context()
-
-    def bind_server(self, port:int) -> Tuple[bool, Optional[OSError]]:
-        '''Binds the server to the Specified Address and Port'''
-        # Attempt to bind the server_socket to the given address/port
+        '''Create a new connection to the server'''
         try:
-            self.server_socket.bind((MAIN_ADDRESS, port))
-        except socket.error as new_error:
-            return False, new_error
+            # Create our Socket and Bind it
+            self._holder = socket.socket(ADDRESS_FAMILY, SOCKET_KIND)
+            self._holder.bind((MAIN_ADDRESS, port))
+
+            # Load our context for encryption
+            self._context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            self._context.load_cert_chain(certfile=CERTFILE, keyfile=KEYFILE, password=PASSWORD)
+
+            # Wrap our Socket
+            self.client:SSLSocket = self._context.wrap_socket(self._holder, server_hostname=MAIN_ADDRESS)
+
+            # Listen for incoming connections
+            self.client.listen()
+            self.connection_open = True
+
+            # Set a timeout
+            self.client.settimeout(2)
         
-        # Update to our selected port number
-        self.port = port
-
-        return True, None
-    
-    def load_context(self) -> Tuple[bool, Optional[ssl.SSLError]]:
-        '''Loads the SSL Context for Encryption'''
-        # Attempt to encrypt the TLS Connection
-        try:
-            self.context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-            self.context.load_cert_chain(certfile=CERTFILE, keyfile=KEYFILE, password=PASSWORD)
-
+            # Begin Listening on Socket
         except ssl.SSLError as new_error:
-            return False, new_error
-        
-        return True, None
+            print('Error on SSL Socket: ', new_error)
+            return
+        except socket.error as new_error:
+            print('Error on Socket:', new_error)
+            return
+
+        # Success, inform we are open to the server
+        self.port = port
+        self.connection_open = True
     
-    def accept(self) -> Tuple[bool, Union[SSLSocket, socket.error]]:
-        '''Accepts Incoming Connections from new Clients'''
+    def accept(self) -> Optional[SSLSocket]:
+        '''Attempts to accept an incoming connection'''
         try:
-            client_socket, _ = self.server_socket.accept()
-            secure_socket = self.context.wrap_socket(client_socket, server_side=True)
-            return True, secure_socket
-        except socket.error as new_error:
-            return False, new_error
-        
-    def listen(self) -> Tuple[bool, Optional[socket.error]]:
-        '''Listens for Incoming Connections'''
-        try:
-            self.server_socket.listen()
-            self.is_listening = True
-        except socket.error as new_error:
-            return False, new_error
-        
-        return True, None
+            # Attempt to accept new client
+            new_socket, _ = self.client.accept()
+        except ssl.SSLError as new_error:
+            print('Error on Accept: ', new_error)
+            return None
+        except socket.timeout as new_error:
+            print('Accept Timed Out')
+            return None
+    
+        return new_socket
     
     def close(self) -> None:
-        '''Turns off the Connections, Shutsdown'''
-        self.is_listening = False
-        self.server_socket.close()
-        del self.server_socket
-        del self.context
+        '''Closes our connection'''
+        self.client.close()
+        self.connection_open = False

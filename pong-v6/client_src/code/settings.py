@@ -2,9 +2,8 @@
 # Contributing Authors:	    Michael Stacy, Name Here, Name Here
 # Email Addresses:          jmst231@uky.edu, Email Here, Email Here
 # Date:                     October 29th, 2023
-# Purpose:                  A configuration file for the Server Source
-# Misc:                     Main  Configuration File
-#                           Documentation for Port Ranges: https://learn.microsoft.com/en-us/mem/configmgr/core/plan-design/hierarchy/ports
+# Purpose:                  A way to create an encrypted Server Socket for Games and Main Server
+# Misc:                     Documentation: https://docs.python.org/3/library/ssl.html
 # =================================================================================================
 
 from socket import AF_INET, SOCK_STREAM

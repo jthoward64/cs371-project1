@@ -8,7 +8,7 @@
 
 import tkinter as tk
 
-from .socketHelper import ClientSocket
+from .sockethelper import Connection, EncodeMessage, DecodeMessage
 
 from .settings import MAIN_PORT
 
@@ -31,11 +31,14 @@ class Application:
         self.code_frame = self.app.children['code_frame']
         self.create_frame = self.app.children['create_frame']
 
+        self.main_error = self.app.children['main_frame'].children['error_label']
+        self.code_error = self.app.children['code_frame'].children['error_label']
+        self.create_error = self.app.children['create_frame'].children['error_label']
         # Select the main_frame to present
         self.change_frame('main_frame')
 
         # Create our Socket Interface for the Main Server
-        self.server_socket:ClientSocket = ClientSocket(MAIN_PORT)
+        self.server_socket:Connection = Connection(MAIN_PORT)
 
         # Run the main_loop
         self.app.mainloop()
@@ -43,48 +46,64 @@ class Application:
     def create_account(self, username:str, password:str, confirm:str) -> None:
         # Validate if the confirm and password are the same
         if password != confirm:
+            self.create_error.configure(text='Passwords do not match')
             pass
         
         # Request the server to create a new account
-        self.server_socket.send({'request':'', 'username':username, 'password':password})
+        self.server_socket.send(EncodeMessage({'request':'', 'username':username, 'password':password}))
 
         # Grab the return message
-        success, new_message = self.server_socket.recv()
-        pass
+        data = self.server_socket.recv()
+        if not data:
+            return
+    
+        new_message = data.message
+    
+        if new_message['return'] == False:
+            self.create_frame.children['error_label'].configure(text='Failed to create account')
+            return
+    
+        self.change_frame('code_frame')
 
     def create_game(self) -> None:
         pass
 
     def join_game(self, code:str) -> None:
+        # Send the server our information
+        self.server_socket.send(EncodeMessage({'request':'join_game', 'code':code}))
         pass
 
     def try_login(self, username:str, password:str) -> None:
         # Send the server our login
-        self.server_socket.send({'request':'login', 'username':username, 'password':password})
+        self.server_socket.send(EncodeMessage({'request':'login', 'username':username, 'password':password}))
 
         # Grab the return message
-        success, new_message = self.server_socket.recv()
+        data = self.server_socket.recv()
 
         # Check if we have a success
-        if not success:
+        if not data:
             # Check if our connection is closed, if so inform user the server isn't connected
             return
+        
+        # Our data dictionary
+        new_message = data.message
         
         # Impossible for new_message to be an error, success would be False
         assert isinstance(new_message, dict), f'Expected dict, got {type(new_message)}'
 
         if new_message['return'] == False:
             # Inform the user the login failed
+            self.main_error.configure(text='Incorrect Login')
             return
         
         # Login Successful, go to code_frame
         self.change_frame('code_frame')
-        pass
 
     def change_frame(self, frame_name:str) -> None:
         # Hide all frames and remember, grab the visible frame's center point
         for frame in self.app.children.values():
-            # Remove the frame from the grid
+            # Remove the frame from the grid, hide the error label
+            frame.children['error_label'].configure(text='')
             frame.grid_remove()
 
         # Show the frame you want to display

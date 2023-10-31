@@ -11,10 +11,7 @@ from typing import List
 from .database import Database as db
 
 # Import our Server creation
-from .socketHelper import Server, SSLSocket
-
-# Client Helper
-from .clientHelper import ClientConnection
+from .sockethelper import Connection, SSLSocket, Client, EncodeMessage, DecodeMessage
 
 # Multithreading and Multiprocessing Needed
 import threading as th
@@ -96,24 +93,22 @@ class Game:
 
         # Create our Server
         # DO NOT ALLOW CLIENTS ACCESS (No Self)
-        new_server = Server(port)
+        new_server = Connection(port)
 
         # List of Client Threads
         client_threads:List[th.Thread] = []
-
-        new_server.listen()
 
         # Begin accepting new connections
         while not shut_down.is_set() and not self.game_down.is_set():
 
             # Accept a new connection
-            success, socket = new_server.accept()
+            success = new_server.accept()
 
             if not success:
                 continue
             
             # Create a new thread
-            new_thread = th.Thread(target=self.client, args=(socket,))
+            new_thread = th.Thread(target=self.client, args=(success,))
             new_thread.start()
 
             client_threads.append(new_thread)
@@ -134,26 +129,24 @@ class Game:
         database = db()
 
         # The socket connection
-        control = ClientConnection(connection)
+        control = Client(connection)
 
         # Do we need to turn this client thread off?
         shut_client = False
 
         while not self.shut_down.is_set() and not self.game_down.is_set() and not shut_client:
             # Grab incoming client connection
-            success, new_message = control.recv()
+            success = control.recv()
 
             # Did our success fail and is the connection closed?
-            if not success and control.is_closed():
+            if not success:
                 with self.information.Lock:
                     if username != '' and (username == self.information.left_player or username == self.information.right_player):
                         # A player has exited, quit the game
                         self.game_down.set()
                 continue
             
-            # Skip if type is in our error list
-            if not success or type(new_message) in ERROR_LIST:
-                continue
+            new_message = success.message
             
             # It's impossible for new_message to be anything but a dict as we only return dict
             # when success is true.
@@ -164,7 +157,7 @@ class Game:
                 # Check if username is valid, else exit this client
                 validated, message = database.validate_user(new_message['username'], new_message['password'])
                 if not validated:
-                    control.send({'request': 'join_game', 'return':False, 'message': message})
+                    control.send(EncodeMessage({'request': 'join_game', 'return':False, 'message': message}))
                     shut_client = True
                     control.close()
                     continue
@@ -183,7 +176,7 @@ class Game:
                     else:
                         player = 'spectate'
                     
-                control.send({'request': 'join_game', 'return':True, 'message':player})
+                control.send(EncodeMessage({'request': 'join_game', 'return':True, 'message':player}))
                 continue
 
             # # # Block Non-Validated Clients # # #
@@ -200,7 +193,7 @@ class Game:
                         'game_code':self.code
                     }
 
-                control.send({'request': 'game_info', 'return':True, 'message':message})
+                control.send(EncodeMessage({'request': 'game_info', 'return':True, 'message':message}))
                 continue
             
             # Requesting to Start the Game
@@ -221,7 +214,7 @@ class Game:
 
                 # Are clients ready to start?
                 start:bool = True if self.left_play.is_set() and self.right_play.is_set() and not self.round_over.is_set() else False
-                control.send({'request': 'ready', 'return':start, 'message':message})
+                control.send(EncodeMessage({'request': 'ready', 'return':start, 'message':message}))
                 continue
 
             # Checking if the player can start the game
@@ -229,7 +222,7 @@ class Game:
             
                 if self.round_over.is_set():
                     # Inform the client the round is over
-                    control.send({'request': 'grab_game', 'return':False, 'message':None})
+                    control.send(EncodeMessage({'request': 'grab_game', 'return':False, 'message':None}))
                     continue
                 
                 # Prepare information
@@ -255,13 +248,13 @@ class Game:
                     game_info['sync'] = self.information.sync
 
                 # Send it
-                control.send({'request': 'grab_game', 'return':True, 'message':game_info})
+                control.send(EncodeMessage({'request': 'grab_game', 'return':True, 'message':game_info}))
                 continue
 
             if new_message['request'] == 'update_game' and player != 'spectate':
 
                 if self.round_over.is_set():
-                    control.send({'request': 'update_game', 'return':False, 'message':None})
+                    control.send(EncodeMessage({'request': 'update_game', 'return':False, 'message':None}))
                     continue
                 
                 # Check if we need to update the game information
@@ -302,7 +295,7 @@ class Game:
                         self.right_paddle.X = new_message['message']['Paddle']['Y']
                         self.right_paddle.Moving = new_message['message']['Paddle']['Moving']
 
-                control.send({'request': 'update_game', 'return':True, 'message':None})
+                control.send(EncodeMessage({'request': 'update_game', 'return':True, 'message':None}))
                 continue
 
         # Client Exiting

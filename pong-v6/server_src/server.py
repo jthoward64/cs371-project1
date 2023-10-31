@@ -9,9 +9,6 @@
 # SSLSocket
 from ssl import SSLSocket
 
-# Check if we have a port is use
-from code.portHelper import check_port
-
 # For Typing
 from types import FrameType
 from typing import List, Dict, Optional
@@ -25,9 +22,6 @@ import signal
 # Our Game Object Manager
 from code.game import Game
 
-# Our Client Connection Manager
-from code.clientHelper import ClientConnection
-
 # How we control the database
 from code.database import Database as db
 
@@ -36,8 +30,19 @@ import multiprocessing as mp
 import threading as th
 
 # Server and Port Information
-from code.socketHelper import Server
+from code.sockethelper import Connection, EncodeMessage, DecodeMessage, Client
 from code.settings import MAIN_PORT, LOWER_PORT, UPPER_PORT, ERROR_LIST
+
+# To see which ports are in use
+import psutil
+
+def check_port(port:int) -> bool:
+    '''Return True if Port is in Use'''
+    for conn in psutil.net_connections(kind='inet'):
+        if conn.laddr.port == port:
+            return True
+    
+    return False
 
 class Lobby:
     def __init__(self):
@@ -50,7 +55,7 @@ class Lobby:
         signal.signal(signal.SIGTERM, self.signal_hanlder)
 
         # Our main server to accept clients
-        new_server = Server(MAIN_PORT)
+        new_server = Connection(MAIN_PORT)
 
         # Our game threads
         self.game_servers:List[th.Thread] = []
@@ -65,13 +70,13 @@ class Lobby:
         while not self.shut_down.is_set():
             
             # Grab incoming client
-            success, new_client = new_server.accept()
+            success = new_server.accept()
 
             if not success:
                 continue
 
             # Create a new client thread
-            new_thread = th.Thread(target=self.client_handler, args=(new_client,))
+            new_thread = th.Thread(target=self.client_handler, args=(success,))
             new_thread.start()
 
         # Wait for all clients to finish
@@ -111,7 +116,7 @@ class Lobby:
         logged_in = False
 
         # Our connection
-        connection = ClientConnection(socket)
+        connection = Client(socket)
 
         # Do we need to close the client?
         close_client = False
@@ -121,16 +126,14 @@ class Lobby:
 
         while not self.shut_down.is_set() and not close_client:
 
-            success, new_message = connection.recv()
+            success = connection.recv()
 
             # Close client if we can't establish connection
-            if not success and connection.is_closed:
+            if not success:
                 close_client = True
                 continue
-            
-            # Skip if other error
-            if not success or new_message in ERROR_LIST:
-                continue
+
+            new_message = success.message
 
             # It's impossible for new_message to be anything but a dict as we only return dict
             # when success is true.
@@ -141,10 +144,10 @@ class Lobby:
                 validated, message = database.validate_user(new_message['username'], new_message['password'])
                 if validated:
                     logged_in = True
-                    connection.send({'request':'login', 'return':True, 'message':None})
+                    connection.send(EncodeMessage({'request':'login', 'return':True, 'message':'Incorrect Login'}))
                     continue
 
-                connection.send({'request':'login', 'return':False, 'message':message})
+                connection.send(EncodeMessage({'request':'login', 'return':False, 'message':'Success'}))
                 continue
             
             # Prevent accessing games
@@ -168,7 +171,7 @@ class Lobby:
                 self.game_servers.append(new_game)
 
                 # Inform the client to move to the new game server
-                connection.send({'request':'create_game', 'return':True, 'message':new_port})
+                connection.send(EncodeMessage({'request':'create_game', 'return':True, 'message':new_port}))
                 continue
 
             if new_message['request'] == 'join_game':
@@ -177,12 +180,14 @@ class Lobby:
                     # Check if the code exists
                     if self.game_codes[new_message['code']]:
                         # Inform the client to move to that game server
-                        connection.send({'request':'join_game', 'return':True, 'message':self.game_codes[new_message['code']]})
+                        connection.send(EncodeMessage({'request':'join_game', 'return':True, 'message':self.game_codes[new_message['code']]}))
                         continue
                 
                 # Failed, code doesn't exist
-                connection.send({'request':'join_game', 'return':False, 'message':'Game does not exist'})
+                connection.send(EncodeMessage({'request':'join_game', 'return':False, 'message':'Game does not exist'}))
                 continue
+
+        connection.close()
 
     def game_handler(self, new_code:str, new_port:int) -> None:
         # Create a Game Process
@@ -197,3 +202,6 @@ class Lobby:
         with self.game_code_lock:
             self.game_codes.pop(new_code)
 
+
+if __name__ == '__main__':
+    new_lobby = Lobby()

@@ -26,7 +26,7 @@ Description: A request from the Client to create a new game server
 
 Success: `{'request':'create_game', 'return':True, 'message':new_port}`
 
-Failure: None Listed
+Failure: {'request':'create_game', 'return':False, 'message':'Failed to create game'}
 
 Return Parameters:
 Success: 'message' = integer port number to connect with
