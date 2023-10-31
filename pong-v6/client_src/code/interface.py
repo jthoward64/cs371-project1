@@ -104,16 +104,17 @@ class Application:
         # Login Successful, go to code_frame
         self.change_frame('code_frame')
 
+    '''bug note: this function causes some frames to not be shown properly after clicking "Back" and "Create Account" multiple times'''
     def change_frame(self, frame_name:str) -> None:
         # Hide all frames and remember, grab the visible frame's center point
         for frame in self.app.children.values():
             # Remove the frame from the grid, hide the error label
-            frame.children['error_label'].configure(text='')
+            #frame.children['error_label'].configure(text='')
             frame.grid_remove()
 
         # Show the frame you want to display
         next_frame = self.app.children[frame_name]
-        next_frame.grid()
+        next_frame.grid(column=0, row=0)
 
     def main_menu(self) -> None:
         '''Our main menu frame for login'''

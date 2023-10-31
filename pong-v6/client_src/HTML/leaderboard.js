@@ -13,6 +13,9 @@ const nameHolder = document.getElementById('nameHolder');
 const scoreHeader = "<div class='ui center aligned inverted segment'>Total Score</div>";
 const nameHeader = "<div class='ui center aligned inverted segment'>Player Name</div>";
 
+// Node.js and PHP (Capital S) give it a file name and port
+// EngineX if you want
+
 // Grabs our new leaderboard data, manipulates the leaderboard
 function loadboard(){
         // Grab new data
