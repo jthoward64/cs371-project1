@@ -3,7 +3,7 @@
 const refreshButton = document.getElementById('refreshButton');
 
 // The URL of our server
-const dataPath = './board.json';
+const dataPath = 'localhost:6000';
 
 // Holds our leaderboard
 const scoreHolder = document.getElementById('scoreHolder');
@@ -12,9 +12,6 @@ const nameHolder = document.getElementById('nameHolder');
 // The format of the header element in each section
 const scoreHeader = "<div class='ui center aligned inverted segment'>Total Score</div>";
 const nameHeader = "<div class='ui center aligned inverted segment'>Player Name</div>";
-
-// Node.js and PHP (Capital S) give it a file name and port
-// EngineX if you want
 
 // Grabs our new leaderboard data, manipulates the leaderboard
 function loadboard(){

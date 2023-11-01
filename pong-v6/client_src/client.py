@@ -131,7 +131,7 @@ Failure: {'request': 'update_game', 'return':False, 'message':None}
 '''
 
 # Our user interface
-from code.interface import Application
+from code.interface import MainWindow
 
 # Our game interface for players
 #from code.gameplay import Game
@@ -139,6 +139,6 @@ from code.interface import Application
 # Our spectate interface for spectators
 #from code.spectate import Spectator
 
-if __name__ == '__main__':
-   # Load our main Application
-   run = Application()
+if __name__ == "__main__":
+    app = MainWindow()
+    app.mainloop()

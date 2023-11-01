@@ -1,84 +1,167 @@
 # =================================================================================================
 # Contributing Authors:	    Michael Stacy, Name Here, Name Here
 # Email Addresses:          jmst231@uky.edu, Email Here, Email Here
-# Date:                     October 30th, 2023
-# Purpose:                  Our user interface for the Client's Main Menu
+# Date:                     October 31st, 2023
+# Purpose:                  Our Tkinter Interface for Clients
 # Misc:                     
 # =================================================================================================
 
 import tkinter as tk
+from tkinter import ttk
 
-from typing import cast
+from typing import Callable, Union
 
-from .sockethelper import Connection, EncodeMessage, DecodeMessage
+from .sockethelper import Connection, EncodeMessage
 
 from .settings import MAIN_PORT
 
-class Application:
-    def __init__(self):
-        # Create our application window
-        self.app = tk.Tk()
-        self.app.title('Pong Game')
+class Image(tk.Frame):
+    def __init__(self, parent:tk.Widget, label_image:tk.Image) -> None:
+        super().__init__(parent)
+        
+        self.label = ttk.Label(self, image=label_image)
+        self.label.pack(side="top", fill='x')
 
-        # Load our Logo
+        self.pack(side='top', fill='both', expand=True)
+
+class Label(tk.Frame):
+    def __init__(self, parent:tk.Widget, label_name:str, label_text:str) -> None:
+        super().__init__(parent)
+        
+        self.label = ttk.Label(self, name=label_name, text=label_text)
+        self.label.pack(side="left", fill='x')
+
+        self.pack()
+
+    def set_text(self, new_text:str) -> None:
+        self.label['text'] = new_text
+
+class TextBox(tk.Frame):
+    def __init__(self, parent:tk.Widget, label_name:str, label_text:str) -> None:
+        super().__init__(parent)
+
+        # Spacer
+        self.label2 = ttk.Label(self, name='label2')
+        self.label2.pack(side="left", fill='x')
+
+        # Our label for box
+        self.label = ttk.Label(self, name=label_name, text=label_text)
+        self.label.pack(side='left', fill='x')
+        
+        # Our box
+        self.box = ttk.Entry(self)
+        self.box.pack(side='left', fill='x', padx=(20, 10))
+        
+        self.pack()
+
+class TwoButton(tk.Frame):
+    def __init__(self, parent:tk.Widget, left_text:str, left_button:Callable, right_text:str, right_button:Callable) -> None:
+        super().__init__(parent)
+        
+        # Spacer
+        self.label = ttk.Label(self, name='label1')
+        self.label.pack(side="left", fill='x')
+        
+        # Create button and add it to the frame
+        self.button_left = ttk.Button(self, text=left_text, command=left_button)
+        self.button_left.pack(side="left", fill='x')
+
+        # Create button and add it to the frame
+        self.button_right = ttk.Button(self, text=right_text, command=right_button)
+        self.button_right.pack(side="left", fill='x')
+
+        # Spacer
+        self.label2 = ttk.Label(self, name='label2')
+        self.label2.pack(side="left", fill='x')
+
+        self.pack()
+
+class MainMenu(tk.Frame):
+    def __init__(self, parent:tk.Tk) -> None:
+        super().__init__(parent)
+
+        # Our image item
         self.image_item = tk.PhotoImage(file="assets/images/logo.png")
 
-        # Load our menus
-        self.main_menu()
-        self.code_menu()
-        self.create_menu()
+        # Our image
+        self.image = Image(self, self.image_item)
 
-        # Add a variable for our menus
-        self.main_frame = self.app.children['main_frame']
-        self.code_frame = self.app.children['code_frame']
-        self.create_frame = self.app.children['create_frame']
+        # Username and Password
+        self.username = TextBox(self, label_name='username_label', label_text='Username:')
+        self.password = TextBox(self, label_name='password_label', label_text='Password:')
 
-        # Grab our text labels
-        self.main_error = tk.Label, self.app.children['main_frame'].children['error_label']
-        self.code_error = tk.Label, self.app.children['code_frame'].children['error_label']
-        self.create_error = tk.Label, self.app.children['create_frame'].children['error_label']
+        self.pack(side='top', fill='both', expand=True)
 
-        # Select the main_frame to present
-        self.change_frame('main_frame')
+class CodeMenu(tk.Frame):
+    def __init__(self, parent:tk.Tk) -> None:
+        super().__init__(parent)
+
+        # Our image item
+        self.image_item = tk.PhotoImage(file="assets/images/logo.png")
+
+        # Our image
+        self.image = Image(self, self.image_item)
+
+        # Game Code
+        self.code = TextBox(self, label_name='code_label', label_text='Game Code:')
+
+        self.pack(side='top', fill='both', expand=True)
+
+class CreateMenu(tk.Frame):
+    def __init__(self, parent:tk.Tk) -> None:
+        super().__init__(parent)
+
+        # Our image item
+        self.image_item = tk.PhotoImage(file="assets/images/logo.png")
+        # Our image
+        self.image = Image(self, self.image_item)
+
+        # Username and Password
+        self.initials = TextBox(self, label_name='initial_label', label_text='Initials:')
+        self.username = TextBox(self, label_name='username_label', label_text='Username:')
+        self.password = TextBox(self, label_name='password_label', label_text='Password:')
+        self.confirm = TextBox(self, label_name='confirm_label', label_text='Password:')
+
+        self.pack(side='top', fill='both', expand=True)
+
+class MainWindow(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        
+        # Set title and size
+        self.title("Pong Login")
 
         # Create our Socket Interface for the Main Server
         self.server_socket:Connection = Connection(MAIN_PORT)
 
-        # Run the main_loop
-        self.app.mainloop()
+        # Create our Login Page
+        self.main_frame = MainMenu(self)
+        self.main_buttons = TwoButton(self.main_frame, left_text='Login', right_text='Create Account', left_button=lambda:self.login(self.main_frame.username.box.get(), self.main_frame.password.box.get()), right_button=lambda:self.change_menu(self.create_frame))
+        self.main_error = Label(self.main_frame, label_name='error_label', label_text='')
 
-    def create_account(self, username:str, password:str, confirm:str, initials:str) -> None:
-        # Validate if the confirm and password are the same
-        if password != confirm:
-            self.create_error.configure(text='Passwords do not match')
-            pass
-        
-        # Request the server to create a new account
-        # new_message['username'], new_message['password'], new_message['initials']
-        self.server_socket.send(EncodeMessage({'request':'create_account', 'username':username, 'password':password, 'initials':initials}))
+        # Our Code Menu
+        self.code_frame = CodeMenu(self)
+        self.code_buttons = TwoButton(self.code_frame, left_text='Join Game', right_text='Create Game', left_button=lambda:self.join(self.code_frame.code.box.get()), right_button=lambda:self.make())
+        self.code_error = Label(self.code_frame, label_name='error_label', label_text='')
 
-        # Grab the return message
-        data = self.server_socket.recv()
-        if not data:
-            return
-    
-        new_message = data.message
-    
-        if new_message['return'] == False:
-            self.create_error.configure(text='Failed to create account')
-            return
-    
-        self.change_frame('code_frame')
+        # Create Account Menu
+        self.create_frame = CreateMenu(self)
+        self.create_buttons = TwoButton(self.create_frame, left_text='Back', right_text='Create Account', left_button=lambda:self.change_menu(self.main_frame), right_button=lambda:self.create(self.create_frame.username.box.get(), self.create_frame.password.box.get(), self.create_frame.confirm.box.get(), self.create_frame.initials.box.get()))
+        self.create_error = Label(self.create_frame, label_name='error_label', label_text='')
 
-    def create_game(self) -> None:
-        pass
+        # Start by setting to Login Page
+        self.change_menu(self.main_frame)
 
-    def join_game(self, code:str) -> None:
-        # Send the server our information
-        self.server_socket.send(EncodeMessage({'request':'join_game', 'code':code}))
-        pass
+    def change_menu(self, frame:Union[MainMenu, CreateMenu, CodeMenu]) -> None:
+        '''Change the Frame Menu'''
+        self.main_frame.pack_forget()
+        self.create_frame.pack_forget()
+        self.code_frame.pack_forget()
 
-    def try_login(self, username:str, password:str) -> None:
+        frame.pack(side='top', fill='both', expand=True)
+
+    def login(self, username:str, password:str) -> None:
+        '''Send a Request to the Server for Login Validation'''
         # Send the server our login
         self.server_socket.send(EncodeMessage({'request':'login', 'username':username, 'password':password}))
 
@@ -98,155 +181,43 @@ class Application:
 
         if new_message['return'] == False:
             # Inform the user the login failed
-            self.main_error.configure(text='Incorrect Login')
+            self.main_error.label.config(text='Incorrect Login')
             return
         
         # Login Successful, go to code_frame
-        self.change_frame('code_frame')
+        self.change_menu(frame=self.code_frame)
 
-    '''bug note: this function causes some frames to not be shown properly after clicking "Back" and "Create Account" multiple times'''
-    def change_frame(self, frame_name:str) -> None:
-        # Hide all frames and remember, grab the visible frame's center point
-        for frame in self.app.children.values():
-            # Remove the frame from the grid, hide the error label
-            #frame.children['error_label'].configure(text='')
-            frame.grid_remove()
+    def join(self, code:str) -> None:
+        '''Send a Request to the Server to Join a Game'''
+        pass
 
-        # Show the frame you want to display
-        next_frame = self.app.children[frame_name]
-        next_frame.grid(column=0, row=0)
+    def make(self) -> None:
+        '''Send a Request to the Server to Make a Game'''
+        pass
 
-    def main_menu(self) -> None:
-        '''Our main menu frame for login'''
-        # Create our frame
-        new_frame = tk.Frame(self.app, name='main_frame')
-        new_frame.grid(row=0, column=0)
+    def create(self, username:str, password:str, confirm:str, initials:str) -> None:
+        '''Send a Request to the Server to Create an Account'''
+        # Validate if the confirm and password are the same
+        if password != confirm:
+            self.create_error.label.config(text='Passwords do not match')
 
-        # Load our image
-        image_label = tk.Label(new_frame, image=self.image_item)
-        image_label.grid(column=0, row=0, columnspan=2, sticky='nsew')
+            pass
+        
+        # Request the server to create a new account
+        # new_message['username'], new_message['password'], new_message['initials']
+        self.server_socket.send(EncodeMessage({'request':'create_account', 'username':username, 'password':password, 'initials':initials}))
 
-        # Load our username label
-        username_label = tk.Label(new_frame, text='Username:')
-        username_label.grid(column=0, row=1, columnspan=1, sticky='e')
+        # Grab the return message
+        data = self.server_socket.recv()
+        if not data:
+            return
+    
+        new_message = data.message
+    
+        if new_message['return'] == False:
+            self.create_error.label.config(text='Failed to create account')
+            return
+    
+        self.change_menu(self.code_frame)
 
-        # Load our username box
-        username_box = tk.Entry(new_frame)
-        username_box.grid(column=1, row=1, columnspan=1, sticky='e')
-
-        # Load our password label
-        password_label = tk.Label(new_frame, text='Password:')
-        password_label.grid(column=0, row=2, columnspan=1, sticky='e')
-
-        # Load our password box
-        password_box = tk.Entry(new_frame)
-        password_box.grid(column=1, row=2, columnspan=1, sticky='e')
-
-        # Create our space label
-        space = tk.Label(new_frame, name='space')
-        space.grid(column=0, row=3, columnspan=2)
-
-        # Load our button
-        login_button = tk.Button(new_frame, text='Login', command=lambda:self.try_login(username_box.get(), password_box.get()))
-        login_button.grid(column=0, row=4, columnspan=1, sticky='ew')
-
-        # Load our button
-        create_button = tk.Button(new_frame, text='Create Account', command=lambda:self.change_frame('create_frame'))
-        create_button.grid(column=1, row=4, columnspan=1, sticky='ew')
-
-        # Create our error label
-        error_label = tk.Label(new_frame, name='error_label')
-        error_label.grid(column=0, row=5, columnspan=2)
-
-    def create_menu(self) -> None:
-        '''Our main menu frame for login'''
-        # Create our frame
-        new_frame = tk.Frame(self.app, name='create_frame')
-        new_frame.grid(row=0, column=0)
-
-        # Load our image
-        image_label = tk.Label(new_frame, image=self.image_item)
-        image_label.grid(column=0, row=0, columnspan=2, sticky='nsew')
-
-        # Load our username label
-        username_label = tk.Label(new_frame, text='Username:')
-        username_label.grid(column=0, row=1, columnspan=1, sticky='e')
-
-        # Load our username box
-        username_box = tk.Entry(new_frame)
-        username_box.grid(column=1, row=1, columnspan=1, sticky='e')
-
-        # Load our password label
-        password_label = tk.Label(new_frame, text='Password:')
-        password_label.grid(column=0, row=2, columnspan=1, sticky='e')
-
-        # Load our password box
-        password_box = tk.Entry(new_frame)
-        password_box.grid(column=1, row=2, columnspan=1, sticky='e')
-
-        # Load our confirmation password label
-        password_label_confirm = tk.Label(new_frame, text='Confirm Password:')
-        password_label_confirm.grid(column=0, row=3, columnspan=1, sticky='e')
-
-        # Load our confirmation password box
-        password_box_confirm = tk.Entry(new_frame)
-        password_box_confirm.grid(column=1, row=3, columnspan=1, sticky='e')
-
-        # Load our initials label
-        initials_label = tk.Label(new_frame, text='Initials:')
-        initials_label.grid(column=0, row=4, columnspan=1, sticky='e')
-
-        # Load our initials box
-        initials_box = tk.Entry(new_frame)
-        initials_box.grid(column=1, row=4, columnspan=1, sticky='e')
-
-        # Load our button
-        login_button = tk.Button(new_frame, text='Create Account', command=lambda:self.create_account(username_box.get(), password_box.get(), password_box_confirm.get(), initials_box.get()))
-        login_button.grid(column=1, row=5, columnspan=1, sticky='ew')
-
-        # Load our button
-        create_button = tk.Button(new_frame, text='Back', command=lambda:self.change_frame('main_frame'))
-        create_button.grid(column=0, row=5, columnspan=1, sticky='ew')
-
-        # Create our error label
-        error_label = tk.Label(new_frame, name='error_label')
-        error_label.grid(column=0, row=6, columnspan=2)
-
-    def code_menu(self) -> None:
-        '''Our code menu to enter a code'''
-        # Create our frame
-        new_frame = tk.Frame(self.app, name='code_frame')
-        new_frame.grid(row=0, column=0)
-
-        # Load our image
-        image_label = tk.Label(new_frame, image=self.image_item)
-        image_label.grid(column=0, row=0, columnspan=2, sticky='nsew')
-
-        # Load our code label
-        code_label = tk.Label(new_frame, text='Game Code:')
-        code_label.grid(column=0, row=1, columnspan=1, sticky='e')
-
-        # Load our code box
-        code_box = tk.Entry(new_frame)
-        code_box.grid(column=1, row=1, columnspan=1, sticky='e')
-
-        # Create our space label
-        space = tk.Label(new_frame, name='space')
-        space.grid(column=0, row=2, columnspan=2)
-
-        # Create our space label
-        space = tk.Label(new_frame, name='space')
-        space.grid(column=0, row=3, columnspan=2)
-
-        # Load our button to join a game
-        login_button = tk.Button(new_frame, text='Join Game', command=lambda:self.join_game(code_box.get()))
-        login_button.grid(column=0, row=4, columnspan=1, sticky='ew')
-
-        # Load our button to create a game
-        create_button = tk.Button(new_frame, text='Create Game', command=self.create_game)
-        create_button.grid(column=1, row=4, columnspan=1, sticky='ew')
-
-        # Create our error label
-        error_label = tk.Label(new_frame, name='error_label')
-        error_label.grid(column=0, row=5, columnspan=2)
 
