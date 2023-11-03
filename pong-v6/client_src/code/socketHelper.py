@@ -119,7 +119,12 @@ class Connection:
     def recv(self) -> Optional[DecodeMessage]:
         '''Attempts to Send the Message to the Server'''
         try:
-            new_message = DecodeMessage(self.client.recv())
+            new_message = DecodeMessage(self.client.recv(RECEIVER_SIZE))
+            if not hasattr(new_message, 'message'):
+                print('Client Disconnected')
+                self.client.close()
+                self.connection_open = False
+                return None
         except ssl.SSLError as new_error:
             print('Error on Recv: ', new_error)
             self.client.close()
