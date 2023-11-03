@@ -15,7 +15,6 @@ from typing import Tuple, Optional
 
 DATABASE_PATH:str = './database/holder.db'
 
-
 class Database:
     def __init__(self) -> None:
         # Create the Connector
