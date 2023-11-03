@@ -9,8 +9,6 @@ import threading as th
 # Our spectate interface for spectators
 #from code.spectate import Spectator
 
-    
-
 if __name__ == "__main__":
     app = MainWindow()
     app.mainloop()
