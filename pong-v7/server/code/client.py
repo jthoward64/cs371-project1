@@ -3,7 +3,7 @@
 # Email Addresses:          jmst231@uky.edu, Email Here, Email Here
 # Date:                     October 29th, 2023
 # Purpose:                  Creates our Client Thread to Manage Request from Client
-# Misc:                     
+# Misc:                     A part of the Lobby Server
 # =================================================================================================
 
 # Our Client Socket and Server Management
@@ -23,6 +23,9 @@ from helpers.gameinfo import GameInformation
 
 # For Type Hinting
 from multiprocessing.synchronize import Event
+
+# Game Server
+from .game import GameServer
 
 class Client:
     def __init__(self, connection:ClientWrapper, shut_down:Event, game_info:GameInformation) -> None:
@@ -93,7 +96,18 @@ class Client:
     
     def create_game(self, request:dict) -> None:
         '''Attempts to create a new game instance'''
-        self.connection.send({'request':'create_game', 'return':False, 'error':'Code Not Complete'})
+
+        # Generate new code, return it to the Client
+        new_code, new_port = self.game_info.generate_code()
+
+        # Generate a new game process
+        new_game = mp.Process(target=GameServer, args=(new_code, new_port, self.shut_down, self.game_info))
+        with self.game_info._lock:
+            self.game_info.game_process.append(new_game)
+
+        new_game.start()
+
+        self.connection.send({'request':'create_game', 'return':True, 'message':new_port})
     
     def join_game(self, request:dict) -> None:
         '''Informs Client to Start Game if Exists'''
@@ -103,15 +117,15 @@ class Client:
             return
         
         # Check if code is in game_codes
-        new_code = self.game_info.check_code(request['code'])
-        if new_code is None:
+        new_port = self.game_info.check_code(request['code'])
+        if new_port is None:
             print('Invalid Game Code')
             self.connection.send({'request':'join_game', 'return':False, 'error':'Invalid Game Code'})
             return
         
         # Success, send the message
         print('Valid Game Code')
-        self.connection.send({'request':'join_game', 'return':True, 'message':new_code})
+        self.connection.send({'request':'join_game', 'return':True, 'message':new_port})
 
     def run_thread(self) -> None:
         '''Our main function for the Client Thread'''

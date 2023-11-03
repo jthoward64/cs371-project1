@@ -45,6 +45,8 @@ class LobbyServer:
         signal.signal(signal.SIGINT, self.signal_shutdown)
         signal.signal(signal.SIGTERM, self.signal_shutdown)
 
+        self.lobby
+
         # Grab our Game Information
         self.game_info = GameInformation()
 
