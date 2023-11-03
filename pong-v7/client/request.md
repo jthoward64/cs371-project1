@@ -1,39 +1,3 @@
-# Main Responses (server.py):
-## Type: login
-Description: A request from the Client to Validate their Login Credentials to the Server
-
-Required Parameters: new_message['username'], new_message['password']
-
-Success: `{'request':'login', 'return':True, 'message':None}`
-
-Failure: `{'request':'login', 'return':False, 'message':message}`
-
-## Type: join_game
-Description: A request from the Client to join a game server (using code) by requesting which Port the Server is Listening to
-
-Required Parameters: new_message['code']
-
-Success: `{'request':'join_game', 'return':True, 'message':self.game_codes[new_message['code']]}`
-
-Failure: `{'request':'join_game', 'return':False, 'message':'Game does not exist'}`
-
-Return Parameters:
-Success: integer port number to connect with
-Failure: 'Game does not exist'
-
-## Type: create_game
-Description: A request from the Client to create a new game server
-
-Success: `{'request':'create_game', 'return':True, 'message':new_port}`
-
-Failure: {'request':'create_game', 'return':False, 'message':'Failed to create game'}
-
-Return Parameters:
-Success: 'message' = integer port number to connect with
-Failure: None Listed
-
-
-
 # Game (game.py):
 ## Type: join_game
 Description: A request from the Client to validate their login and join into playing or spectating the game
