@@ -92,8 +92,6 @@ class LobbyServer:
             # Start the thread
             new_thread.start()
 
-        
-
         # Wait for all threads to finish
         self.leaderboard_thread.join()
         for thread in self.thread_list:
