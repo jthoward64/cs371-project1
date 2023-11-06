@@ -1,4 +1,5 @@
 *.pyc
 .DS_STORE
-/pong-v6/pong
+/pong/pong
+/pong-v*/pong
 __pychache__
