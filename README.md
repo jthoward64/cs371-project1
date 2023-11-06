@@ -11,7 +11,7 @@
 ## Current Version | Release: 3.0 | pong
 This is the current active version of the Pong Game
 
-## Experimental Version | Releases: 7.0.0 | pong-v7
+## Experimental Version | Releases: 7.1.0 | pong-v7
 This is the experimental version of the Pong Game
 
 To run PHP Server (Webpage on Port 80):

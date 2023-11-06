@@ -3,7 +3,7 @@
 const refreshButton = document.getElementById('refreshButton');
 
 // The URL of our server
-const dataPath = 'localhost:6000';
+const dataPath = './board.json';
 
 // Holds our leaderboard
 const scoreHolder = document.getElementById('scoreHolder');

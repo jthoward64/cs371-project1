@@ -11,7 +11,7 @@ import sqlite3 as connector
 from sqlite3 import Error
 
 # For Type Hinting
-from typing import Tuple, Optional
+from typing import Tuple, Union
 
 DATABASE_PATH:str = './database/holder.db'
 
@@ -110,3 +110,38 @@ class Database:
                 return False, 'Account does not exists', 0
             
             return True, 'Success', result[0]
+        
+    def grab_leaderboard(self) -> Union[dict, None]:
+        '''Returns a Dictionary of Top Players'''
+        with self._connect as conn:
+            
+            cursor = conn.cursor()
+
+            new_query = 'SELECT initials, wins FROM users ORDER BY wins DESC LIMIT 10;'
+
+            try:
+                cursor.execute(new_query)
+            except Error as new_error:
+                print(f'Failed to grab leaderboard: {new_error}')
+                return None
+            
+
+            try:
+                result = cursor.fetchall()
+            except Error as new_error:
+                print(f'Failed to fetch leaderboard: {new_error}')
+                return None
+            
+            # Check if our result is None
+            if result is None:
+                print('Leaderboard does not exist')
+                return None
+            
+            # Create a dictionary holder
+            holder = {}
+            
+            # Conver the result into a dictionary
+            for item in result:
+                holder[item[0]] = item[1]
+            
+            return holder
