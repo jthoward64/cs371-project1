@@ -15,8 +15,8 @@ MAIN_PORT:int = 4000
 RECEIVER_SIZE:int = 1024
 
 # The range of acceptable ports
-LOWER_PORT:int = 49152
-UPPER_PORT:int = 65535
+LOWER_PORT:int = 15000
+UPPER_PORT:int = 16000
 
 # Settings for the Server Creation
 ADDRESS_FAMILY = AF_INET
