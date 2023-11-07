@@ -17,7 +17,7 @@ from .sockethelper import Connection
 # This is the main game loop.  For the most part, you will not need to modify this.  The sections
 # where you should add to the code are marked.  Feel free to change any part of this project
 # to suit your needs.
-def playGame(screenWidth: int, screenHeight: int, client: socket.socket) -> None:
+def playGame(screenWidth: int, screenHeight: int, client: Connection) -> None:
     # Pygame inits
     pygame.mixer.pre_init(44100, -16, 2, 2048)
     pygame.init()
@@ -137,29 +137,14 @@ def playGame(screenWidth: int, screenHeight: int, client: socket.socket) -> None
         )
         clock.tick(60)
 
-        success = sendInfo(client, {"Type": "Spectator"})
-
-        if not success:
-            # What do we do when there isn't a success?
-            # I suggest continue or looping until we get a success
-            pass
-
-        try:
-            # Our updated information
-            responsePackage = client.recv(512).decode()
-        except ConnectionResetError:
-            responsePackage = False
-
-        # Did our server disconnect?
-        if not responsePackage:
+        if not client.send({"Type": "Spectator"}):
             print("Server Disconnected")
             pygame.quit()
             return
 
-        # Try opening the JSON
-        success, newInfo = unpackInfo(responsePackage)
+        newInfo = client.recv()
 
-        if not success:
+        if not newInfo:
             # Failed to unpack, skip because we can't grab info
             # Can also add a loop here to attempt again a few times
             continue
