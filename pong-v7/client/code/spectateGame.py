@@ -6,9 +6,13 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
-from handler.connectionHandler import sendInfo, unpackInfo
-from assets.code.helperCode import *
-import pygame, socket
+import socket
+
+import pygame
+
+from .helperCode import *
+from .sockethelper import Connection
+
 
 # This is the main game loop.  For the most part, you will not need to modify this.  The sections
 # where you should add to the code are marked.  Feel free to change any part of this project
@@ -17,7 +21,7 @@ def playGame(screenWidth: int, screenHeight: int, client: socket.socket) -> None
     # Pygame inits
     pygame.mixer.pre_init(44100, -16, 2, 2048)
     pygame.init()
-    
+
     # Set to spectator mode
     pygame.display.set_caption(f"Currently Spectating")
 
@@ -43,7 +47,9 @@ def playGame(screenWidth: int, screenHeight: int, client: socket.socket) -> None
     paddleWidth = 10
     paddleStartPosY = (screenHeight / 2) - (paddleHeight / 2)
     leftPaddle = Paddle(pygame.Rect(10, paddleStartPosY, paddleWidth, paddleHeight))
-    rightPaddle = Paddle(pygame.Rect(screenWidth - 20, paddleStartPosY, paddleWidth, paddleHeight))
+    rightPaddle = Paddle(
+        pygame.Rect(screenWidth - 20, paddleStartPosY, paddleWidth, paddleHeight)
+    )
 
     ball = Ball(pygame.Rect(screenWidth / 2, screenHeight / 2, 5, 5), -5, 0)
 
@@ -137,7 +143,7 @@ def playGame(screenWidth: int, screenHeight: int, client: socket.socket) -> None
             # What do we do when there isn't a success?
             # I suggest continue or looping until we get a success
             pass
-        
+
         try:
             # Our updated information
             responsePackage = client.recv(512).decode()
@@ -157,8 +163,8 @@ def playGame(screenWidth: int, screenHeight: int, client: socket.socket) -> None
             # Failed to unpack, skip because we can't grab info
             # Can also add a loop here to attempt again a few times
             continue
-        
-        '''
+
+        """
         Example of Update
         
         update = {
@@ -178,7 +184,7 @@ def playGame(screenWidth: int, screenHeight: int, client: socket.socket) -> None
             }
             "Sync": 0,
         }
-        '''
+        """
 
         # Update paddle information
         leftPaddle.rect.x = newInfo["lPaddle"]["X"]
@@ -186,7 +192,7 @@ def playGame(screenWidth: int, screenHeight: int, client: socket.socket) -> None
         leftPaddle.moving = newInfo["lPaddle"]["moving"]
         rightPaddle.rect.x = newInfo["rPaddle"]["X"]
         rightPaddle.rect.y = newInfo["rPaddle"]["Y"]
-        rightPaddle.moving =newInfo["rPaddle"]["Moving"]
+        rightPaddle.moving = newInfo["rPaddle"]["Moving"]
 
         # Update ball and score information
         ball.rect.x = newInfo["Ball"]["X"]

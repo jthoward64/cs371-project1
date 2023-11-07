@@ -6,14 +6,20 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
-from handler.connectionHandler import sendInfo, unpackInfo
-from assets.code.helperCode import *
-import pygame, socket
+import socket
+
+import pygame
+
+from .helperCode import *
+from .sockethelper import Connection
+
 
 # This is the main game loop.  For the most part, you will not need to modify this.  The sections
 # where you should add to the code are marked.  Feel free to change any part of this project
 # to suit your needs.
-def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: socket.socket) -> None:
+def playGame(
+    screenWidth: int, screenHeight: int, playerPaddle: str, client: socket.socket
+) -> None:
     # Pygame inits
     pygame.mixer.pre_init(44100, -16, 2, 2048)
     pygame.init()
@@ -87,7 +93,7 @@ def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: soc
         # Feel free to change when the score is updated to suit your needs/requirements
         """ Last Modified October 14th, 2023 ************************************************************************************************ """
 
-        '''
+        """
         Example of Update
         
         update = {
@@ -107,7 +113,7 @@ def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: soc
             }
             "Sync": 0,
         }
-        '''
+        """
 
         update = {
             "Type": "Update",
@@ -124,7 +130,7 @@ def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: soc
                 "X": ball.rect.x,
                 "Y": ball.rect.y,
             },
-            "Sync": sync
+            "Sync": sync,
         }
 
         success = sendInfo(client, update)
@@ -153,7 +159,7 @@ def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: soc
             textRect.centerx = int(screenWidth / 2)
             textRect.centery = int(screenHeight / 2)
             winMessage = screen.blit(textSurface, textRect)
-            ''' ---------------------------------------------------------------- Modify for Game Restart ---------------------------------------------------------------- '''
+            """ ---------------------------------------------------------------- Modify for Game Restart ---------------------------------------------------------------- """
         else:
             # ==== Ball Logic =====================================================================
             ball.updatePos()
@@ -223,10 +229,10 @@ def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: soc
         if not success:
             # What do we do when there isn't a success?
             # I suggest continue or looping until we get a success
-            
-           # sendInfo(client, {"Type": "Grab"})
+
+            # sendInfo(client, {"Type": "Grab"})
             pass
-        
+
         try:
             # Our updated information
             responsePackage = client.recv(512).decode()
@@ -246,8 +252,8 @@ def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: soc
             # Failed to unpack, skip because we can't grab info
             # Can also add a loop here to attempt again a few times
             continue
-        
-        '''
+
+        """
         Example of Update
         
         update = {
@@ -267,12 +273,12 @@ def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: soc
             }
             "Sync": 0,
         }
-        '''
+        """
 
         # Update opponent paddle information
         opponentPaddleObj.rect.x = newInfo["Paddle"]["X"]
         opponentPaddleObj.rect.y = newInfo["Paddle"]["Y"]
-        opponentPaddleObj.moving =newInfo["Paddle"]["Moving"]
+        opponentPaddleObj.moving = newInfo["Paddle"]["Moving"]
 
         # Check if we need to update the ball and score
         if newInfo["Sync"] > sync:
