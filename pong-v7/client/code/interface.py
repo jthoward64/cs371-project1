@@ -1,6 +1,6 @@
 # =================================================================================================
-# Contributing Authors:	    Michael Stacy, Name Here, Name Here
-# Email Addresses:          jmst231@uky.edu, Email Here, Email Here
+# Contributing Authors:	    Michael Stacy, Juliann Hyatt, Name Here
+# Email Addresses:          jmst231@uky.edu, jnhy222@uky.com, Email Here
 # Date:                     October 31st, 2023
 # Purpose:                  Our Tkinter Interface for Clients
 # Misc:                     
