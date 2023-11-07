@@ -1,6 +1,6 @@
 # =================================================================================================
-# Contributing Authors:	    Michael Stacy, Name Here, Name Here
-# Email Addresses:          jmst231@uky.edu, Email Here, Email Here
+# Contributing Authors:	    Michael Stacy, Juliann Hyatt, Name Here
+# Email Addresses:          jmst231@uky.edu, jnhy222@uky.edu, Email Here
 # Date:                     October 29th, 2023
 # Purpose:                  A way to create an encrypted Server Socket for Games and Main Server
 # Misc:                     Documentation: https://docs.python.org/3/library/ssl.html

@@ -1,6 +1,6 @@
 # =================================================================================================
-# Contributing Authors:	    <Anyone who touched the code>
-# Email Addresses:          <Your uky.edu email addresses>
+# Contributing Authors:	    <Juliann Hyatt,Anyone who touched the code>
+# Email Addresses:          <jnhy222@uky.com Your uky.edu email addresses>
 # Date:                     <The date the file was last edited>
 # Purpose:                  <How this file contributes to the project>
 # Misc:                     <Not Required.  Anything else you might want to include>
@@ -223,6 +223,8 @@ def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: soc
         if not success:
             # What do we do when there isn't a success?
             # I suggest continue or looping until we get a success
+            
+           # sendInfo(client, {"Type": "Grab"})
             pass
         
         try:
