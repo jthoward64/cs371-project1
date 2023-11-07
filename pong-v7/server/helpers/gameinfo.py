@@ -52,8 +52,8 @@ class GameInformation:
         new_code = "".join(random.choice(choice_list) for _ in range(6))
 
         with self._lock:
-            if self.game_codes[new_code]:
-                return self.generate_code()
+            while self.game_codes.get(new_code):
+                new_code = "".join(random.choice(choice_list) for _ in range(6))
 
             # Check if the port is in usage
             while self.check_port(test_port):
