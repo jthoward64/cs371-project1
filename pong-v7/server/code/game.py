@@ -62,7 +62,6 @@ class Information:
         # Sync of the Clients
         self.sync:int = 0
 
-
 class GameServer:
     # new_game = mp.Process(target=GameServer, args=(new_code, new_port, self.shut_down, self.game_info))
     def __init__(self, new_code:str, new_port:int, shut_down:Event) -> None:

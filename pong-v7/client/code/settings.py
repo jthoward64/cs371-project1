@@ -17,6 +17,9 @@ RECEIVER_SIZE:int = 1024
 ADDRESS_FAMILY = AF_INET # IPv4
 SOCKET_KIND = SOCK_STREAM # TCP
 
+WINDOW_HEIGHT = 480
+WINDOW_WIDTH = 640
+
 # Settings for the Server Encryption
 CERTFILE:str='./certs/cert.pem'
 

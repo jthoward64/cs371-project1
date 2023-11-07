@@ -62,9 +62,6 @@ class LobbyServer:
         # For shutting down entire server
         self.shut_down:Event = mp.Event()
 
-        self.leaderboard_thread = th.Thread(target=self.leaderboard)
-        self.leaderboard_thread.start()
-
         while not self.shut_down.is_set():
 
             # Accept an incoming Client
@@ -93,7 +90,6 @@ class LobbyServer:
             new_thread.start()
 
         # Wait for all threads to finish
-        self.leaderboard_thread.join()
         for thread in self.thread_list:
             thread.join()
         for process in self.game_info.game_process:
@@ -102,25 +98,3 @@ class LobbyServer:
     def signal_shutdown(self, signal:int, frame:Optional[FrameType]) -> None:
         '''Handles the signal for shutting down'''
         self.shut_down.set()
-
-    def leaderboard(self) -> None:
-        '''Handles the leaderboard settings update'''
-        file_path = '../HTML/board.json'
-
-        leaderboard_db = Database()
-
-        # While the server is running, refresh the leaderboard every 5 seconds
-        while not self.shut_down.is_set():
-            time.sleep(5)
-            
-            # Grab the current leaderboard
-            leaderboard_list = leaderboard_db.grab_leaderboard()
-
-            # Ensure the leaderboard actually exists
-            if leaderboard_list is None:
-                print('Error: Leaderboard not found')
-                continue
-            
-            # Update our leaderboard
-            with open(file_path, 'w') as fp:
-                json.dump(leaderboard_list, fp)

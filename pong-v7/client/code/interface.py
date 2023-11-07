@@ -13,7 +13,11 @@ from typing import Callable, Union
 
 from .sockethelper import Connection
 
-from .settings import MAIN_PORT
+from .settings import MAIN_PORT, WINDOW_HEIGHT, WINDOW_WIDTH
+
+from .spectateGame import playGame as spectateGame
+from .playGame import playGame
+
 
 class Image(tk.Frame):
     def __init__(self, parent:tk.Widget, label_image:tk.Image) -> None:
@@ -152,6 +156,34 @@ class MainWindow(tk.Tk):
         # Start by setting to Login Page
         self.change_menu(self.main_frame)
 
+    def game_connect(self, port:int) -> bool:
+        '''Attempts to join the Game Server'''
+        self.game_server = Connection(port)
+        
+        # Check if the connection is established
+        if not self.game_server.connection_open:
+            return False
+
+        # Success, close the socket
+        self.server_socket.close()
+
+        self.game_server.send({'request':'join_game', 'username':self.username, 'password':self.password})
+
+        new_message = self.game_server.recv()
+
+        if new_message is None:
+            print('Error, message is empty')
+            return False
+        
+        if new_message['player'] == 'spectate':
+            spectateGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server)
+        elif new_message['player'] == 'right_player':
+            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server)
+        elif new_message['player'] == 'left_player':
+            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server)
+
+        return True
+
     def change_menu(self, frame:Union[MainMenu, CreateMenu, CodeMenu]) -> None:
         '''Change the Frame Menu'''
         self.main_frame.pack_forget()
@@ -180,6 +212,8 @@ class MainWindow(tk.Tk):
             return
         
         # Login Successful, go to code_frame
+        self.username = username
+        self.password = password
         self.change_menu(frame=self.code_frame)
 
     def join(self, code:str) -> None:
@@ -194,9 +228,10 @@ class MainWindow(tk.Tk):
         if new_message['return'] == False:
             self.code_error.label.config(text=new_message['error'])
             return
-        
-        self.code_error.label.config(text='Success, add start_game')
 
+        if not self.game_connect(new_message['message']):
+            self.code_error.label.config(text='Error: could not connect to game server')
+        
     def make(self) -> None:
         '''Send a Request to the Server to Make a Game'''
         print(f'Attempting to make game.')
@@ -212,7 +247,8 @@ class MainWindow(tk.Tk):
             self.code_error.label.config(text=new_message['error'])
             return
         
-        self.code_error.label.config(text='Success, add start_game')
+        if not self.game_connect(new_message['message']):
+            self.code_error.label.config(text='Error: could not connect to game server')
 
     def create(self, username:str, password:str, confirm:str, initials:str) -> None:
         '''Send a Request to the Server to Create an Account'''
