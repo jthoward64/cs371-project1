@@ -1,16 +1,28 @@
 <!DOCTYPE html>
-    <head>
-        <title>Pong Leaderboard</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
-        <script scr="leaderboard.js"></script>
-    </head>
-    <body>
-        <div class="ui segment">
-            <h1 class="ui center aligned segment">Pong Leaderboard</h1>
-            <button id='refreshButton' class="ui fluid primay button">
-                <i class="redo icon"></i>Refresh
-            </button>
+
+<head>
+    <title>Pong Leaderboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    <script scr="leaderboard.js"></script>
+</head>
+
+<body>
+    <div class="ui segment">
+        <dialog id="error-dialog" class="ui modal"
+            style="position: absolute;margin-left: auto;margin-right: auto;left: 0;right: 0;text-align: center;">
+            <div class="header">Error</div>
+            <div class="content">
+                <p id="error-message"></p>
+            </div>
+            <div class="actions">
+                <button id="error-ok" class="ui primary button">OK</button>
+            </div>
+        </dialog>
+        <h1 class="ui center aligned segment">Pong Leaderboard</h1>
+        <button id='refreshButton' class="ui fluid primay button">
+            <i class="redo icon"></i>Refresh
+        </button>
         <div class="ui horizontal segments">
             <div class="ui segment">
                 <div id="nameHolder" class="ui vertical segments">
@@ -27,30 +39,27 @@
                 </div>
             </div>
         </div>
-        </div>
-    </body>
+    </div>
     <script>
         // The refresh button used to grab the leaderboard from the server
         const refreshButton = document.getElementById('refreshButton');
 
         // The URL of our server
-        const dataPath = 'http://localhost:8500/leaderboard';
+        const dataPath = 'http://localhost:8500/';
 
         // Holds our leaderboard
         const scoreHolder = document.getElementById('scoreHolder');
         const nameHolder = document.getElementById('nameHolder');
 
         // Grabs our new leaderboard data, manipulates the leaderboard
-        function loadboard() {
-            // Grab new data
-            fetch(dataPath)
-            .then(response => {
+        async function loadboard() {
+            try {
+                // Grab new data
+                const response = await fetch(dataPath)
                 if (!response.ok) { // Check if response came back fine
                     throw new Error('Network error ' + response.statusText);
                 }
-                return response.json(); // Parse JSON data
-            })
-            .then(data => {
+                const data = await response.json(); // Parse JSON data
                 // Check if data is actually present
                 if (!data) {
                     throw new Error('Data is null or undefined');
@@ -73,10 +82,13 @@
                 } else {
                     console.error('Unexpected data type:', data);
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
-            });
+
+                document.getElementById('error-message').textContent = error.message;
+                document.getElementById('error-dialog').showModal();
+                document.getElementById('error-dialog').classList.add('active');
+            }
         }
 
         // When the client clicks "Refresh", refresh the leaderboard.
@@ -84,5 +96,13 @@
 
         // Load the leaderboard when the page is ready
         window.addEventListener('load', loadboard);
+
+        // When the client clicks "OK" on the error dialog, close it.
+        document.getElementById('error-ok').addEventListener('click', () => {
+            document.getElementById('error-dialog').close();
+            document.getElementById('error-dialog').classList.remove('active');
+        });
     </script>
+</body>
+
 </html>
