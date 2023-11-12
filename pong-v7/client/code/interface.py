@@ -233,9 +233,9 @@ class MainWindow(tk.Tk):
         if new_message['player'] == 'spectate':
             spectateGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server)
         elif new_message['player'] == 'right_player':
-            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server)
+            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server, "right")
         elif new_message['player'] == 'left_player':
-            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server)
+            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server, "left")
 
         return True
 
