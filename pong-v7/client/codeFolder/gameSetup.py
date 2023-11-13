@@ -16,7 +16,7 @@ class gameInstance:
     def __init__(self,screenWidth: int, 
                      screenHeight: int, 
                      playerPaddle: str, 
-                     client: socket.socket):
+                     client: Connection):
         self.isBuilt = 0
         self.screenWidth = screenWidth
         self.screenHeight = screenHeight
@@ -49,7 +49,13 @@ class gameInstance:
         )
         self.ball = Ball(pygame.Rect(screenWidth / 2, screenHeight / 2, 5, 5), -5, 0) 
         self.isBuilt = 1
-
+        
+        
+        # Author:      Juliann Hyatt
+        # Purpose:     Reset game instance to original state
+        # Pre:         Assumes conclusion of game reached
+        # Post:        resets gameInstance for play again
+        
     def reset(self) :
         self.isBuilt = 0
         #These are initialized during game setup

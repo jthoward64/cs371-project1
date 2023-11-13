@@ -96,7 +96,7 @@ class MainMenu(tk.Frame):
         super().__init__(parent)
 
         # Our image item
-        self.image_item = tk.PhotoImage(file="assets/images/logo.png")
+        self.image_item = tk.PhotoImage(file="client/assets/images/logo.png")
 
         # Our image
         self.image = Image(self, self.image_item)
@@ -117,7 +117,7 @@ class CodeMenu(tk.Frame):
         super().__init__(parent)
 
         # Our image item
-        self.image_item = tk.PhotoImage(file="assets/images/logo.png")
+        self.image_item = tk.PhotoImage(file="client/assets/images/logo.png")
 
         # Our image
         self.image = Image(self, self.image_item)
@@ -133,7 +133,7 @@ class CreateMenu(tk.Frame):
         super().__init__(parent)
 
         # Our image item
-        self.image_item = tk.PhotoImage(file="assets/images/logo.png")
+        self.image_item = tk.PhotoImage(file="client/assets/images/logo.png")
         # Our image
         self.image = Image(self, self.image_item)
 
@@ -233,9 +233,9 @@ class MainWindow(tk.Tk):
         if new_message['player'] == 'spectate':
             spectateGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server)
         elif new_message['player'] == 'right_player':
-            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server)
+            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "right", self.game_server, )
         elif new_message['player'] == 'left_player':
-            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server)
+            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "left", self.game_server)
 
         return True
 

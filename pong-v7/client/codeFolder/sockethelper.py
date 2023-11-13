@@ -57,7 +57,7 @@ class Connection:
             return
         except socket.error as new_error:
             print("Error on Socket:", new_error)
-            del self.client
+            #del self.client
             return
 
         # Success, inform we are open to the server
