@@ -13,7 +13,7 @@
     },
     {
       "name": "Start Client",
-      "cwd": "${workspaceFolder}/pong",
+      "cwd": "${workspaceFolder}/pong-v7/client",
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/pong-v7/client/client.py"

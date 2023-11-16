@@ -6,8 +6,6 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
-import socket
-
 import pygame
 
 from .helperCode import *
@@ -114,6 +112,7 @@ def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: Con
         # If the game is over, display the win message
             if lScore > 4 or rScore > 4:
                     winText = "Player 1 Wins! " if lScore > 4 else "Player 2 Wins! "
+                    winText = winText +"\n P to Play Again"
                     textSurface = gameInt.winFont.render(winText, False, gameInt.WHITE, (0, 0, 0))
                     textRect = textSurface.get_rect()
                     textRect.centerx = int(gameInt.screenWidth / 2)
@@ -254,5 +253,5 @@ def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: Con
                 rScore = newInfo["Score"]["rScore"]
                 sync = newInfo["Sync"]
 
-        """ Last Modified October 14th, 2023 ************************************************************************************************ """
-        """ Last Modified October 14th, 2023 ************************************************************************************************ """
+        """ Last Modified November 16th, 2023 ************************************************************************************************ """
+        
