@@ -141,7 +141,7 @@ class GameServer:
         for thread in self.thread_list:
             thread.join()
 
-    def client(self, control: ClientWrapper):
+    def client(self, control: ClientWrapper) -> None:
         """Handles the Client Connections"""
         # Game Information
         username: str = ""

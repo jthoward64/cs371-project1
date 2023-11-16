@@ -1,5 +1,5 @@
 # Our user interface
-from code.interface import MainWindow
+from codeFolder.interface import MainWindow
 
 import threading as th
 

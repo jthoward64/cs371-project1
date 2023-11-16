@@ -12,9 +12,6 @@ import multiprocessing as mp
 # For Type Hinting
 from multiprocessing.synchronize import Event
 
-# Type Hinting requirements
-from typing import Optional
-
 # Our Client Socket and Server Management
 from helpers.clientwrapper import ClientWrapper
 
