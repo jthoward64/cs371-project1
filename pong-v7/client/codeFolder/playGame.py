@@ -205,7 +205,7 @@ def playGame(
 
             try:
                 # Our updated information
-                responsePackage = client.recv(512).decode()  # type: ignore
+                responsePackage = client.recv().decode()  # type: ignore
             except ConnectionResetError:
                 responsePackage = False
 
