@@ -180,7 +180,7 @@ class GameServer:
 
             # Requesting to join the 
             print(new_message)
-            if new_message["type"] == "join_game":
+            if new_message["request"] == "join_game":
                 # Check if username is valid, else exit this client
                 validated, message = database.validate_user(
                     new_message["username"], new_message["password"]

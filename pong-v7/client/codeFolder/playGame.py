@@ -37,12 +37,17 @@ def playGame(
     gameInt.currentPlayer = 1 if gameInt.playerPaddle == "left" else 2
     pygame.display.set_caption(f"Player: {gameInt.currentPlayer} - {game_code}")
 
-    if gameInt.playerPaddle == "left":
+    if gameInt.currentPlayer == 1:
         opponentPaddleObj = gameInt.rightPaddle
         playerPaddleObj = gameInt.leftPaddle
     else:
         opponentPaddleObj = gameInt.leftPaddle
         playerPaddleObj = gameInt.rightPaddle
+    #FIXME wait for player 2
+    cilent.send("request":"start_game")
+    client.recv()
+
+    
     playAgain = True
     while playAgain:
         playAgain = False
@@ -211,7 +216,9 @@ def playGame(
                 # Error? Idk what to do here
                 continue
 
-            key = 'right_player' if gameInt.playerPaddle == 'left' else 'left_player'
+            key = 'right_player' 
+            if gameInt.playerPaddle == 'right':
+            	key = 'left_player'
             opponentPaddleObj.rect.y = msg[key]['Y']
             opponentPaddleObj.moving = msg[key]['Moving']
             lScore = msg['score']['lScore']
