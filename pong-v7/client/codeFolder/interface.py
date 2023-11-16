@@ -248,6 +248,9 @@ class MainWindow(tk.Tk):
                 "Error, return is not true, are username and password correct? Message is: ",
                 new_message.get("message"),
             )
+            self.code_error.label.config(
+                text=new_message.get("message", "Unknown game start error.")
+            )
             return False
 
         if new_message.get("message") == "spectate":
