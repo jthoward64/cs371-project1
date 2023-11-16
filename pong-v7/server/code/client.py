@@ -24,6 +24,9 @@ from helpers.gameinfo import GameInformation
 # Game Server
 from .game import GameServer
 
+# Used to create our Game Server
+from helpers.serversocket import ServerSocket
+
 
 class Client:
     def __init__(
@@ -122,7 +125,8 @@ class Client:
         """Attempts to create a new game instance"""
 
         # Generate new code, return it to the Client
-        new_code = self.game_info.generate_code()
+        game_server = ServerSocket(0)
+        new_code = self.game_info.generate_code(game_server)
 
         # Generate a new game process
         new_game = mp.Process(
@@ -130,6 +134,7 @@ class Client:
             args=(
                 new_code,
                 self.shut_down,
+                game_server
             ),
         )
         with self.game_info._lock:
@@ -138,7 +143,7 @@ class Client:
         new_game.start()
 
         self.connection.send(
-            {"request": "create_game", "return": True, "message": 1337}
+            {"request": "create_game", "return": True, "message": game_server.port}
         )
 
     def join_game(self, request: dict) -> None:

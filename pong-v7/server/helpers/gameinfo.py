@@ -16,6 +16,8 @@ from threading import Lock
 # Type Hinting
 from typing import Dict, List, Optional
 
+# ServerSocket Gaming Process
+from helpers.serversocket import ServerSocket
 
 class GameInformation:
     _lock = Lock()
@@ -27,7 +29,7 @@ class GameInformation:
         # Our List of Game Processes
         self.game_process: List[Process] = []
 
-    def generate_code(self) -> str:
+    def generate_code(self, game_server:ServerSocket) -> str:
         """Generate a Random Game Code"""
         # Grab the list of ascii characters and digits
         choice_list = string.ascii_letters + string.digits + "." + "!" + "-" + ";"
@@ -39,7 +41,7 @@ class GameInformation:
             while self.game_codes.get(new_code):
                 new_code = "".join(random.choice(choice_list) for _ in range(6))
 
-            self.game_codes[new_code] = # Add New Code to create Binding of Server Socket
+            self.game_codes[new_code] = ServerSocket.port
 
         return new_code
 

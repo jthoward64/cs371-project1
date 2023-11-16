@@ -73,9 +73,9 @@ class Information:
 
 class GameServer:
     # new_game = mp.Process(target=GameServer, args=(new_code, new_port, self.shut_down, self.game_info))
-    def __init__(self, new_code: str, shut_down: Event) -> None:
+    def __init__(self, new_code: str, shut_down: Event, game_server:ServerSocket) -> None:
         """Creates the Lobby Server"""
-        self.game_server = ServerSocket(0)
+        self.game_server = game_server
 
         self.code = new_code
 
