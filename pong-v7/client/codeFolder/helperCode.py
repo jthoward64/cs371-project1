@@ -2,11 +2,12 @@
 import pygame
 
 # This draws the score to the screen
+# had to cast textRect as int as it was reading as a float -JNH
 def updateScore(lScore:int, rScore:int, screen:pygame.surface.Surface, color, scoreFont:pygame.font.Font) -> pygame.Rect:
     textSurface = scoreFont.render(f"{lScore}   {rScore}", False, color)
     textRect = textSurface.get_rect()
     screenWidth = screen.get_width()
-    textRect.center = ((screenWidth/2)+5, 50)
+    textRect.center = (int(screenWidth/2)+5, 50)
     return screen.blit(textSurface, textRect)
 
 class Paddle:

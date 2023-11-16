@@ -2,13 +2,11 @@
 # Contributing Authors:	    <Juliann Hyatt,Anyone who touched the code>
 # Email Addresses:          <jnhy222@uky.com Your uky.edu email addresses>
 # Date:                     <11-12-2023>
-# Purpose:                  <How this file contributes to the project>
-# Misc:                     <Not Required.  Anything else you might want to include>
+# Purpose:                  creates the game instance as an object to ease resetting
 # =================================================================================================
 
 
 import os.path as path
-import socket
 
 import pygame
 
