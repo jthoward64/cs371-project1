@@ -25,13 +25,14 @@ class ClientWrapper:
     connection_open: bool = True
 
     def __init__(self, connection: SSLSocket) -> None:
+        """Creates a new ClientWrapper to handle the SSLSocket Connection"""
         self.client = connection
 
     def send(self, message: dict) -> bool:
         """Attempts to Send the Message to the Server"""
         try:
             # Encode the Message and Send
-            new_message = self.encode_message(message)
+            new_message = self._encode_message(message)
             if not new_message:
                 print("Error Encoding Message")
                 return False
@@ -48,11 +49,11 @@ class ClientWrapper:
 
     def recv(self) -> Optional[dict]:
         """Attempts to Send the Message to the Server"""
-        new_message = self.decode_message()
+        new_message = self._decode_message()
 
         return new_message
 
-    def encode_message(self, message: dict) -> Optional[bytes]:
+    def _encode_message(self, message: dict) -> Optional[bytes]:
         try:
             # Convert to Binary
             binary = json.dumps(message).encode("utf-8")
@@ -62,7 +63,7 @@ class ClientWrapper:
 
         return binary
 
-    def decode_message(self) -> Optional[dict]:
+    def _decode_message(self) -> Optional[dict]:
         try:
             # Decode
             incoming = self.client.recv(RECEIVER_SIZE)

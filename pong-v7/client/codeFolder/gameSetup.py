@@ -13,10 +13,7 @@ from .helperCode import *
 from .sockethelper import Connection
 
 class gameInstance:
-    def __init__(self,screenWidth: int, 
-                     screenHeight: int, 
-                     playerPaddle: str, 
-                     client: Connection):
+    def __init__(self,screenWidth: int, screenHeight: int, playerPaddle: str, client: Connection):
         self.isBuilt = 0
         self.screenWidth = screenWidth
         self.screenHeight = screenHeight

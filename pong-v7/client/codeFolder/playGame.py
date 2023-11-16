@@ -18,9 +18,7 @@ from .gameSetup import *
 # This is the main game loop.  For the most part, you will not need to modify this.  The sections
 # where you should add to the code are marked.  Feel free to change any part of this project
 # to suit your needs.
-def playGame(
-    screenWidth: int, screenHeight: int, playerPaddle: str, client: Connection
-) -> None:
+def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: Connection) -> None:
    
     gameInt = gameInstance(screenWidth,screenHeight,playerPaddle,client)
     
@@ -256,4 +254,5 @@ def playGame(
                 rScore = newInfo["Score"]["rScore"]
                 sync = newInfo["Sync"]
 
+        """ Last Modified October 14th, 2023 ************************************************************************************************ """
         """ Last Modified October 14th, 2023 ************************************************************************************************ """

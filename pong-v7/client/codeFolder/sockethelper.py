@@ -44,9 +44,7 @@ class Connection:
             self.__context.verify_mode = ssl.CERT_REQUIRED
 
             # Wrap our Socket
-            self.client: SSLSocket = self.__context.wrap_socket(
-                self.__holder, server_hostname=MAIN_ADDRESS
-            )
+            self.client: SSLSocket = self.__context.wrap_socket(self.__holder, server_hostname=MAIN_ADDRESS)
 
             # Connect to the Server
             self.client.connect((MAIN_ADDRESS, port))

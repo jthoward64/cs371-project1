@@ -15,7 +15,6 @@ from typing import Tuple, Union
 
 DATABASE_PATH: str = "./database/holder.db"
 
-
 class Database:
     def __init__(self) -> None:
         # Create the Connector
@@ -51,9 +50,7 @@ class Database:
 
             return True, "Success"
 
-    def create_user(
-        self, username: str, password: str, initials: str
-    ) -> Tuple[bool, str]:
+    def create_user(self, username: str, password: str, initials: str) -> Tuple[bool, str]:
         """Creates a new user from the given information"""
         with self._connect as conn:
             cursor = conn.cursor()

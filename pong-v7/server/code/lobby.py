@@ -15,9 +15,6 @@ import signal
 # Used in Client Threads and Game Processing
 import threading as th
 
-# Our time and json is used to slow down the automated HTML Update for the Leaderboard
-import time
-
 # For Type Hinting
 from multiprocessing.synchronize import Event
 from types import FrameType
@@ -25,9 +22,6 @@ from typing import List, Optional
 
 # Our Client Socket and Server Management
 from helpers.clientwrapper import ClientWrapper
-
-# Our database connection
-from helpers.database import Database
 
 # Our game information
 from helpers.gameinfo import GameInformation
@@ -83,9 +77,7 @@ class LobbyServer:
             print("Client Connected")
 
             # Create a thread for the client to interact with
-            new_thread = th.Thread(
-                target=Client, args=(new_wrap, self.shut_down, self.game_info)
-            )
+            new_thread = th.Thread(target=Client, args=(new_wrap, self.shut_down, self.game_info))
 
             # Add to the list
             self.thread_list.append(new_thread)
