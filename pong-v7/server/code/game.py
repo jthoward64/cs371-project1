@@ -8,6 +8,7 @@
 
 # Used in Client Threads and Game Processing
 import threading as th
+from multiprocessing.connection import Connection
 
 # For Type Hinting
 from multiprocessing.synchronize import Event
@@ -73,9 +74,9 @@ class Information:
 
 class GameServer:
     # new_game = mp.Process(target=GameServer, args=(new_code, new_port, self.shut_down, self.game_info))
-    def __init__(self, new_code: str, shut_down: Event, game_server:ServerSocket) -> None:
+    def __init__(self, new_code: str, shut_down: Event, port_pipe: Connection) -> None:
         """Creates the Lobby Server"""
-        self.game_server = game_server
+        self.game_server = ServerSocket(0)
 
         self.code = new_code
 
@@ -83,6 +84,8 @@ class GameServer:
         if not self.game_server.connection_open:
             print("Failed to create Lobby Server")
             return
+
+        port_pipe.send(self.game_server.port)
 
         # Game Information
         self.information = Information()
