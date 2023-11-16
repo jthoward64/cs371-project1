@@ -1,4 +1,4 @@
-from code.lobby import LobbyServer
+from codeFolder.lobby import LobbyServer
 
 if __name__ == "__main__":
     print("Starting Lobby Server")
