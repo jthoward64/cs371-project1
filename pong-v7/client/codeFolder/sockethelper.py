@@ -22,9 +22,6 @@ from .settings import ADDRESS_FAMILY, CERTFILE, MAIN_ADDRESS, RECEIVER_SIZE, SOC
 
 
 class Connection:
-    # Create our socket
-    __holder: socket.socket = socket.socket(ADDRESS_FAMILY, SOCKET_KIND)
-
     # Is our connection open?
     connection_open: bool = False
 
@@ -34,6 +31,8 @@ class Connection:
     def __init__(self, port: int) -> None:
         """Create a new connection to the server"""
         try:
+            self.__holder = socket.create_connection((MAIN_ADDRESS, port))
+
             # Load our context to encrypt the connection
             self.__context = ssl.create_default_context()
             self.__context.load_verify_locations(CERTFILE)
@@ -44,10 +43,9 @@ class Connection:
             self.__context.verify_mode = ssl.CERT_REQUIRED
 
             # Wrap our Socket
-            self.client: SSLSocket = self.__context.wrap_socket(self.__holder, server_hostname=MAIN_ADDRESS)
-
-            # Connect to the Server
-            self.client.connect((MAIN_ADDRESS, port))
+            self.client: SSLSocket = self.__context.wrap_socket(
+                self.__holder, server_hostname=MAIN_ADDRESS
+            )
 
         except ssl.SSLError as new_error:
             print("Error on SSL Socket: ", new_error)
@@ -55,7 +53,7 @@ class Connection:
             return
         except socket.error as new_error:
             print("Error on Socket:", new_error)
-            #del self.client
+            # del self.client
             return
 
         # Success, inform we are open to the server
