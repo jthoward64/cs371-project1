@@ -17,13 +17,25 @@ from .sockethelper import Connection
 # where you should add to the code are marked.  Feel free to change any part of this project
 # to suit your needs.
 def playGame(
-    screenWidth: int, screenHeight: int, playerPaddle: str, client: Connection
+    screenWidth: int,
+    screenHeight: int,
+    playerPaddle: str,
+    client: Connection,
 ) -> None:
     pygame.init()
     gameInt = gameInstance(screenWidth, screenHeight, playerPaddle, client)
+
+    client.send({"request": "game_info"})
+    game_info = client.recv()  # type: ignore
+    if not game_info:
+        print("Server Disconnected")
+        pygame.quit()
+        return
+    game_code = game_info["message"].get("game_code", "Unknown Code")
+
     pygame.mixer.pre_init(44100, -16, 2, 2048)
     gameInt.currentPlayer = 1 if gameInt.playerPaddle == "left" else 2
-    pygame.display.set_caption(f"Player: {gameInt.currentPlayer}")
+    pygame.display.set_caption(f"Player: {gameInt.currentPlayer} - {game_code}")
 
     if gameInt.playerPaddle == "left":
         opponentPaddleObj = gameInt.rightPaddle
