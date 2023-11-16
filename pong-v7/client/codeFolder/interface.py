@@ -243,12 +243,22 @@ class MainWindow(tk.Tk):
             print("Error, message is empty")
             return False
 
-        if new_message["player"] == "spectate":
+        if new_message.get("return", False) == False:
+            print(
+                "Error, return is not true, are username and password correct? Message is: ",
+                new_message.get("message"),
+            )
+            return False
+
+        if new_message.get("message") == "spectate":
             spectateGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server)
-        elif new_message["player"] == "right_player":
+        elif new_message.get("message") == "right_player":
             playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "right", self.game_server)
-        elif new_message["player"] == "left_player":
+        elif new_message.get("message") == "left_player":
             playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "left", self.game_server)
+        else:
+            print("Error, player is not defined")
+            return False
 
         return True
 

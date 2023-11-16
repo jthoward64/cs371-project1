@@ -9,14 +9,14 @@
       "cwd": "${workspaceFolder}/pong",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/pong/pongServer.py"
+      "program": "${workspaceFolder}/pong-v7/server/main.py"
     },
     {
       "name": "Start Client",
-      "cwd": "${workspaceFolder}/pong",
+      "cwd": "${workspaceFolder}/pong-v7/client",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/pong/pongClient.py"
+      "program": "${workspaceFolder}/pong-v7/client/client.py"
     }
   ]
 }
