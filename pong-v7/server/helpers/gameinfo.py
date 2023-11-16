@@ -14,9 +14,7 @@ from multiprocessing import Process
 from threading import Lock
 
 # Type Hinting
-from typing import Dict, List, Optional, Tuple
-
-from .settings import LOWER_PORT, UPPER_PORT
+from typing import Dict, List, Optional
 
 
 class GameInformation:
