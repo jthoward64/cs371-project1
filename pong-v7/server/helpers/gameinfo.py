@@ -16,8 +16,6 @@ from threading import Lock
 # Type Hinting
 from typing import Dict, List, Optional, Tuple
 
-import psutil
-
 from .settings import LOWER_PORT, UPPER_PORT
 
 
@@ -31,22 +29,10 @@ class GameInformation:
         # Our List of Game Processes
         self.game_process: List[Process] = []
 
-    def check_port(self, port: int) -> bool:
-        """Return True if Port is in Use"""
-        for conn in psutil.net_connections(kind="inet"):
-            assert conn.laddr, "Connections should not be empty"
-            if conn.laddr.port == port:
-                return True
-
-        return False
-
-    def generate_code(self) -> Tuple[str, int]:
+    def generate_code(self) -> str:
         """Generate a Random Game Code"""
         # Grab the list of ascii characters and digits
         choice_list = string.ascii_letters + string.digits + "." + "!" + "-" + ";"
-
-        # Generate a random port between acceptable range
-        test_port = random.randint(LOWER_PORT, UPPER_PORT)
 
         # Populate a 255 Character Long Token
         new_code = "".join(random.choice(choice_list) for _ in range(6))
@@ -55,13 +41,9 @@ class GameInformation:
             while self.game_codes.get(new_code):
                 new_code = "".join(random.choice(choice_list) for _ in range(6))
 
-            # Check if the port is in usage
-            while self.check_port(test_port):
-                test_port = random.randint(LOWER_PORT, UPPER_PORT)
+            self.game_codes[new_code] = # Add New Code to create Binding of Server Socket
 
-            self.game_codes[new_code] = test_port
-
-        return new_code, test_port
+        return new_code
 
     def check_code(self, code: str) -> Optional[int]:
         """Check if a code exists"""
