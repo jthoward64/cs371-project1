@@ -41,7 +41,7 @@ class GameInformation:
             while self.game_codes.get(new_code):
                 new_code = "".join(random.choice(choice_list) for _ in range(6))
 
-            self.game_codes[new_code] = ServerSocket.port
+            self.game_codes[new_code] = game_server.port
 
         return new_code
 
