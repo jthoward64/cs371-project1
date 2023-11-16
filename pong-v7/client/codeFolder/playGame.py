@@ -21,7 +21,6 @@ def playGame(
 ) -> None:
     pygame.init()
     gameInt = gameInstance(screenWidth, screenHeight, playerPaddle, client)
-
     pygame.mixer.pre_init(44100, -16, 2, 2048)
     gameInt.currentPlayer = 1 if gameInt.playerPaddle == "left" else 2
     pygame.display.set_caption(f"Player: {gameInt.currentPlayer}")
@@ -77,6 +76,26 @@ def playGame(
             # Feel free to change when the score is updated to suit your needs/requirements
 
             '''Update the Server using 'request' and information here'''
+            newDict = {
+                'request': 'update_game',
+                'message': {
+                    'Paddle': {
+                        'X': playerPaddleObj.rect.x,
+                        'Y': playerPaddleObj.rect.y,
+                        'Moving': playerPaddleObj.moving
+                    },
+                    'score': {
+                        'lScore':lScore,
+                        'rScore':rScore,
+                    },
+                    'ball': {
+                        'X': gameInt.ball.rect.x,
+                        'Y': gameInt.ball.rect.y,
+                    },
+                    'sync': sync,
+                }
+            }
+            client.send(newDict)
             
             # =========================================================================================
 
@@ -173,3 +192,18 @@ def playGame(
             # opponent's game
 
             '''Use 'request' not Type'''
+            client.send({'request':'grab_game'})
+
+            msg = client.recv()
+            if msg is None:
+                # Error? Idk what to do here
+                continue
+
+            key = 'right_player' if gameInt.playerPaddle == 'left' else 'left_player'
+            opponentPaddleObj.rect.y = msg[key]['Y']
+            opponentPaddleObj.moving = msg[key]['Moving']
+            lScore = msg['score']['lScore']
+            rScore = msg['score']['rScore']
+            gameInt.ball.rect.x = msg['ball']['X']
+            gameInt.ball.rect.y = msg['ball']['Y']
+            sync = msg['sync']

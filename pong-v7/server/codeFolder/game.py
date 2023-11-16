@@ -285,6 +285,11 @@ class GameServer:
                         "lScore": self.score.left_score,
                         "rScore": self.score.right_score,
                     }
+                with self.ball.Lock:
+                    game_info['ball'] = {
+                        'X':self.ball.X,
+                        'Y':self.ball.Y,
+                    }
                 with self.information.Lock:
                     game_info["sync"] = self.information.sync
 
