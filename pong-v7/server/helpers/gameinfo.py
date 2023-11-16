@@ -25,12 +25,12 @@ class GameInformation:
 
     def __init__(self) -> None:
         # 'CodeHere': Port Number
-        self.game_codes: Dict[str, int] = {}
+        self.game_codes: Dict[str, Optional[int]] = {}
 
         # Our List of Game Processes
         self.game_process: List[Process] = []
 
-    def generate_code(self, game_Server: ServerSocket) -> str:
+    def generate_code(self) -> str:
         """Generate a Random Game Code"""
         # Grab the list of ascii characters and digits
         choice_list = string.ascii_letters + string.digits + "." + "!" + "-" + ";"
@@ -42,7 +42,7 @@ class GameInformation:
             while self.game_codes.get(new_code):
                 new_code = "".join(random.choice(choice_list) for _ in range(6))
 
-            self.game_codes[new_code] = game_Server.port
+            self.game_codes[new_code] = None
 
         return new_code
 

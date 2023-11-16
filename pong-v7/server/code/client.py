@@ -133,7 +133,7 @@ class Client:
         # Generate a new game process
         new_game = mp.Process(
             target=GameServer,
-            args=(self.shut_down, send_port),
+            args=(new_code, self.shut_down, send_port),
         )
         with self.game_info._lock:
             self.game_info.game_process.append(new_game)
@@ -142,6 +142,8 @@ class Client:
 
         # Grab the port from the game process
         game_server_port = recv_port.recv()
+
+        self.game_info.add_code(new_code, game_server_port)
 
         self.connection.send(
             {"request": "create_game", "return": True, "message": game_server_port}
