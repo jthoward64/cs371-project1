@@ -6,20 +6,56 @@
 # Misc:                     Documentation: https://docs.python.org/3/library/ssl.html
 # =================================================================================================
 
+import argparse
 from os import path
 from socket import AF_INET, SOCK_STREAM
 
+parser: argparse.ArgumentParser = argparse.ArgumentParser(
+    description="Pong Lobby Server"
+)
+parser.add_argument(
+    "--hostname",
+    metavar="hostname",
+    type=str,
+    help="The hostname of the server",
+    default="localhost",
+)
+parser.add_argument(
+    "--port",
+    metavar="port",
+    type=int,
+    help="The port number of the server",
+    default=4000,
+)
+
+parser.add_argument(
+    "--height",
+    metavar="height",
+    type=int,
+    help="The height of the game window",
+    default=480,
+)
+parser.add_argument(
+    "--width",
+    metavar="width",
+    type=int,
+    help="The width of the game window",
+    default=640,
+)
+
+args: argparse.Namespace = parser.parse_args()
+
 # Settings Folder to Contain Globals
-MAIN_ADDRESS: str = "localhost"
-MAIN_PORT: int = 4000
+MAIN_ADDRESS: str = args.hostname
+MAIN_PORT: int = args.port
 RECEIVER_SIZE: int = 1024
 
 # Settings for the Server Creation
 ADDRESS_FAMILY = AF_INET  # IPv4
 SOCKET_KIND = SOCK_STREAM  # TCP
 
-WINDOW_HEIGHT = 480
-WINDOW_WIDTH = 640
+WINDOW_HEIGHT = args.height
+WINDOW_WIDTH = args.width
 
 # Settings for the Server Encryption
 current_dir = path.abspath(path.dirname(__file__))
