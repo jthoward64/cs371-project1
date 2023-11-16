@@ -6,20 +6,21 @@
 # Misc:                     Documentation: https://docs.python.org/3/library/ssl.html
 # =================================================================================================
 
+from os import path
 from socket import AF_INET, SOCK_STREAM
 
 # Settings Folder to Contain Globals
-MAIN_ADDRESS:str = 'localhost'
-MAIN_PORT:int = 4000
-RECEIVER_SIZE:int = 1024
+MAIN_ADDRESS: str = "localhost"
+MAIN_PORT: int = 4000
+RECEIVER_SIZE: int = 1024
 
 # Settings for the Server Creation
-ADDRESS_FAMILY = AF_INET # IPv4
-SOCKET_KIND = SOCK_STREAM # TCP
+ADDRESS_FAMILY = AF_INET  # IPv4
+SOCKET_KIND = SOCK_STREAM  # TCP
 
 WINDOW_HEIGHT = 480
 WINDOW_WIDTH = 640
 
 # Settings for the Server Encryption
-CERTFILE:str='./certs/cert.pem'
-
+current_dir = path.abspath(path.dirname(__file__))
+CERTFILE: str = path.join(current_dir, "..", "certs", "cert.pem")

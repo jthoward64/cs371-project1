@@ -6,14 +6,18 @@
 # Misc:                     Documentation: https://dev.mysql.com/doc/connector-python/en/connector-python-coding.html
 # =================================================================================================
 
-# Needed to control the database
 import sqlite3 as connector
+
+# Needed to control the database
+from os import path
 from sqlite3 import Error
 
 # For Type Hinting
 from typing import Tuple, Union
 
-DATABASE_PATH: str = "./database/holder.db"
+current_dir = path.abspath(path.dirname(__file__))
+DATABASE_PATH: str = path.join(current_dir, "..", "database", "holder.db")
+
 
 class Database:
     def __init__(self) -> None:
@@ -50,7 +54,9 @@ class Database:
 
             return True, "Success"
 
-    def create_user(self, username: str, password: str, initials: str) -> Tuple[bool, str]:
+    def create_user(
+        self, username: str, password: str, initials: str
+    ) -> Tuple[bool, str]:
         """Creates a new user from the given information"""
         with self._connect as conn:
             cursor = conn.cursor()

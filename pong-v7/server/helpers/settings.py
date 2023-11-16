@@ -7,6 +7,7 @@
 #                           Documentation for Port Ranges: https://learn.microsoft.com/en-us/mem/configmgr/core/plan-design/hierarchy/ports
 # =================================================================================================
 
+from os import path
 from socket import AF_INET, SOCK_STREAM
 
 # Settings Folder to Contain Globals
@@ -23,6 +24,7 @@ ADDRESS_FAMILY = AF_INET
 SOCKET_KIND = SOCK_STREAM
 
 # Settings for the Server Encryption
-CERTFILE: str = "./certs/cert.pem"
-KEYFILE: str = "./certs/key.pem"
+current_dir = path.abspath(path.dirname(__file__))
+CERTFILE: str = path.join(current_dir, "..", "certs", "cert.pem")
+KEYFILE: str = path.join(current_dir, "..", "certs", "key.pem")
 PASSWORD: str = "buxbor-dasjyR-8koqvi"  # Removed for Security Reasons
