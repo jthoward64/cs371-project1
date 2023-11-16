@@ -125,9 +125,7 @@ class Client:
         new_code, new_port = self.game_info.generate_code()
 
         # Generate a new game process
-        new_game = mp.Process(
-            target=GameServer, args=(new_code, new_port, self.shut_down, self.game_info)
-        )
+        new_game = mp.Process(target=GameServer, args=(new_code, new_port, self.shut_down,))
         with self.game_info._lock:
             self.game_info.game_process.append(new_game)
 
