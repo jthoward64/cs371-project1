@@ -233,11 +233,7 @@ class MainWindow(tk.Tk):
         if new_message['player'] == 'spectate':
             spectateGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server)
         elif new_message['player'] == 'right_player':
-<<<<<<< HEAD:pong-v7/client/code/interface.py
             playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "right", self.game_server)
-=======
-            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "right", self.game_server, )
->>>>>>> playAgain:pong-v7/client/codeFolder/interface.py
         elif new_message['player'] == 'left_player':
             playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "left", self.game_server)
 
