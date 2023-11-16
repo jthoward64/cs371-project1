@@ -67,6 +67,10 @@ Return Parameters:
         'lScore':integer,
         'rScore':integer,
     },
+    'ball': {
+        'X':integer,
+        'Y':integer,
+    },
     'sync':integer
 }`
 
@@ -92,7 +96,3 @@ Required Parameters:
     }
     'sync':integer
 }`
-
-Success: `{'request': 'update_game', 'return':True, 'message':None}`
-
-Failure: `{'request': 'update_game', 'return':False, 'message':None}`
