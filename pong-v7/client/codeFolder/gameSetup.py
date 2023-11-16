@@ -6,6 +6,8 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
+
+import socket
 import pygame
 from .helperCode import *
 from .sockethelper import Connection

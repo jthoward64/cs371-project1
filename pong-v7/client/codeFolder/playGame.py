@@ -6,6 +6,8 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
+import socket
+
 import pygame
 
 from .helperCode import *
@@ -252,4 +254,5 @@ def playGame(screenWidth: int, screenHeight: int, playerPaddle: str, client: Con
                 rScore = newInfo["Score"]["rScore"]
                 sync = newInfo["Sync"]
 
+        """ Last Modified October 14th, 2023 ************************************************************************************************ """
         """ Last Modified October 14th, 2023 ************************************************************************************************ """
