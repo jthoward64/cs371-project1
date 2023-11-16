@@ -122,17 +122,23 @@ class Client:
         """Attempts to create a new game instance"""
 
         # Generate new code, return it to the Client
-        new_code, new_port = self.game_info.generate_code()
+        new_code = self.game_info.generate_code()
 
         # Generate a new game process
-        new_game = mp.Process(target=GameServer, args=(new_code, new_port, self.shut_down,))
+        new_game = mp.Process(
+            target=GameServer,
+            args=(
+                new_code,
+                self.shut_down,
+            ),
+        )
         with self.game_info._lock:
             self.game_info.game_process.append(new_game)
 
         new_game.start()
 
         self.connection.send(
-            {"request": "create_game", "return": True, "message": new_port}
+            {"request": "create_game", "return": True, "message": 1337}
         )
 
     def join_game(self, request: dict) -> None:

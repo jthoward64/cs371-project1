@@ -73,7 +73,7 @@ class ServerSocket:
             return False
 
         # Success, inform we are open to the server
-        self.port = port
+        self.port = self._holder.getsockname()[1]
         self.connection_open = True
         return True
 
