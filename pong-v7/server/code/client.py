@@ -142,33 +142,25 @@ class Client:
 
         new_game.start()
 
-        self.connection.send(
-            {"request": "create_game", "return": True, "message": game_server.port}
-        )
+        self.connection.send({"request": "create_game", "return": True, "message": game_server.port})
 
     def join_game(self, request: dict) -> None:
         """Informs Client to Start Game if Exists"""
         # Check if Code exists
         if "code" not in request:
-            self.connection.send(
-                {"request": "join_game", "return": False, "error": "Missing Code"}
-            )
+            self.connection.send({"request": "join_game", "return": False, "error": "Missing Code"})
             return
 
         # Check if code is in game_codes
         new_port = self.game_info.check_code(request["code"])
         if new_port is None:
             print("Invalid Game Code")
-            self.connection.send(
-                {"request": "join_game", "return": False, "error": "Invalid Game Code"}
-            )
+            self.connection.send({"request": "join_game", "return": False, "error": "Invalid Game Code"})
             return
 
         # Success, send the message
         print("Valid Game Code")
-        self.connection.send(
-            {"request": "join_game", "return": True, "message": new_port}
-        )
+        self.connection.send({"request": "join_game", "return": True, "message": new_port})
 
     def run_thread(self) -> None:
         """Our main function for the Client Thread"""
