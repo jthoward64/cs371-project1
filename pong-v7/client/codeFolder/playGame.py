@@ -76,31 +76,11 @@ def playGame(
             # where the ball is and the current score.
             # Feel free to change when the score is updated to suit your needs/requirements
 
-            update = {
-                "Type": "Update",
-                "Paddle": {
-                    "Moving": playerPaddleObj.moving,
-                    "X": playerPaddleObj.rect.x,
-                    "Y": playerPaddleObj.rect.y,
-                },
-                "Score": {
-                    "lScore": lScore,
-                    "rScore": rScore,
-                },
-                "Ball": {
-                    "X": gameInt.ball.rect.x,
-                    "Y": gameInt.ball.rect.y,
-                },
-                "Sync": sync,
-            }
+            '''Update the Server using 'request' and information here'''
+            
+            # =========================================================================================
 
-            success = client.send(update)
-            if not success:
-                # Add an option here in case it fails to send to the server
-                pass
-                # =========================================================================================
-
-                # Update the player paddle and opponent paddle's location on the screen
+            # Update the player paddle and opponent paddle's location on the screen
             for paddle in [playerPaddleObj, opponentPaddleObj]:
                 if paddle.moving == "down":
                     if paddle.rect.bottomleft[1] < gameInt.screenHeight - 10:
@@ -192,71 +172,4 @@ def playGame(
             # Send your server update here at the end of the game loop to sync your game with your
             # opponent's game
 
-            """ Last Modified October 14th, 2023 ************************************************************************************************ """
-
-            success = client.send({"Type": "Grab"})
-
-            if not success:
-                # What do we do when there isn't a success?
-                # I suggest continue or looping until we get a success
-
-                # sendInfo(client, {"Type": "Grab"})
-                pass
-
-            try:
-                # Our updated information
-                responsePackage = client.recv(512).decode()  # type: ignore
-            except ConnectionResetError:
-                responsePackage = False
-
-                # Did our server disconnect?
-            if not responsePackage:
-                print("Server Disconnected")
-                pygame.quit()
-                playAgain = False
-                return
-
-            # Try opening the JSON
-            success, newInfo = client.recv(responsePackage)  # type: ignore
-
-            if not success:
-                # Failed to unpack, skip because we can't grab info
-                # Can also add a loop here to attempt again a few times
-                continue
-
-            """
-        Example of Update
-        
-        update = {
-            "Type": "Grab",
-            "Paddle": {
-                "Moving":"",
-                "X": 0,
-                "Y": 1,
-            }
-            "Score": {
-                "lScore":0,
-                "rScore":0,
-            }
-            "Ball": {
-                "X":0,
-                "Y":0,
-            }
-            "Sync": 0,
-        }
-        """
-
-            # Update opponent paddle information
-            opponentPaddleObj.rect.x = newInfo["Paddle"]["X"]
-            opponentPaddleObj.rect.y = newInfo["Paddle"]["Y"]
-            opponentPaddleObj.moving = newInfo["Paddle"]["Moving"]
-
-            # Check if we need to update the ball and score
-            if newInfo["Sync"] > sync:
-                gameInt.ball.rect.x = newInfo["Ball"]["X"]
-                gameInt.ball.rect.y = newInfo["Ball"]["Y"]
-                lScore = newInfo["Score"]["lScore"]
-                rScore = newInfo["Score"]["rScore"]
-                sync = newInfo["Sync"]
-
-        """ Last Modified November 16th, 2023 ************************************************************************************************ """
+            '''Use 'request' not Type'''
