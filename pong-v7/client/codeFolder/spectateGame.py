@@ -6,10 +6,15 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
+from os import path
+
 import pygame
 
 from .helperCode import *
 from .sockethelper import Connection
+
+current_dir = path.abspath(path.dirname(__file__))
+assets_dir = path.join(current_dir, "..", "assets")
 
 
 # This is the main game loop.  For the most part, you will not need to modify this.  The sections
@@ -26,10 +31,10 @@ def playGame(screenWidth: int, screenHeight: int, client: Connection) -> None:
     # Constants
     WHITE = (255, 255, 255)
     clock = pygame.time.Clock()
-    scoreFont = pygame.font.Font("./assets/fonts/pong-score.ttf", 32)
-    winFont = pygame.font.Font("./assets/fonts/visitor.ttf", 48)
-    pointSound = pygame.mixer.Sound("./assets/sounds/point.wav")
-    bounceSound = pygame.mixer.Sound("./assets/sounds/bounce.wav")
+    scoreFont = pygame.font.Font(path.join(assets_dir, "fonts", "pong-score.ttf"), 32)
+    winFont = pygame.font.Font(path.join(assets_dir, "fonts", "visitor.ttf"), 48)
+    pointSound = pygame.mixer.Sound(path.join(assets_dir, "sounds", "point.wav"))
+    bounceSound = pygame.mixer.Sound(path.join(assets_dir, "sounds", "bounce.wav"))
 
     # Display objects
     screen = pygame.display.set_mode((screenWidth, screenHeight))
