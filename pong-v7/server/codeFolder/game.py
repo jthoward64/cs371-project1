@@ -9,16 +9,13 @@
 # Used in Client Threads and Game Processing
 import threading as th
 from multiprocessing.connection import Connection
-
 # For Type Hinting
 from multiprocessing.synchronize import Event
-
 # Typing Requisites
 from typing import List
 
 # Our Client Socket and Server Management
 from helpers.clientwrapper import ClientWrapper
-
 # Our database connection
 from helpers.database import Database as db
 from helpers.serversocket import ServerSocket

@@ -225,6 +225,10 @@ def playGame(
                 pygame.quit()
                 return
 
+            if game_state == False:
+                # Game over
+                return
+
             if gameInt.playerPaddle == "right":
                 opponentPaddleObj.rect.y = game_state["left_paddle"]["y"]
                 opponentPaddleObj.moving = game_state["left_paddle"]["moving"]

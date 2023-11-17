@@ -45,6 +45,7 @@ class GameApi:
     def send_and_check(
         self, request: str, data: Optional[dict], checkOk: bool = True
     ) -> Union[dict, str]:
+        print("Sending request", request, data)
         success = self.connection.send({"request": request, **(data or {})})
         if success:
             response = self.connection.recv()
