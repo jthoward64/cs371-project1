@@ -44,7 +44,7 @@ def playGame(
         opponentPaddleObj = gameInt.leftPaddle
         playerPaddleObj = gameInt.rightPaddle
     #FIXME wait for player 2
-    cilent.send("request":"start_game")
+    client.send({"request":"start_game"})
     client.recv()
 
     
@@ -108,6 +108,8 @@ def playGame(
                     'ball': {
                         'X': gameInt.ball.rect.x,
                         'Y': gameInt.ball.rect.y,
+                        'xVel': gameInt.ball.xVel,
+                        'yVel': gameInt.ball.yVel,
                     },
                     'sync': sync,
                 }
@@ -216,13 +218,13 @@ def playGame(
                 # Error? Idk what to do here
                 continue
 
-            key = 'right_player' 
-            if gameInt.playerPaddle == 'right':
-            	key = 'left_player'
+            key = 'right_player' if gameInt.playerPaddle == 'right' else 'left_player'
             opponentPaddleObj.rect.y = msg[key]['Y']
             opponentPaddleObj.moving = msg[key]['Moving']
             lScore = msg['score']['lScore']
             rScore = msg['score']['rScore']
             gameInt.ball.rect.x = msg['ball']['X']
             gameInt.ball.rect.y = msg['ball']['Y']
+            gameInt.ball.xVel = msg['ball']['xVel']
+            gameInt.ball.yVel = msg['ball']['yVel']
             sync = msg['sync']

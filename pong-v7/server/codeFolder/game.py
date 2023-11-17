@@ -41,7 +41,8 @@ class Ball:
         """Contains the Ball Information X, Y"""
         self.X: int = 0
         self.Y: int = 0
-
+        self.yVel: int = 0
+        self.xVel: int = 0
 
 class Score:
     Lock: th.Lock = th.Lock()
@@ -207,9 +208,7 @@ class GameServer:
                     else:
                         player = "spectate"
 
-                control.send(
-                    {"request": "join_game", "return": True, "message": player}
-                )
+                control.send({"request": "join_game", "return": True, "message": player})
                 continue
 
             # # # Block Non-Validated Clients # # #
@@ -290,6 +289,8 @@ class GameServer:
                     game_info['ball'] = {
                         'X':self.ball.X,
                         'Y':self.ball.Y,
+                        'xVel': self.ball.xVel,
+                        'yVel': self.ball.yVel,
                     }
                 with self.information.Lock:
                     game_info["sync"] = self.information.sync
@@ -321,11 +322,7 @@ class GameServer:
                             self.score.right_score = new_message["message"]["score"][
                                 "rScore"
                             ]
-                            if (
-                                self.score.left_score > 4
-                                or self.score.right_score > 4
-                                and not self.round_over.is_set()
-                            ):
+                            if (self.score.left_score > 4 or self.score.right_score > 4 and not self.round_over.is_set()):
                                 self.round_over.set()
 
                                 # Winner
@@ -350,6 +347,8 @@ class GameServer:
                         with self.ball.Lock:
                             self.ball.X = new_message["message"]["ball"]["X"]
                             self.ball.Y = new_message["message"]["ball"]["Y"]
+                            self.ball.xVel = new_message['message']['ball']['xVel']
+                            self.ball.yVel = new_message['message']['ball']['yVel']
 
                 if player == "left_player":
                     # Update Left
