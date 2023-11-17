@@ -28,8 +28,6 @@ def playGame(
     screenHeight: int,
     playerPaddle: str,
     game_api: GameApi,
-    lInitial: str,
-    rInitial: str,
 ) -> None:
     game_metadata = game_api.game_info()
     if isinstance(game_metadata, str):
@@ -67,6 +65,9 @@ def playGame(
     waitingText = restartFont.render("Waiting on other player...", True, WHITE)
     waitingText_center = (screenWidth / 2 - 125, screenHeight / 2 + 30)
 
+    lInitial = ''
+    rInitial = ''
+
     leftTextScore = bottomFont.render(f"{lInitial}: 0", True, WHITE)
     leftText_x = 10
     leftText_y = (
@@ -100,6 +101,9 @@ def playGame(
     running = True
     restart = False
 
+    # Our bool to control the first game when waiting for second player to join
+    startedGame = False
+
     if playerPaddle == "left":
         opponentPaddleObj = rightPaddle
         playerPaddleObj = leftPaddle
@@ -115,19 +119,27 @@ def playGame(
 
     sync = 0
 
-    # tester = None
-    # while not tester:
-    #     tester = game_api.start_game()
-    #     if isinstance(tester, str):
-    #         print(tester)
-    #         messagebox.showerror("Error", tester)
-    #         pygame.quit()
-    #         return
-    #     time.sleep(0.02)
+    # Do we start for the first game?
+    startTest = None
 
     while True:
         # Wiping the screen
         screen.fill((0, 0, 0))
+
+        if startedGame is False:
+            startTest = game_api.start_game()
+            if isinstance(startTest, str):
+                print(startTest)
+                messagebox.showerror("Error", startTest)
+                pygame.quit()
+                return
+
+            time.sleep(0.02)
+
+        if startTest:
+            startedGame = True
+            lInitial = startTest["left_player_initials"]
+            rInitial = startTest["right_player_initials"]
 
         # Blit the bottomMessage
         gameMessage = screen.blit(bottomMessageSurface, (bottomtext_x, bottomtext_y))
@@ -175,7 +187,7 @@ def playGame(
                     paddle.rect.y -= paddle.speed
 
         # If the game is over, display the win message
-        if lScore > 4 or rScore > 4 or running is False:
+        if not startedGame and (lScore > 4 or rScore > 4 or running is False):
             # Add our win message
             winText = "Player 1 Wins! " if lScore > 4 else "Player 2 Wins! "
             textSurface = winFont.render(winText, False, WHITE, (0, 0, 0))
