@@ -146,8 +146,7 @@ class GameApi:
                 left_paddle is None
                 or right_paddle is None
                 or ball is None
-                or left_score is None
-                or right_score is None
+                or score is None
                 or sync is None
             ):
                 return "Invalid message from server (missing data)"
