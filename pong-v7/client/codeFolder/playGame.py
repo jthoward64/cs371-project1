@@ -99,7 +99,6 @@ def playGame(
 
     # Set to false when we're not running
     running = False
-    restart = False
 
     # Our bool to control the first game when waiting for second player to join
     startedGame = False
@@ -140,7 +139,6 @@ def playGame(
         if startTest and not startedGame:
             running = True
             startedGame = True
-            running = True
             lInitial = startTest["left_player_initials"]
             rInitial = startTest["right_player_initials"]
 
@@ -163,8 +161,7 @@ def playGame(
 
                 # Did we request to restart?
                 elif event.key == pygame.K_r and running is False:
-                    # Restart to True
-                    restart = True
+                    startedGame = False
 
             elif event.type == pygame.KEYUP:
                 playerPaddleObj.moving = None
@@ -224,8 +221,6 @@ def playGame(
             # Add our message to restart the game
             running = False
 
-            ################################################################ SEND TO SERVERF "START GAME" REQUEST #################################################################
-
         # Drawing the dotted line in the center
         if running is True:
             for i in centerLine:
@@ -260,10 +255,10 @@ def playGame(
             pygame.draw.rect(screen, WHITE, ball.rect)
             # ==== End Ball Logic =================================================================
         else:
-            if startedGame and not restart:
+            if startedGame:
                 restartHolder = screen.blit(restartText, restartText_center)
-            else:
-                restartHolder = screen.blit(waitingText, waitingText_center)
+
+                
 
         # Drawing the player's new location
         for paddle in [playerPaddleObj, opponentPaddleObj]:
@@ -276,9 +271,9 @@ def playGame(
             [
                 topWall,
                 bottomWall,
-                ball.rect,
-                leftPaddle.rect,
-                rightPaddle.rect,
+                ball,
+                leftPaddle,
+                rightPaddle,
                 scoreRect,
                 winMessage,
                 gameMessage,
@@ -330,6 +325,5 @@ def playGame(
 
             leftTextScore = bottomFont.render(f"{lInitial}: {lWins}", True, WHITE)
             rightTextScore = bottomFont.render(f"{rInitial}: {rWins}", True, WHITE)
-            pass
 
         # =========================================================================================
