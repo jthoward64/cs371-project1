@@ -5,19 +5,9 @@ import tkinter as tk
 from tkinter import messagebox
 
 import pygame
-from helperCode import *
 
 from .api.gameApi import BallInfo, GameApi, PaddleInfo
-
-# Constants
-WHITE = (255, 255, 255)
-clock = pygame.time.Clock()
-scoreFont = pygame.font.Font("./assets/fonts/pong-score.ttf", 32)
-winFont = pygame.font.Font("./assets/fonts/visitor.ttf", 48)
-bottomFont = pygame.font.Font(None, 24)
-restartFont = pygame.font.Font(None, 32)
-pointSound = pygame.mixer.Sound("./assets/sounds/point.wav")
-bounceSound = pygame.mixer.Sound("./assets/sounds/bounce.wav")
+from .helperCode import *
 
 
 # This is the main game loop.  For the most part, you will not need to modify this.  The sections
@@ -39,6 +29,16 @@ def playGame(
     # Pygame inits
     pygame.mixer.pre_init(44100, -16, 2, 2048)
     pygame.init()
+
+    # Constants
+    WHITE = (255, 255, 255)
+    clock = pygame.time.Clock()
+    scoreFont = pygame.font.Font("./assets/fonts/pong-score.ttf", 32)
+    winFont = pygame.font.Font("./assets/fonts/visitor.ttf", 48)
+    bottomFont = pygame.font.Font(None, 24)
+    restartFont = pygame.font.Font(None, 32)
+    pointSound = pygame.mixer.Sound("./assets/sounds/point.wav")
+    bounceSound = pygame.mixer.Sound("./assets/sounds/bounce.wav")
 
     # Display objects
     screen = pygame.display.set_mode((screenWidth, screenHeight))
