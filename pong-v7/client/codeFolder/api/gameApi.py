@@ -249,7 +249,8 @@ class GameApi:
                         "xVel": ball["x_vel"],
                         "yVel": ball["y_vel"],
                     },
-                    "score": {"lScore": left_score, "rScore": right_score},
+                    "lScore": left_score,
+                    "rScore": right_score,
                     "sync": sync,
                 },
             }
