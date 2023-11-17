@@ -6,6 +6,7 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
+from time import time
 from tkinter import messagebox
 
 import pygame
@@ -54,6 +55,7 @@ def playGame(
             messagebox.showerror("Error", tester)
             pygame.quit()
             return
+        time.sleep(0.02)
 
     playAgain = True
     while playAgain:

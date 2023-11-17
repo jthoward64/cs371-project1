@@ -111,12 +111,12 @@ class GameApi:
         """
         response = self.send_and_check("start_game", None, False)
         if isinstance(response, dict):
-            if response.get("return", False):
+            if response.get("return", False) == False:
                 return False
             else:
                 message = response.get("message", None)
-                left_player_initials = message.get("left_player_initials", "N/A")
-                right_player_initials = message.get("right_player_initials", "N/A")
+                left_player_initials = message.get("left_player", "N/A")
+                right_player_initials = message.get("right_player", "N/A")
                 game_code = message.get("game_code", None)
                 if game_code is None:
                     return "Invalid response from server (game_code was None)"
