@@ -51,8 +51,13 @@ Failure: `{'request': 'grab_game', 'return':False, 'message':None}`
 Return Parameters:
 
 `'message': {
-    # This is the opponent's paddle
-    'paddle': {
+    # This is the player's paddle
+    'left_paddle': {
+        'x': 0,
+        'y': 0,
+        'moving': '',
+        },
+    'right_paddle': {
         'x': 0,
         'y': 0,
         'moving': '',
@@ -67,6 +72,10 @@ Return Parameters:
         'lScore': 0,
         'rScore': 0,
     },
+    'wins': {
+        'left_player':0,
+        'right_player':0,
+    }
     'sync': 0,
 }
 `
@@ -77,13 +86,8 @@ Description: A method to update the game on the current progress
 Required Parameters:
 
 `'message': {
-    # This is the player's paddle
-    'left_paddle': {
-        'x': 0,
-        'y': 0,
-        'moving': '',
-        },
-    'right_paddle': {
+    # This is the opponent's paddle
+    'paddle': {
         'x': 0,
         'y': 0,
         'moving': '',
