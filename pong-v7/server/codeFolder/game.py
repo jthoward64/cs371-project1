@@ -184,25 +184,19 @@ class GameServer:
             if new_message["request"] == "grab_game":
                 if not self.game_info.continue_game():
                     # Inform the client the round is over
-                    control.send(
-                        {"request": "grab_game", "return": False, "message": None}
-                    )
+                    control.send({"request": "grab_game", "return": False, "message": None})
                     continue
 
                 # Prepare information
                 game_info: dict = self.game_info.grab_game()
 
                 # Send it
-                control.send(
-                    {"request": "grab_game", "return": True, "message": game_info}
-                )
+                control.send({"request": "grab_game", "return": True, "message": game_info})
                 continue
 
             if new_message["request"] == "update_game" and player != "spectate":
                 if not self.game_info.continue_game():
-                    control.send(
-                        {"request": "update_game", "return": False, "message": None}
-                    )
+                    #control.send({"request": "update_game", "return": False, "message": None})
                     continue
 
                 self.game_info.update_game(player, new_message["message"])
