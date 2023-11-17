@@ -1,44 +1,23 @@
+import random
 import threading as th
-from typing import Tuple
+from typing import Literal, Tuple
 
 from helpers.database import Database as db
 
 
 class GameInfo:
     def __init__(self) -> None:
+        # Lock for full game data
         self.game_lock = th.Lock()
-        self.game_data = {
-            "left": {
-                "x": 0,
-                "y": 0,
-                "moving": "",
-            },
-            "right": {
-                "x": 0,
-                "y": 0,
-                "moving": "",
-            },
-            "ball": {
-                "x": 0,
-                "y": 0,
-                "xVel": 0,
-                "yVel": 0,
-            },
-            "score": {
-                "lScore": 0,
-                "rScore": 0,
-            },
-            "wins": {
-                "left_player": 0,
-                "right_player": 0,
-            },
-            "sync": 0,
-        }
+        # Lock for basic game data
+        self.basic_lock = th.Lock()
+
+        self.game_data = {}
+        self.starting_direction: Literal["left", "right"]
 
         self.database = db()
 
-        # Lock for basic game data
-        self.basic_lock = th.Lock()
+        self.reset_game()
 
         # Is the game running
         self.game_running = False
@@ -130,6 +109,8 @@ class GameInfo:
                 "sync": 0,
             }
 
+            self.starting_direction = random.choice(["left", "right"])
+
             self.game_running = False
 
     def set_player(self, user: str, initials: str) -> str:
@@ -148,6 +129,10 @@ class GameInfo:
     def grab_players(self) -> Tuple[str, str]:
         with self.basic_lock:
             return self.initials["left"], self.initials["right"]
+
+    def grab_starting_direction(self) -> str:
+        with self.game_lock:
+            return self.starting_direction
 
     def continue_game(self) -> bool:
         with self.basic_lock:

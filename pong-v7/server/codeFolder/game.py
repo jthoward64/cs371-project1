@@ -157,6 +157,7 @@ class GameServer:
                     message["left_player"],
                     message["right_player"],
                 ) = self.game_info.grab_players()
+                message["starting_direction"] = self.game_info.grab_starting_direction()
                 message["game_code"] = self.code
 
                 control.send(
@@ -172,6 +173,7 @@ class GameServer:
                     message["left_player"],
                     message["right_player"],
                 ) = self.game_info.grab_players()
+                message["starting_direction"] = self.game_info.grab_starting_direction()
                 message["game_code"] = self.code
 
                 # Are clients ready to start?

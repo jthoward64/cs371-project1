@@ -12,6 +12,7 @@ class GameMeta(TypedDict):
     left_player_initials: str
     right_player_initials: str
     game_code: str
+    starting_direction: Literal["left", "right"]
 
 
 class PaddleInfo(TypedDict):
@@ -96,13 +97,17 @@ class GameApi:
             left_player_initials = message.get("left_player", "N/A")
             right_player_initials = message.get("right_player", "N/A")
             game_code = message.get("game_code", None)
+            starting_direction = message.get("starting_direction", None)
             if game_code is None:
                 return "Invalid message from server (game_code was None)"
+            elif starting_direction is None:
+                return "Invalid message from server (starting_direction was None)"
             else:
                 return {
                     "left_player_initials": left_player_initials,
                     "right_player_initials": right_player_initials,
                     "game_code": game_code,
+                    "starting_direction": starting_direction,
                 }
         else:
             return response
@@ -120,13 +125,17 @@ class GameApi:
                 left_player_initials = message.get("left_player", "N/A")
                 right_player_initials = message.get("right_player", "N/A")
                 game_code = message.get("game_code", None)
+                starting_direction = message.get("starting_direction", None)
                 if game_code is None:
                     return "Invalid response from server (game_code was None)"
+                elif starting_direction is None:
+                    return "Invalid response from server (starting_direction was None)"
                 else:
                     return {
                         "left_player_initials": left_player_initials,
                         "right_player_initials": right_player_initials,
                         "game_code": game_code,
+                        "starting_direction": starting_direction,
                     }
         else:
             return response

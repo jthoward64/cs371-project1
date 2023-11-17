@@ -32,6 +32,7 @@ def playGame(
 
     # Constants
     WHITE = (255, 255, 255)
+    GREY = (100, 100, 100)
     clock = pygame.time.Clock()
     scoreFont = pygame.font.Font("./assets/fonts/pong-score.ttf", 32)
     winFont = pygame.font.Font("./assets/fonts/visitor.ttf", 48)
@@ -139,6 +140,7 @@ def playGame(
         if startTest and not startedGame:
             running = True
             startedGame = True
+            ball.reset(startTest["starting_direction"])
             lInitial = startTest["left_player_initials"]
             rInitial = startTest["right_player_initials"]
 
@@ -196,7 +198,6 @@ def playGame(
                 messagebox.showerror("Error", "Server Disconnected")
                 pygame.quit()
                 return
-            pass
 
         # =========================================================================================
 
@@ -224,7 +225,7 @@ def playGame(
         # Drawing the dotted line in the center
         if running is True:
             for i in centerLine:
-                pygame.draw.rect(screen, WHITE, i)
+                pygame.draw.rect(screen, GREY, i)
 
             # ==== Ball Logic =====================================================================
             ball.updatePos()
@@ -258,8 +259,6 @@ def playGame(
             if startedGame:
                 restartHolder = screen.blit(restartText, restartText_center)
 
-                
-
         # Drawing the player's new location
         for paddle in [playerPaddleObj, opponentPaddleObj]:
             pygame.draw.rect(screen, WHITE, paddle.rect)
@@ -271,9 +270,9 @@ def playGame(
             [
                 topWall,
                 bottomWall,
-                ball,
-                leftPaddle,
-                rightPaddle,
+                ball.rect,
+                leftPaddle.rect,
+                rightPaddle.rect,
                 scoreRect,
                 winMessage,
                 gameMessage,
