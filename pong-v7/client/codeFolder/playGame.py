@@ -278,9 +278,9 @@ def playGame(
         # This number should be synchronized between you and your opponent.  If your number is larger
         # then you are ahead of them in time, if theirs is larger, they are ahead of you, and you need to
         # catch up (use their info)
-        sync += 1
         # Only send an update if the game is currently running
         if running:
+            sync += 1
             own_paddle: PaddleInfo = {
                 "x": playerPaddleObj.rect.x,
                 "y": playerPaddleObj.rect.y,
