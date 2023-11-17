@@ -2,7 +2,7 @@
 ## Type: join_game
 Description: A request from the Client to validate their login and join into playing or spectating the game
 
-Required Parameters: new_message['username], new_message['password]
+Required Parameters: new_message[username], new_message[password], new_message[initials]
 
 Success: `{'request': 'join_game', 'return':True, 'message':player}`
 
@@ -22,7 +22,6 @@ Return Parameters:
 `message = {
     'left_player':self.information.left_initial,
     'right_player':self.information.right_initial,
-    'client_number':self.information.client_number,
     'game_code':self.code
 }`
 

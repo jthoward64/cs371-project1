@@ -39,8 +39,14 @@ class GameInfo:
             'right': False,
         }
 
-        # Initials of the Players
+        # Username of the Players
         self.user = {
+            'left': '',
+            'right': ''
+        }
+
+        # Initials of the Players
+        self.initials = {
             'left': '',
             'right': ''
         }
@@ -118,16 +124,22 @@ class GameInfo:
 
             self.game_running = False
 
-    def set_player(self, user:str) -> str:
+    def set_player(self, user:str, initials:str) -> str:
         with self.basic_lock:
             if self.user['left'] == '':
                 self.user['left'] = user
-                return 'left'
+                self.initials['left'] = initials
+                return 'left_player'
             if self.user['right'] == '':
                 self.user['right'] = user
-                return 'right'
+                self.initials['right'] = initials
+                return 'right_player'
             
             return 'spectate'
+        
+    def player_check(self, user:str) -> bool:
+        with self.basic_lock:
+            return self.user['left'] == user or self.user['right'] == user
         
     def increment_win(self, player:str):
         '''Increments the Wins in a Player'''
