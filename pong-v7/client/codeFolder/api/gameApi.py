@@ -11,7 +11,6 @@ class JoinGameResponse(TypedDict):
 class GameMeta(TypedDict):
     left_player_initials: str
     right_player_initials: str
-    client_number: int
     game_code: str
 
 
@@ -59,9 +58,12 @@ class GameApi:
         else:
             return "Failed to send request to server"
 
-    def join_game(self, username: str, password: str) -> Union[JoinGameResponse, str]:
+    def join_game(
+        self, username: str, password: str, initials: str
+    ) -> Union[JoinGameResponse, str]:
         response = self.send_and_check(
-            "join_game", {"username": username, "password": password}
+            "join_game",
+            {"username": username, "password": password, "initials": initials},
         )
         if isinstance(response, dict):
             request = response.get("message", None)
@@ -81,17 +83,13 @@ class GameApi:
         if isinstance(response, dict):
             left_player_initials = response.get("left_player_initials", "N/A")
             right_player_initials = response.get("right_player_initials", "N/A")
-            client_number = response.get("client_number", None)
             game_code = response.get("game_code", None)
-            if client_number is None:
-                return "Invalid response from server (client_number was None)"
-            elif game_code is None:
+            if game_code is None:
                 return "Invalid response from server (game_code was None)"
             else:
                 return {
                     "left_player_initials": left_player_initials,
                     "right_player_initials": right_player_initials,
-                    "client_number": client_number,
                     "game_code": game_code,
                 }
         else:
@@ -108,17 +106,13 @@ class GameApi:
             else:
                 left_player_initials = response.get("left_player_initials", "N/A")
                 right_player_initials = response.get("right_player_initials", "N/A")
-                client_number = response.get("client_number", None)
                 game_code = response.get("game_code", None)
-                if client_number is None:
-                    return "Invalid response from server (client_number was None)"
-                elif game_code is None:
+                if game_code is None:
                     return "Invalid response from server (game_code was None)"
                 else:
                     return {
                         "left_player_initials": left_player_initials,
                         "right_player_initials": right_player_initials,
-                        "client_number": client_number,
                         "game_code": game_code,
                     }
         else:
