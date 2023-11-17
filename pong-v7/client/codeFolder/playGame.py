@@ -45,8 +45,11 @@ def playGame(
         playerPaddleObj = gameInt.rightPaddle
     #FIXME wait for player 2
     client.send({"request":"start_game"})
-    client.recv()
-
+    tester = client.recv()
+    while (not tester):
+        client.send({"request":"start_game"})
+        tester = client.recv()
+    
     
     playAgain = True
     while playAgain:
