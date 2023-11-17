@@ -30,7 +30,7 @@ class GameInformation:
     def generate_code(self) -> str:
         """Generate a Random Game Code"""
         # Grab the list of ascii characters and digits
-        choice_list = string.ascii_letters + string.digits + "." + "!" + "-" + ";"
+        choice_list = string.ascii_letters + string.digits
 
         # Populate a 255 Character Long Token
         new_code = "".join(random.choice(choice_list) for _ in range(6))
