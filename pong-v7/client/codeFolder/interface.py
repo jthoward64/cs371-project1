@@ -9,8 +9,9 @@
 import os.path as path
 import tkinter as tk
 from tkinter import ttk
-from typing import Callable, Union
+from typing import Callable, Optional, Union
 
+from .api.gameApi import GameApi
 from .playGame import playGame
 from .settings import MAIN_PORT, WINDOW_HEIGHT, WINDOW_WIDTH
 from .sockethelper import Connection
@@ -160,6 +161,8 @@ class CreateMenu(tk.Frame):
 
 
 class MainWindow(tk.Tk):
+    game_api: Optional[GameApi] = None
+
     def __init__(self):
         super().__init__()
 
@@ -220,47 +223,35 @@ class MainWindow(tk.Tk):
 
     def game_connect(self, port: int) -> bool:
         """Attempts to join the Game Server"""
-        self.game_server = Connection(port)
+        game_server = Connection(port)
 
         # Check if the connection is established
-        if not self.game_server.connection_open:
+        if not game_server.connection_open:
             return False
+
+        self.game_api = GameApi(game_server)
 
         # Success, close the socket
         self.server_socket.close()
 
-        self.game_server.send(
-            {
-                "request": "join_game",
-                "username": self.username,
-                "password": self.password,
-            }
+        join_game_response = self.game_api.join_game(
+            self.username, self.password, self.create_frame.initials.box.get()
         )
 
-        new_message = self.game_server.recv()
-
-        if new_message is None:
-            print("Error, message is empty")
+        if isinstance(join_game_response, str):
+            print(f"Error: {join_game_response}")
+            self.code_error.label.config(text=join_game_response)
             return False
 
-        if new_message.get("return", False) == False:
-            print(
-                "Error, return is not true, are username and password correct? Message is: ",
-                new_message.get("message"),
-            )
-            self.code_error.label.config(
-                text=new_message.get("message", "Unknown game start error.")
-            )
-            return False
-
-        if new_message.get("message") == "spectate":
-            spectateGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_server)
-        elif new_message.get("message") == "right_player":
-            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "right", self.game_server)
-        elif new_message.get("message") == "left_player":
-            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "left", self.game_server)
+        if join_game_response["player"] == "spectate":
+            spectateGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_api)
+        elif join_game_response["player"] == "right_player":
+            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "right", self.game_api)
+        elif join_game_response["player"] == "left_player":
+            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "left", self.game_api)
         else:
-            print("Error, player is not defined")
+            print("Error, player is not a valid value")
+            self.code_error.label.config(text="Error: player is not a valid value")
             return False
 
         return True

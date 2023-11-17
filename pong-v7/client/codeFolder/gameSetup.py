@@ -10,8 +10,8 @@ import os.path as path
 
 import pygame
 
+from .api.gameApi import GameApi
 from .helperCode import *
-from .sockethelper import Connection
 
 current_dir = path.abspath(path.dirname(__file__))
 assets_dir = path.join(current_dir, "..", "assets")
@@ -19,13 +19,17 @@ assets_dir = path.join(current_dir, "..", "assets")
 
 class gameInstance:
     def __init__(
-        self, screenWidth: int, screenHeight: int, playerPaddle: str, client: Connection, 
+        self,
+        screenWidth: int,
+        screenHeight: int,
+        playerPaddle: str,
+        game_api: GameApi,
     ):
         self.isBuilt = 0
         self.screenWidth = screenWidth
         self.screenHeight = screenHeight
         self.playerPaddle = playerPaddle
-        self.client = client
+        self.game_api = game_api
         # These are initialized during game setup
         self.currentPlayer = 0
         # Constants
