@@ -53,6 +53,7 @@ Failure: `{'request': 'grab_game', 'return':False, 'message':None}`
 Return Parameters:
 
 `'message': {
+    # This is the opponent's paddle
     'paddle': {
         'x': 0,
         'y': 0,
@@ -78,16 +79,12 @@ Description: A method to update the game on the current progress
 Required Parameters:
 
 `'message': {
-    'left': {
+    # This is the player's paddle
+    'paddle': {
         'x': 0,
         'y': 0,
         'moving': '',
         },
-    'right': {
-        'x': 0,
-        'y': 0,
-        'moving': '',
-    },
     'ball': {
         'x': 0,
         'y': 0,
