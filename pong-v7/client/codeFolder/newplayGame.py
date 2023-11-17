@@ -7,7 +7,7 @@ from tkinter import messagebox
 import pygame
 from helperCode import *
 
-from .api.gameApi import GameApi
+from .api.gameApi import BallInfo, GameApi, PaddleInfo
 
 # Constants
 WHITE = (255, 255, 255)
@@ -65,8 +65,8 @@ def playGame(
     waitingText = restartFont.render("Waiting on other player...", True, WHITE)
     waitingText_center = (screenWidth / 2 - 125, screenHeight / 2 + 30)
 
-    lInitial = ''
-    rInitial = ''
+    lInitial = ""
+    rInitial = ""
 
     leftTextScore = bottomFont.render(f"{lInitial}: 0", True, WHITE)
     leftText_x = 10
@@ -173,6 +173,29 @@ def playGame(
 
         # Only send an update if the game is currently running
         if running:
+            own_paddle: PaddleInfo = {
+                "x": playerPaddleObj.rect.x,
+                "y": playerPaddleObj.rect.y,
+                "moving": playerPaddleObj.moving,
+            }
+            ball_info: BallInfo = {
+                "x": ball.rect.x,
+                "y": ball.rect.y,
+                "x_vel": ball.xVel,
+                "y_vel": ball.yVel,
+            }
+            update_sent = game_api.update_game(
+                own_paddle,
+                ball_info,
+                lScore,
+                rScore,
+                sync,
+            )
+            if not update_sent:
+                print(update_sent)
+                messagebox.showerror("Error", "Server Disconnected")
+                pygame.quit()
+                return
             pass
 
         # =========================================================================================
@@ -230,7 +253,7 @@ def playGame(
                 bounceSound.play()
                 ball.hitWall()
 
-            pygame.draw.rect(screen, WHITE, ball)
+            pygame.draw.rect(screen, WHITE, ball.rect)
             # ==== End Ball Logic =================================================================
 
         # Drawing the dotted line in the center
@@ -240,7 +263,7 @@ def playGame(
 
         # Drawing the player's new location
         for paddle in [playerPaddleObj, opponentPaddleObj]:
-            pygame.draw.rect(screen, WHITE, paddle)
+            pygame.draw.rect(screen, WHITE, paddle.rect)
 
         pygame.draw.rect(screen, WHITE, topWall)
         pygame.draw.rect(screen, WHITE, bottomWall)
@@ -249,9 +272,9 @@ def playGame(
             [
                 topWall,
                 bottomWall,
-                ball,
-                leftPaddle,
-                rightPaddle,
+                ball.rect,
+                leftPaddle.rect,
+                rightPaddle.rect,
                 scoreRect,
                 winMessage,
                 gameMessage,
@@ -272,6 +295,35 @@ def playGame(
 
         # Only grab an update if the game is currently running
         if running:
+            game_state = game_api.grab_game()
+
+            if isinstance(game_state, str):
+                print(game_state)
+                messagebox.showerror("Error", game_state)
+                pygame.quit()
+                return
+
+            if game_state == False:
+                # Game over
+                return
+
+            if playerPaddle == "right":
+                opponentPaddleObj.rect.y = game_state["left_paddle"]["y"]
+                opponentPaddleObj.moving = game_state["left_paddle"]["moving"]
+            elif playerPaddle == "left":
+                opponentPaddleObj.rect.y = game_state["right_paddle"]["y"]
+                opponentPaddleObj.moving = game_state["right_paddle"]["moving"]
+
+            lScore = game_state["left_score"]
+            rScore = game_state["right_score"]
+            ball.rect.x = game_state["ball"]["x"]
+            ball.rect.y = game_state["ball"]["y"]
+            ball.xVel = game_state["ball"]["x_vel"]
+            ball.yVel = game_state["ball"]["y_vel"]
+            lWins = game_state["left_wins"]
+            rWins = game_state["right_wins"]
+            sync = game_state["sync"]
+
             leftTextScore = bottomFont.render(f"{lInitial}: {lWins}", True, WHITE)
             rightTextScore = bottomFont.render(f"{rInitial}: {rWins}", True, WHITE)
             pass

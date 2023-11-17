@@ -33,6 +33,8 @@ class GameInfo(TypedDict):
     ball: BallInfo
     left_score: int
     right_score: int
+    left_wins: int
+    right_wins: int
     sync: int
 
 
@@ -136,12 +138,13 @@ class GameApi:
             if response.get("return", False) == False:
                 return False
 
-            message = response.get("message", None)
-            left_paddle = message.get("left_paddle", None)
-            right_paddle = message.get("right_paddle", None)
-            ball = message.get("ball", None)
-            score = message.get("score", None)
+            message = response.get("message", {})
+            left_paddle = message.get("left_paddle", {})
+            right_paddle = message.get("right_paddle", {})
+            ball = message.get("ball", {})
+            score = message.get("score", {})
             sync = message.get("sync", None)
+            wins = message.get("wins", {})
             if (
                 left_paddle is None
                 or right_paddle is None
@@ -163,6 +166,8 @@ class GameApi:
                 ball_y_vel = ball.get("yVel", None)
                 left_score = score.get("lScore", None)
                 right_score = score.get("rScore", None)
+                left_wins = wins.get("left_player", None)
+                right_wins = wins.get("right_player", None)
                 sync = sync
 
                 if (
@@ -178,6 +183,8 @@ class GameApi:
                     or ball_y_vel is None
                     or left_score is None
                     or right_score is None
+                    or left_wins is None
+                    or right_wins is None
                     or sync is None
                 ):
                     return "Invalid message from server (missing data)"
@@ -219,6 +226,8 @@ class GameApi:
                         },
                         "left_score": left_score,
                         "right_score": right_score,
+                        "left_wins": left_wins,
+                        "right_wins": right_wins,
                         "sync": sync,
                     }
         else:
