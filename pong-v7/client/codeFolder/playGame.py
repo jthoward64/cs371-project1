@@ -138,7 +138,9 @@ def playGame(
             if lScore > 4 or rScore > 4:
                 winText = "Player 1 Wins! " if lScore > 4 else "Player 2 Wins! "
                 winText = winText + "\n P to Play Again"
-                textSurface = gameInt.winFont.render(winText, False, gameInt.WHITE, (0, 0, 0))
+                textSurface = gameInt.winFont.render(
+                    winText, False, gameInt.WHITE, (0, 0, 0)
+                )
                 textRect = textSurface.get_rect()
                 textRect.centerx = int(gameInt.screenWidth / 2)
                 textRect.centery = int(gameInt.screenHeight / 2)
@@ -146,7 +148,9 @@ def playGame(
                 for event in pygame.event.get():
                     if event.key == pygame.K_p:
                         gameInt.reset()
+                        isRunning = 
                         playAgain = True
+                        client.send("")
 
                 """ ---------------------------------------------------------------- Modify for Game Restart ---------------------------------------------------------------- """
             else:
@@ -237,3 +241,4 @@ def playGame(
             gameInt.ball.xVel = game_state["ball"]["x_vel"]
             gameInt.ball.yVel = game_state["ball"]["y_vel"]
             sync = game_state["sync"]
+
