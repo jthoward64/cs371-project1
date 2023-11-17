@@ -148,10 +148,7 @@ class GameServer:
             if new_message["request"] == "game_info":
                 # Return Message
                 message = {}
-                (
-                    message["left_player"],
-                    message["right_player"],
-                ) = self.game_info.grab_players()
+                message["left_player"], message["right_player"] = self.game_info.grab_players()
                 message["game_code"] = self.code
 
                 control.send(
@@ -163,10 +160,7 @@ class GameServer:
             if new_message["request"] == "start_game":
                 # Return Message
                 message = {}
-                (
-                    message["left_player"],
-                    message["right_player"],
-                ) = self.game_info.grab_players()
+                message["left_player"], message["right_player"] = self.game_info.grab_players()
                 message["game_code"] = self.code
 
                 # Are clients ready to start?

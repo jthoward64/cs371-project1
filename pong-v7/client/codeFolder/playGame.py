@@ -148,7 +148,9 @@ def playGame(
                 for event in pygame.event.get():
                     if event.key == pygame.K_p:
                         gameInt.reset()
+                        isRunning = 
                         playAgain = True
+                        client.send("")
 
                 """ ---------------------------------------------------------------- Modify for Game Restart ---------------------------------------------------------------- """
             else:
@@ -243,3 +245,4 @@ def playGame(
             gameInt.ball.xVel = game_state["ball"]["x_vel"]
             gameInt.ball.yVel = game_state["ball"]["y_vel"]
             sync = game_state["sync"]
+
