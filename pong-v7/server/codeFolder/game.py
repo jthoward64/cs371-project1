@@ -9,13 +9,16 @@
 # Used in Client Threads and Game Processing
 import threading as th
 from multiprocessing.connection import Connection
+
 # For Type Hinting
 from multiprocessing.synchronize import Event
+
 # Typing Requisites
 from typing import List
 
 # Our Client Socket and Server Management
 from helpers.clientwrapper import ClientWrapper
+
 # Our database connection
 from helpers.database import Database as db
 from helpers.serversocket import ServerSocket
@@ -38,6 +41,7 @@ class GameServer:
             return
 
         port_pipe.send(self.game_server.port)
+        port_pipe.close()
 
         # Game Information
         self.game_info = GameInfo()
@@ -112,6 +116,7 @@ class GameServer:
             # Requesting to join the
             print(new_message)
             if new_message["request"] == "join_game":
+                print(new_message)
                 # Check if username is valid, else exit this client
                 validated, message = database.validate_user(
                     new_message["username"], new_message["password"]
@@ -148,7 +153,10 @@ class GameServer:
             if new_message["request"] == "game_info":
                 # Return Message
                 message = {}
-                message["left_player"], message["right_player"] = self.game_info.grab_players()
+                (
+                    message["left_player"],
+                    message["right_player"],
+                ) = self.game_info.grab_players()
                 message["game_code"] = self.code
 
                 control.send(
@@ -160,7 +168,10 @@ class GameServer:
             if new_message["request"] == "start_game":
                 # Return Message
                 message = {}
-                message["left_player"], message["right_player"] = self.game_info.grab_players()
+                (
+                    message["left_player"],
+                    message["right_player"],
+                ) = self.game_info.grab_players()
                 message["game_code"] = self.code
 
                 # Are clients ready to start?
@@ -175,19 +186,23 @@ class GameServer:
             if new_message["request"] == "grab_game":
                 if not self.game_info.continue_game():
                     # Inform the client the round is over
-                    control.send({"request": "grab_game", "return": False, "message": None})
+                    control.send(
+                        {"request": "grab_game", "return": False, "message": None}
+                    )
                     continue
 
                 # Prepare information
                 game_info: dict = self.game_info.grab_game()
 
                 # Send it
-                control.send({"request": "grab_game", "return": True, "message": game_info})
+                control.send(
+                    {"request": "grab_game", "return": True, "message": game_info}
+                )
                 continue
 
             if new_message["request"] == "update_game" and player != "spectate":
                 if not self.game_info.continue_game():
-                    #control.send({"request": "update_game", "return": False, "message": None})
+                    # control.send({"request": "update_game", "return": False, "message": None})
                     continue
 
                 self.game_info.update_game(player, new_message["message"])
@@ -197,5 +212,5 @@ class GameServer:
                 elif new_message["message"]["rScore"] > 4:
                     self.game_info.increment_win("right")
 
-                #control.send({"request": "update_game", "return": True, "message": None})
+                # control.send({"request": "update_game", "return": True, "message": None})
                 continue

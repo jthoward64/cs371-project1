@@ -128,7 +128,7 @@ class Client:
         new_code = self.game_info.generate_code()
 
         # A pipe to send the port back to the main process from the game process
-        send_port, recv_port = mp.Pipe()
+        recv_port, send_port = mp.Pipe()
 
         # Generate a new game process
         new_game = mp.Process(
