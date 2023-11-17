@@ -128,9 +128,13 @@ class GameApi:
         else:
             return response
 
-    def grab_game(self) -> Union[GameInfo, str]:
-        response = self.send_and_check("grab_game", None)
+    def grab_game(self) -> Union[GameInfo, str, Literal[False]]:
+        response = self.send_and_check("grab_game", None, False)
+
         if isinstance(response, dict):
+            if response.get("return", False) == False:
+                return False
+
             message = response.get("message", None)
             left_paddle = message.get("left_paddle", None)
             right_paddle = message.get("right_paddle", None)
