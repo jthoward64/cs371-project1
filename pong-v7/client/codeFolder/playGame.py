@@ -2,12 +2,16 @@ import socket
 import sys
 import time
 import tkinter as tk
+from os import path
 from tkinter import messagebox
 
 import pygame
 
 from .api.gameApi import BallInfo, GameApi, PaddleInfo
 from .helperCode import *
+
+current_dir = path.abspath(path.dirname(__file__))
+assets_dir = path.join(current_dir, "..", "assets")
 
 
 # This is the main game loop.  For the most part, you will not need to modify this.  The sections
@@ -34,12 +38,12 @@ def playGame(
     WHITE = (255, 255, 255)
     GREY = (100, 100, 100)
     clock = pygame.time.Clock()
-    scoreFont = pygame.font.Font("./assets/fonts/pong-score.ttf", 32)
-    winFont = pygame.font.Font("./assets/fonts/visitor.ttf", 48)
+    scoreFont = pygame.font.Font(path.join(assets_dir, "fonts", "pong-score.ttf"), 32)
+    winFont = pygame.font.Font(path.join(assets_dir, "fonts", "visitor.ttf"), 48)
     bottomFont = pygame.font.Font(None, 24)
     restartFont = pygame.font.Font(None, 32)
-    pointSound = pygame.mixer.Sound("./assets/sounds/point.wav")
-    bounceSound = pygame.mixer.Sound("./assets/sounds/bounce.wav")
+    pointSound = pygame.mixer.Sound(path.join(assets_dir, "sounds", "point.wav"))
+    bounceSound = pygame.mixer.Sound(path.join(assets_dir, "sounds", "bounce.wav"))
 
     # Display objects
     screen = pygame.display.set_mode((screenWidth, screenHeight))

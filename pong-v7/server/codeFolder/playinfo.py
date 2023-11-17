@@ -113,13 +113,11 @@ class GameInfo:
         if player == "left":
             with self.left_lock:
                 self.left_data["paddle"] = data["paddle"]
-                self.left_data["score"] = data["score"]
-                self.left_data["wins"] = data["wins"]
+                self.left_data["score"] = data["lScore"]
         elif player == "right":
             with self.right_lock:
                 self.right_data["paddle"] = data["paddle"]
-                self.right_data["score"] = data["score"]
-                self.right_data["wins"] = data["wins"]
+                self.right_data["score"] = data["rScore"]
 
     def start_game(self, player: str) -> bool:
         """Starts the Game Sequence"""
