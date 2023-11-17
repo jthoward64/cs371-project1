@@ -156,7 +156,7 @@ class GameServer:
                 # Are clients ready to start?
                 start: bool = self.game_info.start_game(player)
 
-                control.send({"request": "ready", "return": start, "message": message})
+                control.send({"request": "start_game", "return": start, "message": message})
                 continue
 
             # Checking if the player can start the game
@@ -182,10 +182,8 @@ class GameServer:
 
                 if new_message['message']['lScore'] > 4:
                     self.game_info.increment_win('left')
-                    self.game_info.reset_game()
                 elif new_message['message']['rScore'] > 4:
                     self.game_info.increment_win('right')
-                    self.game_info.reset_game()
 
                 control.send({"request": "update_game", "return": True, "message": None})
                 continue
