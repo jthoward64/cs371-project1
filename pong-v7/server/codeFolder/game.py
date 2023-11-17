@@ -94,6 +94,7 @@ class GameServer:
         # Game Information
         username: str = ""
         player: str = ""
+        initials: str = ""
 
         # Database Connection
         database = db()
@@ -101,23 +102,14 @@ class GameServer:
         # Do we need to turn this client thread off?
         shut_client = False
 
-        while (
-            not self.shut_down.is_set()
-            and not self.game_down.is_set()
-            and not shut_client
-        ):
+        while (not self.shut_down.is_set() and not self.game_down.is_set() and not shut_client):
             # Grab incoming client connection
             success = control.recv()
 
             # Did our success fail and is the connection closed?
             if success is None:
-                with self.game_info:
-                    if username != "" and (
-                        username == self.information.left_player
-                        or username == self.information.right_player
-                    ):
-                        # A player has exited, quit the game
-                        self.game_down.set()
+                if self.game_info.player_check(username):
+                    self.game_down.set()
                 continue
 
             new_message = success
@@ -126,32 +118,21 @@ class GameServer:
             print(new_message)
             if new_message["request"] == "join_game":
                 # Check if username is valid, else exit this client
-                validated, message = database.validate_user(
-                    new_message["username"], new_message["password"]
-                )
+                validated, message = database.validate_user(new_message["username"], new_message["password"])
                 if not validated:
-                    control.send(
-                        {"request": "join_game", "return": False, "message": message}
-                    )
+                    control.send({"request": "join_game", "return": False, "message": message})
                     shut_client = True
                     control.close()
                     continue
 
                 # Update our username
-                username = new_message["username"]
+                username = new_message['username']
+                initials = new_message['initials']
 
                 # Inform Client of Success, add to Player List
-                with self.information.Lock:
-                    if self.information.left_player == "":
-                        self.information.left_player = username
-                        player = "left_player"
-                    elif self.information.right_player == "":
-                        self.information.right_player = username
-                        player = "right_player"
-                    else:
-                        player = "spectate"
+                player_type = self.game_info.set_player(username, initials)
 
-                control.send({"request": "join_game", "return": True, "message": player})
+                control.send({"request": "join_game", "return": True, "message": player_type})
                 continue
 
             # # # Block Non-Validated Clients # # #
@@ -164,9 +145,10 @@ class GameServer:
                     message = {
                         "left_player": self.information.left_initial,
                         "right_player": self.information.right_initial,
-                        "client_number": self.information.client_number,
                         "game_code": self.code,
                     }
+                
+
 
                 control.send(
                     {"request": "game_info", "return": True, "message": message}
@@ -185,7 +167,6 @@ class GameServer:
                     message = {
                         "left_player": self.information.left_initial,
                         "right_player": self.information.right_initial,
-                        "client_number": self.information.client_number,
                         "game_code": self.code,
                     }
 
@@ -314,6 +295,3 @@ class GameServer:
                     {"request": "update_game", "return": True, "message": None}
                 )
                 continue
-
-        # Client Exiting
-        self.information.client_number -= 1
