@@ -158,6 +158,13 @@ class GameInfo:
     def increment_win(self, player:str):
         '''Increments the Wins in a Player'''
         with self.basic_lock:
+
+            # Prevent us from incrementing where we already have
+            if not self.game_running:
+                return
+            
+            self.reset_game()
+            
             username = self.user[player]
             self.wins[player] += 1
 

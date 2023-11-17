@@ -209,10 +209,8 @@ class GameServer:
 
                 if new_message["message"]["lScore"] > 4:
                     self.game_info.increment_win("left")
-                    self.game_info.reset_game()
                 elif new_message["message"]["rScore"] > 4:
                     self.game_info.increment_win("right")
-                    self.game_info.reset_game()
 
                 control.send(
                     {"request": "update_game", "return": True, "message": None}
