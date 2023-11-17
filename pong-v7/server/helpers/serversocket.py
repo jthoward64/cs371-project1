@@ -86,7 +86,6 @@ class ServerSocket:
             print("Error on Accept: ", new_error)
             return None
         except socket.timeout as new_error:
-            print("Accept Timed Out")
             return None
 
         return new_socket
