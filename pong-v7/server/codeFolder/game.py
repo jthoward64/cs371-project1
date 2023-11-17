@@ -44,15 +44,8 @@ class GameServer:
         # Game Information
         self.game_info = GameInfo()
 
-        # Clients Ready to Start
-        self.left_play: th.Event = th.Event()
-        self.right_play: th.Event = th.Event()
-
         # Game Server shutdown
         self.game_down: th.Event = th.Event()
-
-        # Inform clients round is over
-        self.round_over: th.Event = th.Event()
 
         # Main Server shut_down information
         self.shut_down: Event = shut_down
