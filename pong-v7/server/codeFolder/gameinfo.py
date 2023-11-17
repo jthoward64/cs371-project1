@@ -54,9 +54,9 @@ class GameInfo:
     def grab_game(self, player:str) -> dict:
         '''Returns the current game data'''
         with self.game_lock:
-
+            return_player = 'left' if player is 'left' else 'right'
             new_info = {
-                'paddle': self.game_data[player],
+                'paddle': self.game_data[return_player],
                 'ball': self.game_data['ball'],
                 'score': self.game_data['score'],
                 'sync': self.game_data['sync']

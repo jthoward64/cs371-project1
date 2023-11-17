@@ -52,27 +52,25 @@ Failure: `{'request': 'grab_game', 'return':False, 'message':None}`
 
 Return Parameters:
 
-`game_info = {
-    'left_player': {
-        'X':integer,
-        'Y':integer,
-        'Moving':string
-    },
-    'right_player': {
-        'X':integer,
-        'Y':integer,
-        'Moving':string
+`'message': {
+    'paddle': {
+        'x': 0,
+        'y': 0,
+        'moving': '',
+        },
+    'ball': {
+        'x': 0,
+        'y': 0,
+        'xVel': 0,
+        'yVel': 0,
     },
     'score': {
-        'lScore':integer,
-        'rScore':integer,
+        'lScore': 0,
+        'rScore': 0,
     },
-    'ball': {
-        'X':integer,
-        'Y':integer,
-    },
-    'sync':integer
-}`
+    'sync': 0,
+}
+`
 
 ## Type: update_game
 Description: A method to update the game on the current progress
@@ -81,18 +79,26 @@ Note: Will return False if Game is Over, Spectate Players cannot Call this Metho
 Required Parameters:
 
 `'message': {
-    'Paddle':{
-        'X':integer,
-        'Y':integer,
-        'Moving':string,
-    },
-    'score':{
-        'lScore':integer,
-        'rScore':integer,
+    'left': {
+        'x': 0,
+        'y': 0,
+        'moving': '',
+        },
+    'right': {
+        'x': 0,
+        'y': 0,
+        'moving': '',
     },
     'ball': {
-        'X':integer,
-        'Y':integer,
-    }
-    'sync':integer
-}`
+        'x': 0,
+        'y': 0,
+        'xVel': 0,
+        'yVel': 0,
+    },
+    'score': {
+        'lScore': 0,
+        'rScore': 0,
+    },
+    'sync': 0,
+}
+`
