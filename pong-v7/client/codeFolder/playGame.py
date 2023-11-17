@@ -221,9 +221,12 @@ def playGame(
 
             # Add our message to restart the game
             running = False
-
-        # Drawing the dotted line in the center
-        if running is True:
+        
+        if not running:
+            if startedGame:
+                restartHolder = screen.blit(restartText, restartText_center)
+        else:
+            # Drawing the dotted line in the center
             for i in centerLine:
                 pygame.draw.rect(screen, GREY, i)
 
@@ -252,12 +255,9 @@ def playGame(
             if ball.rect.colliderect(topWall) or ball.rect.colliderect(bottomWall):
                 bounceSound.play()
                 ball.hitWall()
-
+            
             pygame.draw.rect(screen, WHITE, ball.rect)
             # ==== End Ball Logic =================================================================
-        else:
-            if startedGame:
-                restartHolder = screen.blit(restartText, restartText_center)
 
         # Drawing the player's new location
         for paddle in [playerPaddleObj, opponentPaddleObj]:
