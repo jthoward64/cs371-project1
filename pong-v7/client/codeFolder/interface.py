@@ -8,7 +8,7 @@
 
 import os.path as path
 import tkinter as tk
-from tkinter import ttk
+from tkinter import messagebox, ttk
 from typing import Callable, Optional, Union
 
 from .api.gameApi import GameApi
@@ -171,6 +171,15 @@ class MainWindow(tk.Tk):
 
         # Create our Socket Interface for the Main Server
         self.server_socket: Connection = Connection(MAIN_PORT)
+
+        if self.server_socket.maybe_server_issue:
+            self.withdraw()
+            messagebox.showerror(
+                "Connection Error",
+                "Failed to connect to server. Please check that the server is reachable and that you have configured the client correctly. Configuration can be set in settings.py or by passing an argument (see '--help' for more information).",
+                parent=self,
+            )
+            self.destroy()
 
         # Create our Login Page
         self.main_frame = MainMenu(self)

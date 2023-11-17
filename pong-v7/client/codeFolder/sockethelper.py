@@ -15,7 +15,7 @@ import ssl
 from ssl import SSLSocket
 
 # For Typing
-from typing import Optional
+from typing import Literal, Optional
 
 # Our Address Family and Socket Type
 from .settings import ADDRESS_FAMILY, CERTFILE, MAIN_ADDRESS, RECEIVER_SIZE, SOCKET_KIND
@@ -25,13 +25,15 @@ class Connection:
     # Is our connection open?
     connection_open: bool = False
 
+    maybe_server_issue: bool = False
+
     # Our port number
     port: int
 
     def __init__(self, port: int) -> None:
         """Create a new connection to the server"""
         try:
-            self.__holder = socket.create_connection((MAIN_ADDRESS, port))
+            self.__holder = socket.create_connection((MAIN_ADDRESS, port), 3)
 
             # Load our context to encrypt the connection
             self.__context = ssl.create_default_context()
@@ -47,13 +49,20 @@ class Connection:
                 self.__holder, server_hostname=MAIN_ADDRESS
             )
 
+        except socket.timeout as new_error:
+            print("Socket Timeout: ", new_error)
+            self.maybe_server_issue = True
+            return
         except ssl.SSLError as new_error:
-            print("Error on SSL Socket: ", new_error)
-            del self.client
+            print("SSL Error on Socket: ", new_error)
             return
         except socket.error as new_error:
-            print("Error on Socket:", new_error)
-            # del self.client
+            if new_error.errno == 111:
+                print("Connection Refused")
+                self.maybe_server_issue = True
+                return
+            else:
+                print("Error on Socket:", new_error)
             return
 
         # Success, inform we are open to the server
@@ -61,6 +70,7 @@ class Connection:
         self.connection_open = True
 
     def send(self, message: dict) -> bool:
+        print("Tried to send message when connection is closed")
         if not self.connection_open:
             return False
 
@@ -99,6 +109,10 @@ class Connection:
         return binary
 
     def decode_message(self) -> Optional[dict]:
+        if not self.connection_open:
+            print("Tried to decode message when connection is closed")
+            return None
+
         try:
             # Decode
             incoming = self.client.recv(RECEIVER_SIZE)
