@@ -28,7 +28,7 @@ class BallInfo(TypedDict):
 
 
 class GameInfo(TypedDict):
-    paddle: PaddleInfo
+    opponent_paddle: PaddleInfo
     ball: BallInfo
     left_score: int
     right_score: int
@@ -123,8 +123,8 @@ class GameApi:
         if isinstance(response, dict):
             paddle = response.get("paddle", None)
             ball = response.get("ball", None)
-            left_score = response.get("left_score", None)
-            right_score = response.get("right_score", None)
+            left_score = response.get("lScore", None)
+            right_score = response.get("rScore", None)
             sync = response.get("sync", None)
             if (
                 paddle is None
@@ -140,8 +140,8 @@ class GameApi:
                 paddle_moving = paddle.get("moving", None)
                 ball_x = ball.get("x", None)
                 ball_y = ball.get("y", None)
-                ball_x_vel = ball.get("x_vel", None)
-                ball_y_vel = ball.get("y_vel", None)
+                ball_x_vel = ball.get("xVel", None)
+                ball_y_vel = ball.get("yVel", None)
                 left_score = left_score
                 right_score = right_score
                 sync = sync
@@ -170,7 +170,7 @@ class GameApi:
                         return "Invalid response from server (paddle moving was not up, down, or empty string)"
 
                     return {
-                        "paddle": {
+                        "opponent_paddle": {
                             "x": paddle_x,
                             "y": paddle_y,
                             "moving": parsed_paddle_moving,
@@ -190,7 +190,7 @@ class GameApi:
 
     def update_game(
         self,
-        paddle: PaddleInfo,
+        own_paddle: PaddleInfo,
         ball: BallInfo,
         left_score: int,
         right_score: int,
@@ -201,10 +201,18 @@ class GameApi:
                 "request": "update_game",
                 "message": {
                     "paddle": {
-                        "x": paddle["x"],
-                        "y": paddle["y"],
-                        "moving": paddle["moving"] or "",
+                        "x": own_paddle["x"],
+                        "y": own_paddle["y"],
+                        "moving": own_paddle["moving"] or "",
                     },
+                    "ball": {
+                        "x": ball["x"],
+                        "y": ball["y"],
+                        "xVel": ball["x_vel"],
+                        "yVel": ball["y_vel"],
+                    },
+                    "score": {"lscore": left_score, "rscore": right_score},
+                    "sync": sync,
                 },
             }
         )

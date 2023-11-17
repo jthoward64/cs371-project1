@@ -6,11 +6,13 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
+from tkinter import messagebox
+
 import pygame
 
+from .api.gameApi import BallInfo, GameApi, PaddleInfo
 from .gameSetup import *
 from .helperCode import *
-from .sockethelper import Connection
 
 
 # This is the main game loop.  For the most part, you will not need to modify this.  The sections
@@ -20,18 +22,18 @@ def playGame(
     screenWidth: int,
     screenHeight: int,
     playerPaddle: str,
-    client: Connection,
+    game_api: GameApi,
 ) -> None:
     pygame.init()
-    gameInt = gameInstance(screenWidth, screenHeight, playerPaddle, client)
+    gameInt = gameInstance(screenWidth, screenHeight, playerPaddle, game_api)
 
-    client.send({"request": "game_info"})
-    game_info = client.recv()  # type: ignore
-    if not game_info:
+    game_metadata = game_api.game_info()
+    if isinstance(game_metadata, str):
         print("Server Disconnected")
+        messagebox.showerror("Error", game_metadata)
         pygame.quit()
         return
-    game_code = game_info["message"].get("game_code", "Unknown Code")
+    game_code = game_metadata["game_code"]
 
     pygame.mixer.pre_init(44100, -16, 2, 2048)
     gameInt.currentPlayer = 1 if gameInt.playerPaddle == "left" else 2
@@ -43,14 +45,16 @@ def playGame(
     else:
         opponentPaddleObj = gameInt.leftPaddle
         playerPaddleObj = gameInt.rightPaddle
-    #FIXME wait for player 2
-    client.send({"request":"start_game"})
-    tester = client.recv()
-    while (not tester):
-        client.send({"request":"start_game"})
-        tester = client.recv()
-    
-    
+    # FIXME wait for player 2
+    tester = None
+    while not tester:
+        tester = game_api.start_game()
+        if isinstance(tester, str):
+            print(tester)
+            messagebox.showerror("Error", tester)
+            pygame.quit()
+            return
+
     playAgain = True
     while playAgain:
         playAgain = False
@@ -88,37 +92,37 @@ def playGame(
                         playerPaddleObj.moving = "up"
 
                     elif event.type == pygame.KEYUP:
-                        playerPaddleObj.moving = ""
+                        playerPaddleObj.moving = None
 
             # =========================================================================================
             # Your code here to send an update to the server on your paddle's information,
             # where the ball is and the current score.
             # Feel free to change when the score is updated to suit your needs/requirements
 
-            '''Update the Server using 'request' and information here'''
-            newDict = {
-                'request': 'update_game',
-                'message': {
-                    'Paddle': {
-                        'X': playerPaddleObj.rect.x,
-                        'Y': playerPaddleObj.rect.y,
-                        'Moving': playerPaddleObj.moving
-                    },
-                    'score': {
-                        'lScore':lScore,
-                        'rScore':rScore,
-                    },
-                    'ball': {
-                        'X': gameInt.ball.rect.x,
-                        'Y': gameInt.ball.rect.y,
-                        'xVel': gameInt.ball.xVel,
-                        'yVel': gameInt.ball.yVel,
-                    },
-                    'sync': sync,
-                }
+            own_paddle: PaddleInfo = {
+                "x": playerPaddleObj.rect.x,
+                "y": playerPaddleObj.rect.y,
+                "moving": playerPaddleObj.moving,
             }
-            client.send(newDict)
-            
+            ball: BallInfo = {
+                "x": gameInt.ball.rect.x,
+                "y": gameInt.ball.rect.y,
+                "x_vel": gameInt.ball.xVel,
+                "y_vel": gameInt.ball.yVel,
+            }
+            update_sent = game_api.update_game(
+                own_paddle,
+                ball,
+                lScore,
+                rScore,
+                sync,
+            )
+            if not update_sent:
+                print(update_sent)
+                messagebox.showerror("Error", "Server Disconnected")
+                pygame.quit()
+                return
+
             # =========================================================================================
 
             # Update the player paddle and opponent paddle's location on the screen
@@ -213,21 +217,20 @@ def playGame(
             # Send your server update here at the end of the game loop to sync your game with your
             # opponent's game
 
-            '''Use 'request' not Type'''
-            client.send({'request':'grab_game'})
+            game_state = game_api.grab_game()
 
-            msg = client.recv()
-            if msg is None:
-                # Error? Idk what to do here
-                continue
+            if isinstance(game_state, str):
+                print(game_state)
+                messagebox.showerror("Error", game_state)
+                pygame.quit()
+                return
 
-            key = 'right_player' if gameInt.playerPaddle == 'right' else 'left_player'
-            opponentPaddleObj.rect.y = msg[key]['Y']
-            opponentPaddleObj.moving = msg[key]['Moving']
-            lScore = msg['score']['lScore']
-            rScore = msg['score']['rScore']
-            gameInt.ball.rect.x = msg['ball']['X']
-            gameInt.ball.rect.y = msg['ball']['Y']
-            gameInt.ball.xVel = msg['ball']['xVel']
-            gameInt.ball.yVel = msg['ball']['yVel']
-            sync = msg['sync']
+            opponentPaddleObj.rect.y = game_state["opponent_paddle"]["y"]
+            opponentPaddleObj.moving = game_state["opponent_paddle"]["moving"]
+            lScore = game_state["left_score"]
+            rScore = game_state["right_score"]
+            gameInt.ball.rect.x = game_state["ball"]["x"]
+            gameInt.ball.rect.y = game_state["ball"]["y"]
+            gameInt.ball.xVel = game_state["ball"]["x_vel"]
+            gameInt.ball.yVel = game_state["ball"]["y_vel"]
+            sync = game_state["sync"]
