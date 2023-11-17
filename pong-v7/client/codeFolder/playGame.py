@@ -225,8 +225,13 @@ def playGame(
                 pygame.quit()
                 return
 
-            opponentPaddleObj.rect.y = game_state["opponent_paddle"]["y"]
-            opponentPaddleObj.moving = game_state["opponent_paddle"]["moving"]
+            if gameInt.playerPaddle == "right":
+                opponentPaddleObj.rect.y = game_state["left_paddle"]["y"]
+                opponentPaddleObj.moving = game_state["left_paddle"]["moving"]
+            elif gameInt.playerPaddle == "left":
+                opponentPaddleObj.rect.y = game_state["right_paddle"]["y"]
+                opponentPaddleObj.moving = game_state["right_paddle"]["moving"]
+
             lScore = game_state["left_score"]
             rScore = game_state["right_score"]
             gameInt.ball.rect.x = game_state["ball"]["x"]

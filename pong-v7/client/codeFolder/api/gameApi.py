@@ -28,7 +28,8 @@ class BallInfo(TypedDict):
 
 
 class GameInfo(TypedDict):
-    opponent_paddle: PaddleInfo
+    left_paddle: PaddleInfo
+    right_paddle: PaddleInfo
     ball: BallInfo
     left_score: int
     right_score: int
@@ -121,13 +122,15 @@ class GameApi:
     def grab_game(self) -> Union[GameInfo, str]:
         response = self.send_and_check("grab_game", None)
         if isinstance(response, dict):
-            paddle = response.get("paddle", None)
+            left_paddle = response.get("left_paddle", None)
+            right_paddle = response.get("right_paddle", None)
             ball = response.get("ball", None)
             left_score = response.get("lScore", None)
             right_score = response.get("rScore", None)
             sync = response.get("sync", None)
             if (
-                paddle is None
+                left_paddle is None
+                or right_paddle is None
                 or ball is None
                 or left_score is None
                 or right_score is None
@@ -135,9 +138,12 @@ class GameApi:
             ):
                 return "Invalid response from server (missing data)"
             else:
-                paddle_x = paddle.get("x", None)
-                paddle_y = paddle.get("y", None)
-                paddle_moving = paddle.get("moving", None)
+                left_paddle_x = left_paddle.get("x", None)
+                left_paddle_y = left_paddle.get("y", None)
+                left_paddle_moving = left_paddle.get("moving", None)
+                right_paddle_x = right_paddle.get("x", None)
+                right_paddle_y = right_paddle.get("y", None)
+                right_paddle_moving = right_paddle.get("moving", None)
                 ball_x = ball.get("x", None)
                 ball_y = ball.get("y", None)
                 ball_x_vel = ball.get("xVel", None)
@@ -147,9 +153,12 @@ class GameApi:
                 sync = sync
 
                 if (
-                    paddle_x is None
-                    or paddle_y is None
-                    or paddle_moving is None
+                    left_paddle_x is None
+                    or left_paddle_y is None
+                    or left_paddle_moving is None
+                    or right_paddle_x is None
+                    or right_paddle_y is None
+                    or right_paddle_moving is None
                     or ball_x is None
                     or ball_y is None
                     or ball_x_vel is None
@@ -160,20 +169,34 @@ class GameApi:
                 ):
                     return "Invalid response from server (missing data)"
                 else:
-                    if paddle_moving == "up":
-                        parsed_paddle_moving = "up"
-                    elif paddle_moving == "down":
-                        parsed_paddle_moving = "down"
-                    elif paddle_moving == "":
-                        parsed_paddle_moving = None
+                    if left_paddle_moving == "up":
+                        parsed_left_paddle_moving = "up"
+                    elif left_paddle_moving == "down":
+                        parsed_left_paddle_moving = "down"
+                    elif left_paddle_moving == "":
+                        parsed_left_paddle_moving = None
+                    else:
+                        return "Invalid response from server (paddle moving was not up, down, or empty string)"
+
+                    if right_paddle_moving == "up":
+                        parsed_right_paddle_moving = "up"
+                    elif right_paddle_moving == "down":
+                        parsed_right_paddle_moving = "down"
+                    elif right_paddle_moving == "":
+                        parsed_right_paddle_moving = None
                     else:
                         return "Invalid response from server (paddle moving was not up, down, or empty string)"
 
                     return {
-                        "opponent_paddle": {
-                            "x": paddle_x,
-                            "y": paddle_y,
-                            "moving": parsed_paddle_moving,
+                        "left_paddle": {
+                            "x": left_paddle_x,
+                            "y": left_paddle_y,
+                            "moving": parsed_left_paddle_moving,
+                        },
+                        "right_paddle": {
+                            "x": right_paddle_x,
+                            "y": right_paddle_y,
+                            "moving": parsed_right_paddle_moving,
                         },
                         "ball": {
                             "x": ball_x,
