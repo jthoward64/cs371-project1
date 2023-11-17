@@ -180,6 +180,7 @@ class MainWindow(tk.Tk):
                 parent=self,
             )
             self.destroy()
+            return
 
         # Create our Login Page
         self.main_frame = MainMenu(self)
@@ -234,6 +235,14 @@ class MainWindow(tk.Tk):
         """Attempts to join the Game Server"""
         game_server = Connection(port)
 
+        if game_server.maybe_server_issue:
+            messagebox.showerror(
+                "Connection Error",
+                "Failed to connect to game server. Please check that the server is reachable and that you have configured the client correctly. Configuration can be set in settings.py or by passing an argument (see '--help' for more information).",
+                parent=self,
+            )
+            return False
+
         # Check if the connection is established
         if not game_server.connection_open:
             return False
@@ -252,16 +261,20 @@ class MainWindow(tk.Tk):
             self.code_error.label.config(text=join_game_response)
             return False
 
-        if join_game_response["player"] == "spectate":
-            spectateGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_api)
-        elif join_game_response["player"] == "right_player":
-            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "right", self.game_api)
-        elif join_game_response["player"] == "left_player":
-            playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "left", self.game_api)
-        else:
-            print("Error, player is not a valid value")
-            self.code_error.label.config(text="Error: player is not a valid value")
-            return False
+        self.withdraw()
+        try:
+            if join_game_response["player"] == "spectate":
+                spectateGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_api)
+            elif join_game_response["player"] == "right_player":
+                playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "right", self.game_api)
+            elif join_game_response["player"] == "left_player":
+                playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "left", self.game_api)
+            else:
+                print("Error, player is not a valid value")
+                self.code_error.label.config(text="Error: player is not a valid value")
+                return False
+        finally:
+            self.deiconify()
 
         return True
 

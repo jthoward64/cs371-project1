@@ -18,7 +18,7 @@ parser.add_argument(
     metavar="hostname",
     type=str,
     help="The hostname of the server",
-    default="10.113.33.209",
+    default="localhost",
 )
 parser.add_argument(
     "--port",

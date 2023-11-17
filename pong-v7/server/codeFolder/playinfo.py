@@ -77,7 +77,10 @@ class GameInfo:
         with self.game_lock:
             if data["sync"] > self.game_data["sync"]:
                 self.game_data["sync"] = data["sync"]
-                self.game_data["score"] = data["score"]
+                self.game_data["score"] = {
+                    "lScore": data["lScore"],
+                    "rScore": data["rScore"],
+                }
                 self.game_data["ball"] = data["ball"]
 
             self.game_data[player] = data["paddle"]
@@ -166,8 +169,9 @@ class GameInfo:
             username = self.user[player]
             self.wins[player] += 1
 
-            self.game_data["wins"]["left_player"] = self.wins["left"]
-            self.game_data["wins"]["right_player"] = self.wins["right"]
+            with self.game_lock:
+                self.game_data["wins"]["left_player"] = self.wins["left"]
+                self.game_data["wins"]["right_player"] = self.wins["right"]
 
             success, message, wins_number = self.database.grab_wins(username)
 
