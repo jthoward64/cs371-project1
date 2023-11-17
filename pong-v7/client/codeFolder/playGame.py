@@ -138,9 +138,7 @@ def playGame(
             if lScore > 4 or rScore > 4:
                 winText = "Player 1 Wins! " if lScore > 4 else "Player 2 Wins! "
                 winText = winText + "\n P to Play Again"
-                textSurface = gameInt.winFont.render(
-                    winText, False, gameInt.WHITE, (0, 0, 0)
-                )
+                textSurface = gameInt.winFont.render(winText, False, gameInt.WHITE, (0, 0, 0))
                 textRect = textSurface.get_rect()
                 textRect.centerx = int(gameInt.screenWidth / 2)
                 textRect.centery = int(gameInt.screenHeight / 2)
