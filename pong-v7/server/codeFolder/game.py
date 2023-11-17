@@ -23,55 +23,8 @@ from helpers.clientwrapper import ClientWrapper
 from helpers.database import Database as db
 from helpers.serversocket import ServerSocket
 
-
-class Paddle:
-    Lock: th.Lock = th.Lock()
-
-    def __init__(self) -> None:
-        """Contains the Paddle Information X, Y, Moving"""
-        self.X: int = 0
-        self.Y: int = 0
-        self.Moving: str = ""
-
-
-class Ball:
-    Lock: th.Lock = th.Lock()
-
-    def __init__(self) -> None:
-        """Contains the Ball Information X, Y"""
-        self.X: int = 0
-        self.Y: int = 0
-        self.yVel: int = 0
-        self.xVel: int = 0
-
-class Score:
-    Lock: th.Lock = th.Lock()
-
-    def __init__(self) -> None:
-        """Contains the Score Information left_score and right_score"""
-        self.left_score: int = 0
-        self.right_score: int = 0
-
-
-class Information:
-    Lock: th.Lock = th.Lock()
-
-    def __init__(self) -> None:
-        """Contains the left_player, right_player, left_initial, right_initial, sync"""
-        # Our player usernames
-        self.left_player: str = ""
-        self.right_player: str = ""
-
-        # Initials for Game Play
-        self.left_initial: str = ""
-        self.right_initial: str = ""
-
-        # Number of Clients
-        self.client_number: int = 0
-
-        # Sync of the Clients
-        self.sync: int = 0
-
+# Our game information
+from gameinfo import GameInfo
 
 class GameServer:
     # new_game = mp.Process(target=GameServer, args=(new_code, new_port, self.shut_down, self.game_info))
@@ -89,17 +42,7 @@ class GameServer:
         port_pipe.send(self.game_server.port)
 
         # Game Information
-        self.information = Information()
-
-        # Paddles
-        self.left_paddle = Paddle()
-        self.right_paddle = Paddle()
-
-        # Ball information
-        self.ball = Ball()
-
-        # Score of the current game
-        self.score = Score()
+        self.game_info = GameInfo()
 
         # Clients Ready to Start
         self.left_play: th.Event = th.Event()
@@ -168,7 +111,7 @@ class GameServer:
 
             # Did our success fail and is the connection closed?
             if success is None:
-                with self.information.Lock:
+                with self.game_info:
                     if username != "" and (
                         username == self.information.left_player
                         or username == self.information.right_player

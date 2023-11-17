@@ -74,7 +74,6 @@ Return Parameters:
 
 ## Type: update_game
 Description: A method to update the game on the current progress
-Note: Will return False if Game is Over, Spectate Players cannot Call this Method
 
 Required Parameters:
 
