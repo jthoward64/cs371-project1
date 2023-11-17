@@ -19,6 +19,6 @@ class Leaderboard(SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    with HTTPServer(("", 80), Leaderboard) as httpd:
+    with HTTPServer(("0.0.0.0", 80), Leaderboard) as httpd:
         print("serving leaderboard.html at port", 80)
         httpd.serve_forever()

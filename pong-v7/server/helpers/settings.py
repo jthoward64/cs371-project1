@@ -11,7 +11,7 @@ from os import path
 from socket import AF_INET, SOCK_STREAM
 
 # Settings Folder to Contain Globals
-MAIN_ADDRESS: str = "localhost"
+MAIN_ADDRESS: str = "0.0.0.0"
 MAIN_PORT: int = 4000
 RECEIVER_SIZE: int = 1024
 
