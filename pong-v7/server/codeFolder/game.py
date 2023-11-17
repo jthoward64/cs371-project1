@@ -185,5 +185,5 @@ class GameServer:
                 elif new_message['message']['rScore'] > 4:
                     self.game_info.increment_win('right')
 
-                control.send({"request": "update_game", "return": True, "message": None})
+                #control.send({"request": "update_game", "return": True, "message": None})
                 continue
