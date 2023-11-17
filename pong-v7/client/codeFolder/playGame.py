@@ -98,7 +98,7 @@ def playGame(
     ball = Ball(pygame.Rect(screenWidth / 2, screenHeight / 2, 5, 5), -5, 0)
 
     # Set to false when we're not running
-    running = True
+    running = False
     restart = False
 
     # Our bool to control the first game when waiting for second player to join
@@ -135,8 +135,10 @@ def playGame(
                 return
 
             time.sleep(0.02)
+            restartHolder = screen.blit(waitingText, waitingText_center)
 
-        if startTest:
+        if startTest and not startedGame:
+            running = True
             startedGame = True
             lInitial = startTest["left_player_initials"]
             rInitial = startTest["right_player_initials"]
@@ -210,7 +212,7 @@ def playGame(
                     paddle.rect.y -= paddle.speed
 
         # If the game is over, display the win message
-        if not startedGame and (lScore > 4 or rScore > 4 or running is False):
+        if startedGame and (lScore > 4 or rScore > 4 or running is False):
             # Add our win message
             winText = "Player 1 Wins! " if lScore > 4 else "Player 2 Wins! "
             textSurface = winFont.render(winText, False, WHITE, (0, 0, 0))
@@ -226,7 +228,7 @@ def playGame(
                 restartHolder = screen.blit(waitingText, waitingText_center)
 
                 ################################################################ SEND TO SERVERF "START GAME" REQUEST #################################################################
-        else:
+        elif startedGame:
             # ==== Ball Logic =====================================================================
             ball.updatePos()
 
