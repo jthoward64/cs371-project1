@@ -140,8 +140,7 @@ class GameApi:
             left_paddle = message.get("left_paddle", None)
             right_paddle = message.get("right_paddle", None)
             ball = message.get("ball", None)
-            left_score = message.get("lScore", None)
-            right_score = message.get("rScore", None)
+            score = message.get("score", None)
             sync = message.get("sync", None)
             if (
                 left_paddle is None
@@ -163,8 +162,8 @@ class GameApi:
                 ball_y = ball.get("y", None)
                 ball_x_vel = ball.get("xVel", None)
                 ball_y_vel = ball.get("yVel", None)
-                left_score = left_score
-                right_score = right_score
+                left_score = score.get("lScore", None)
+                right_score = score.get("rScore", None)
                 sync = sync
 
                 if (
