@@ -24,7 +24,7 @@ from helpers.database import Database as db
 from helpers.serversocket import ServerSocket
 
 # Our game information
-from gameinfo import GameInfo
+from .gameinfo import GameInfo
 
 class GameServer:
     # new_game = mp.Process(target=GameServer, args=(new_code, new_port, self.shut_down, self.game_info))
