@@ -194,7 +194,7 @@ class GameServer:
                     continue
 
                 # Prepare information
-                game_info: dict = self.game_info.grab_game()
+                game_info = self.game_info.grab_game()
 
                 # Send it
                 control.send(
