@@ -6,7 +6,7 @@
 # Misc:                     <Not Required.  Anything else you might want to include>
 # =================================================================================================
 
-from time import time
+import time
 from tkinter import messagebox
 
 import pygame
