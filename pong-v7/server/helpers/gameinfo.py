@@ -14,7 +14,8 @@ from multiprocessing import Process
 from threading import Lock
 
 # Type Hinting
-from typing import Dict, List, Optional
+from typing import Dict, List, Literal, Optional, Union
+
 
 class GameInformation:
     _lock = Lock()
@@ -42,17 +43,17 @@ class GameInformation:
 
         return new_code
 
-    def check_code(self, code: str) -> Optional[int]:
+    def check_code(self, code: str) -> Union[Optional[int], Literal[False]]:
         """Check if a code exists"""
         with self._lock:
             if code in self.game_codes:
                 return self.game_codes[code]
 
-        return None
+        return False
 
     def add_code(self, code: str, port: int) -> bool:
         """Adds a Game Code to the List"""
-        if self.check_code(code) is None:
+        if self.check_code(code) == False:
             return False
 
         with self._lock:
