@@ -51,12 +51,19 @@ class GameApi:
             if response is not None and response.get("request") == request:
                 ok = response.get("return", False)
                 if ok or not checkOk:
+                    print("Received and returning response", response)
                     return response
                 else:
+                    print("Server probably returned error", response)
                     return response.get("message", "Unknown error")
             else:
-                return "Invalid response from server"
+                print(
+                    f"Invalid response from server (request was not the same as sent: {(response or {}).get('request', 'None')} != {request})",
+                    response,
+                )
+                return "Invalid response from server (request was not the same as sent)"
         else:
+            print("Failed to send request to server")
             return "Failed to send request to server"
 
     def join_game(
@@ -82,11 +89,12 @@ class GameApi:
     def game_info(self) -> Union[GameMeta, str]:
         response = self.send_and_check("game_info", None)
         if isinstance(response, dict):
-            left_player_initials = response.get("left_player_initials", "N/A")
-            right_player_initials = response.get("right_player_initials", "N/A")
-            game_code = response.get("game_code", None)
+            message = response.get("message", None)
+            left_player_initials = message.get("left_player_initials", "N/A")
+            right_player_initials = message.get("right_player_initials", "N/A")
+            game_code = message.get("game_code", None)
             if game_code is None:
-                return "Invalid response from server (game_code was None)"
+                return "Invalid message from server (game_code was None)"
             else:
                 return {
                     "left_player_initials": left_player_initials,
@@ -105,9 +113,10 @@ class GameApi:
             if response.get("return", False):
                 return False
             else:
-                left_player_initials = response.get("left_player_initials", "N/A")
-                right_player_initials = response.get("right_player_initials", "N/A")
-                game_code = response.get("game_code", None)
+                message = response.get("message", None)
+                left_player_initials = message.get("left_player_initials", "N/A")
+                right_player_initials = message.get("right_player_initials", "N/A")
+                game_code = message.get("game_code", None)
                 if game_code is None:
                     return "Invalid response from server (game_code was None)"
                 else:
@@ -122,12 +131,13 @@ class GameApi:
     def grab_game(self) -> Union[GameInfo, str]:
         response = self.send_and_check("grab_game", None)
         if isinstance(response, dict):
-            left_paddle = response.get("left_paddle", None)
-            right_paddle = response.get("right_paddle", None)
-            ball = response.get("ball", None)
-            left_score = response.get("lScore", None)
-            right_score = response.get("rScore", None)
-            sync = response.get("sync", None)
+            message = response.get("message", None)
+            left_paddle = message.get("left_paddle", None)
+            right_paddle = message.get("right_paddle", None)
+            ball = message.get("ball", None)
+            left_score = message.get("lScore", None)
+            right_score = message.get("rScore", None)
+            sync = message.get("sync", None)
             if (
                 left_paddle is None
                 or right_paddle is None
@@ -136,7 +146,7 @@ class GameApi:
                 or right_score is None
                 or sync is None
             ):
-                return "Invalid response from server (missing data)"
+                return "Invalid message from server (missing data)"
             else:
                 left_paddle_x = left_paddle.get("x", None)
                 left_paddle_y = left_paddle.get("y", None)
@@ -167,7 +177,7 @@ class GameApi:
                     or right_score is None
                     or sync is None
                 ):
-                    return "Invalid response from server (missing data)"
+                    return "Invalid message from server (missing data)"
                 else:
                     if left_paddle_moving == "up":
                         parsed_left_paddle_moving = "up"
@@ -176,7 +186,7 @@ class GameApi:
                     elif left_paddle_moving == "":
                         parsed_left_paddle_moving = None
                     else:
-                        return "Invalid response from server (paddle moving was not up, down, or empty string)"
+                        return "Invalid message from server (paddle moving was not up, down, or empty string)"
 
                     if right_paddle_moving == "up":
                         parsed_right_paddle_moving = "up"
@@ -185,7 +195,7 @@ class GameApi:
                     elif right_paddle_moving == "":
                         parsed_right_paddle_moving = None
                     else:
-                        return "Invalid response from server (paddle moving was not up, down, or empty string)"
+                        return "Invalid message from server (paddle moving was not up, down, or empty string)"
 
                     return {
                         "left_paddle": {

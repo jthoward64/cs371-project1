@@ -26,6 +26,7 @@ from helpers.serversocket import ServerSocket
 # Our game information
 from .playinfo import GameInfo
 
+
 class GameServer:
     # new_game = mp.Process(target=GameServer, args=(new_code, new_port, self.shut_down, self.game_info))
     def __init__(self, new_code: str, shut_down: Event, port_pipe: Connection) -> None:
@@ -95,7 +96,11 @@ class GameServer:
         # Do we need to turn this client thread off?
         shut_client = False
 
-        while (not self.shut_down.is_set() and not self.game_down.is_set() and not shut_client):
+        while (
+            not self.shut_down.is_set()
+            and not self.game_down.is_set()
+            and not shut_client
+        ):
             # Grab incoming client connection
             success = control.recv()
 
@@ -107,30 +112,36 @@ class GameServer:
 
             new_message = success
 
-            # Requesting to join the 
+            # Requesting to join the
             print(new_message)
             if new_message["request"] == "join_game":
                 # Check if username is valid, else exit this client
-                validated, message = database.validate_user(new_message["username"], new_message["password"])
+                validated, message = database.validate_user(
+                    new_message["username"], new_message["password"]
+                )
                 if not validated:
-                    control.send({"request": "join_game", "return": False, "message": message})
+                    control.send(
+                        {"request": "join_game", "return": False, "message": message}
+                    )
                     shut_client = True
                     control.close()
                     continue
 
                 # Update our username
-                username = new_message['username']
-                initials = new_message['initials']
+                username = new_message["username"]
+                initials = new_message["initials"]
 
                 # Inform Client of Success, add to Player List
                 player_type = self.game_info.set_player(username, initials)
 
-                if player_type == 'spectate':
-                    player = 'spectate'
+                if player_type == "spectate":
+                    player = "spectate"
                 else:
-                    player = 'left' if player_type == 'left_player' else 'right'
-                
-                control.send({"request": "join_game", "return": True, "message": player_type})
+                    player = "left" if player_type == "left_player" else "right"
+
+                control.send(
+                    {"request": "join_game", "return": True, "message": player_type}
+                )
                 continue
 
             # # # Block Non-Validated Clients # # #
@@ -140,52 +151,70 @@ class GameServer:
             if new_message["request"] == "game_info":
                 # Return Message
                 message = {}
-                message['left_player'], message['right_player'] = self.game_info.grab_players()
-                message['game_code'] = self.code
-            
-                control.send({"request": "game_info", "return": True, "message": message})
+                (
+                    message["left_player"],
+                    message["right_player"],
+                ) = self.game_info.grab_players()
+                message["game_code"] = self.code
+
+                control.send(
+                    {"request": "game_info", "return": True, "message": message}
+                )
                 continue
 
             # Requesting to Start the Game
             if new_message["request"] == "start_game":
                 # Return Message
                 message = {}
-                message['left_player'], message['right_player'] = self.game_info.grab_players()
-                message['game_code'] = self.code
+                (
+                    message["left_player"],
+                    message["right_player"],
+                ) = self.game_info.grab_players()
+                message["game_code"] = self.code
 
                 # Are clients ready to start?
                 start: bool = self.game_info.start_game(player)
 
-                control.send({"request": "ready", "return": start, "message": message})
+                control.send(
+                    {"request": "start_game", "return": start, "message": message}
+                )
                 continue
 
             # Checking if the player can start the game
             if new_message["request"] == "grab_game":
                 if not self.game_info.continue_game():
                     # Inform the client the round is over
-                    control.send({"request": "grab_game", "return": False, "message": None})
+                    control.send(
+                        {"request": "grab_game", "return": False, "message": None}
+                    )
                     continue
 
                 # Prepare information
                 game_info: dict = self.game_info.grab_game()
 
                 # Send it
-                control.send({"request": "grab_game", "return": True, "message": game_info})
+                control.send(
+                    {"request": "grab_game", "return": True, "message": game_info}
+                )
                 continue
 
             if new_message["request"] == "update_game" and player != "spectate":
                 if not self.game_info.continue_game():
-                    control.send({"request": "update_game", "return": False, "message": None})
+                    control.send(
+                        {"request": "update_game", "return": False, "message": None}
+                    )
                     continue
 
-                self.game_info.update_game(player, new_message['message'])
+                self.game_info.update_game(player, new_message["message"])
 
-                if new_message['message']['lScore'] > 4:
-                    self.game_info.increment_win('left')
+                if new_message["message"]["lScore"] > 4:
+                    self.game_info.increment_win("left")
                     self.game_info.reset_game()
-                elif new_message['message']['rScore'] > 4:
-                    self.game_info.increment_win('right')
+                elif new_message["message"]["rScore"] > 4:
+                    self.game_info.increment_win("right")
                     self.game_info.reset_game()
 
-                control.send({"request": "update_game", "return": True, "message": None})
+                control.send(
+                    {"request": "update_game", "return": True, "message": None}
+                )
                 continue
