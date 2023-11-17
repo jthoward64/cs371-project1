@@ -377,5 +377,8 @@ class MainWindow(tk.Tk):
         if new_message["return"] == False:
             self.create_error.label.config(text=new_message["error"])
             return
+        
+        self.username = username
+        self.password = password
 
         self.change_menu(self.code_frame)

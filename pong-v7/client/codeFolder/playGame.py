@@ -135,8 +135,10 @@ def playGame(
                 return
 
             time.sleep(0.02)
+            restartHolder = screen.blit(waitingText, waitingText_center)
 
-        if startTest:
+        if startTest and not startedGame:
+            running = True
             startedGame = True
             running = True
             lInitial = startTest["left_player_initials"]
