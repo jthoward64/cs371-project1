@@ -37,7 +37,6 @@ return: True if we start, False if we are waiting to start
 `message = {
     'left_player':self.information.left_initial,
     'right_player':self.information.right_initial,
-    'client_number':self.information.client_number,
     'game_code':self.code
 }`
 
@@ -79,7 +78,12 @@ Required Parameters:
 
 `'message': {
     # This is the player's paddle
-    'paddle': {
+    'left_paddle': {
+        'x': 0,
+        'y': 0,
+        'moving': '',
+        },
+    'right_paddle': {
         'x': 0,
         'y': 0,
         'moving': '',

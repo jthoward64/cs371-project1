@@ -1,5 +1,9 @@
 import threading as th
 
+from typing import Tuple
+
+from helpers.database import Database as db
+
 class GameInfo:
     def __init__(self) -> None:
         self.game_lock = th.Lock()
@@ -26,6 +30,8 @@ class GameInfo:
             },
             'sync': 0,
         }
+
+        self.database = db()
 
         # Lock for basic game data
         self.basic_lock = th.Lock()
@@ -57,12 +63,12 @@ class GameInfo:
             'right': 0
         }
 
-    def grab_game(self, player:str) -> dict:
+    def grab_game(self) -> dict:
         '''Returns the current game data'''
         with self.game_lock:
-            return_player = 'left' if player is 'left' else 'right'
             new_info = {
-                'paddle': self.game_data[return_player],
+                'left_paddle': self.game_data['left'],
+                'right_paddle': self.game_data['right'],
                 'ball': self.game_data['ball'],
                 'score': self.game_data['score'],
                 'sync': self.game_data['sync']
@@ -137,6 +143,14 @@ class GameInfo:
             
             return 'spectate'
         
+    def grab_players(self) -> Tuple[str, str]:
+        with self.basic_lock:
+            return self.initials['left'], self.initials['right']
+        
+    def continue_game(self) -> bool:
+        with self.basic_lock:
+            return self.game_running
+        
     def player_check(self, user:str) -> bool:
         with self.basic_lock:
             return self.user['left'] == user or self.user['right'] == user
@@ -144,4 +158,18 @@ class GameInfo:
     def increment_win(self, player:str):
         '''Increments the Wins in a Player'''
         with self.basic_lock:
+            username = self.user[player]
             self.wins[player] += 1
+
+            success, message, wins_number = self.database.grab_wins(username)
+
+            if not success:
+                print(f'Error: unable to grab wins,', message)
+                return
+            
+            wins_number += 1
+
+            success, message = self.database.update_wins(username, wins_number)
+
+            if not success:
+                print('Error: unable to update wins: ', message)

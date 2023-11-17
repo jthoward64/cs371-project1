@@ -132,6 +132,11 @@ class GameServer:
                 # Inform Client of Success, add to Player List
                 player_type = self.game_info.set_player(username, initials)
 
+                if player_type == 'spectate':
+                    player = 'spectate'
+                else:
+                    player = 'left' if player_type == 'left_player' else 'right'
+                
                 control.send({"request": "join_game", "return": True, "message": player_type})
                 continue
 
@@ -141,157 +146,53 @@ class GameServer:
 
             if new_message["request"] == "game_info":
                 # Return Message
-                with self.information.Lock:
-                    message = {
-                        "left_player": self.information.left_initial,
-                        "right_player": self.information.right_initial,
-                        "game_code": self.code,
-                    }
-                
-
-
-                control.send(
-                    {"request": "game_info", "return": True, "message": message}
-                )
+                message = {}
+                message['left_player'], message['right_player'] = self.game_info.grab_players()
+                message['game_code'] = self.code
+            
+                control.send({"request": "game_info", "return": True, "message": message})
                 continue
 
             # Requesting to Start the Game
             if new_message["request"] == "start_game":
-                if player == "left_player":
-                    self.left_play.set()
-                elif player == "right_player":
-                    self.right_play.set()
-
                 # Return Message
-                with self.information.Lock:
-                    message = {
-                        "left_player": self.information.left_initial,
-                        "right_player": self.information.right_initial,
-                        "game_code": self.code,
-                    }
+                message = {}
+                message['left_player'], message['right_player'] = self.game_info.grab_players()
+                message['game_code'] = self.code
 
                 # Are clients ready to start?
-                start: bool = (
-                    True
-                    if self.left_play.is_set()
-                    and self.right_play.is_set()
-                    and not self.round_over.is_set()
-                    else False
-                )
+                start: bool = self.game_info.start_game(player)
+
                 control.send({"request": "ready", "return": start, "message": message})
                 continue
 
             # Checking if the player can start the game
             if new_message["request"] == "grab_game":
-                if self.round_over.is_set():
+                if not self.game_info.continue_game():
                     # Inform the client the round is over
-                    control.send(
-                        {"request": "grab_game", "return": False, "message": None}
-                    )
+                    control.send({"request": "grab_game", "return": False, "message": None})
                     continue
 
                 # Prepare information
-                game_info: dict = {}
-                with self.left_paddle.Lock:
-                    game_info["left_player"] = {
-                        "X": self.left_paddle.X,
-                        "Y": self.left_paddle.Y,
-                        "Moving": self.left_paddle.Moving,
-                    }
-                with self.right_paddle.Lock:
-                    game_info["right_player"] = {
-                        "X": self.right_paddle.X,
-                        "Y": self.right_paddle.Y,
-                        "Moving": self.right_paddle.Moving,
-                    }
-                with self.score.Lock:
-                    game_info["score"] = {
-                        "lScore": self.score.left_score,
-                        "rScore": self.score.right_score,
-                    }
-                with self.ball.Lock:
-                    game_info['ball'] = {
-                        'X':self.ball.X,
-                        'Y':self.ball.Y,
-                        'xVel': self.ball.xVel,
-                        'yVel': self.ball.yVel,
-                    }
-                with self.information.Lock:
-                    game_info["sync"] = self.information.sync
+                game_info: dict = self.game_info.grab_game()
 
                 # Send it
-                control.send(
-                    {"request": "grab_game", "return": True, "message": game_info}
-                )
+                control.send({"request": "grab_game", "return": True, "message": game_info})
                 continue
 
             if new_message["request"] == "update_game" and player != "spectate":
-                if self.round_over.is_set():
-                    control.send(
-                        {"request": "update_game", "return": False, "message": None}
-                    )
+                if not self.game_info.continue_game():
+                    control.send({"request": "update_game", "return": False, "message": None})
                     continue
 
-                # Check if we need to update the game information
-                with self.information.Lock:
-                    if new_message["message"]["sync"] > self.information.sync:
-                        # Update Sync
-                        self.information.sync = new_message["message"]["sync"]
+                self.game_info.update_game(player, new_message['message'])
 
-                        # Update Score
-                        with self.score.Lock:
-                            self.score.left_score = new_message["message"]["score"][
-                                "lScore"
-                            ]
-                            self.score.right_score = new_message["message"]["score"][
-                                "rScore"
-                            ]
-                            if (self.score.left_score > 4 or self.score.right_score > 4 and not self.round_over.is_set()):
-                                self.round_over.set()
+                if new_message['message']['lScore'] > 4:
+                    self.game_info.increment_win('left')
+                    self.game_info.reset_game()
+                elif new_message['message']['rScore'] > 4:
+                    self.game_info.increment_win('right')
+                    self.game_info.reset_game()
 
-                                # Winner
-                                with self.information.Lock:
-                                    winner: str = (
-                                        self.information.left_player
-                                        if self.score.left_score > 4
-                                        else self.information.right_player
-                                    )
-
-                                # Grab Points to award
-                                success, message, wins = database.grab_wins(winner)
-                                if not success or wins is None:
-                                    print("Error, no wins were found")
-                                    continue
-
-                                wins += 1
-                                # Award points
-                                database.update_wins(winner, wins)
-
-                        # Update Ball
-                        with self.ball.Lock:
-                            self.ball.X = new_message["message"]["ball"]["X"]
-                            self.ball.Y = new_message["message"]["ball"]["Y"]
-                            self.ball.xVel = new_message['message']['ball']['xVel']
-                            self.ball.yVel = new_message['message']['ball']['yVel']
-
-                if player == "left_player":
-                    # Update Left
-                    with self.left_paddle.Lock:
-                        self.left_paddle.X = new_message["message"]["Paddle"]["X"]
-                        self.left_paddle.X = new_message["message"]["Paddle"]["Y"]
-                        self.left_paddle.Moving = new_message["message"]["Paddle"][
-                            "Moving"
-                        ]
-                else:
-                    # Update Right
-                    with self.right_paddle.Lock:
-                        self.right_paddle.X = new_message["message"]["Paddle"]["X"]
-                        self.right_paddle.X = new_message["message"]["Paddle"]["Y"]
-                        self.right_paddle.Moving = new_message["message"]["Paddle"][
-                            "Moving"
-                        ]
-
-                control.send(
-                    {"request": "update_game", "return": True, "message": None}
-                )
+                control.send({"request": "update_game", "return": True, "message": None})
                 continue
