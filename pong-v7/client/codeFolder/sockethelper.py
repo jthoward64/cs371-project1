@@ -12,6 +12,7 @@ import json
 # Module to create a Server Socket
 import socket
 import ssl
+import traceback
 from ssl import SSLSocket
 
 # For Typing
@@ -54,7 +55,7 @@ class Connection:
             self.maybe_server_issue = True
             return
         except ssl.SSLError as new_error:
-            print("SSL Error on Socket: ", new_error)
+            print("SSL Error on Socket: ", new_error, traceback.format_exc())
             return
         except socket.error as new_error:
             if new_error.errno == 111:
@@ -62,7 +63,7 @@ class Connection:
                 self.maybe_server_issue = True
                 return
             else:
-                print("Error on Socket:", new_error)
+                print("Error on Socket:", new_error, traceback.format_exc())
             return
 
         # Success, inform we are open to the server
@@ -70,8 +71,11 @@ class Connection:
         self.connection_open = True
 
     def send(self, message: dict) -> bool:
-        print("Tried to send message when connection is closed")
         if not self.connection_open:
+            print(
+                "Tried to send message when connection is closed",
+                traceback.format_exc(),
+            )
             return False
 
         """Attempts to Send the Message to the Server"""
@@ -110,7 +114,10 @@ class Connection:
 
     def decode_message(self) -> Optional[dict]:
         if not self.connection_open:
-            print("Tried to decode message when connection is closed")
+            print(
+                "Tried to send message when connection is closed",
+                traceback.format_exc(),
+            )
             return None
 
         try:

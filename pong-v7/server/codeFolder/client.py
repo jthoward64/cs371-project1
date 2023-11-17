@@ -160,10 +160,21 @@ class Client:
 
         # Check if code is in game_codes
         new_port = self.game_info.check_code(request["code"])
-        if new_port is None:
+        if new_port is False:
             print("Invalid Game Code")
             self.connection.send(
                 {"request": "join_game", "return": False, "error": "Invalid Game Code"}
+            )
+            return
+
+        if new_port is None:
+            print("Game Code has no set port")
+            self.connection.send(
+                {
+                    "request": "join_game",
+                    "return": False,
+                    "error": "Game Code has no set port",
+                }
             )
             return
 
