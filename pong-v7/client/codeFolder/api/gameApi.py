@@ -1,7 +1,7 @@
 from email import message
 from typing import Literal, Optional, TypedDict, Union
 
-from .sockethelper import Connection
+from ..sockethelper import Connection
 
 
 class JoinGameResponse(TypedDict):
