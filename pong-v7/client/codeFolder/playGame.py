@@ -186,7 +186,7 @@ def playGame(
         # Time since last frame in milliseconds
         deltaTime = clock.tick(60)
         paddlePixelsPerSecond = 200
-        paddleSpeed: int = paddlePixelsPerSecond * (deltaTime // 1000)
+        paddleSpeed: int = int(paddlePixelsPerSecond * (deltaTime / 1000.0))
 
         # Update the player paddle and opponent paddle's location on the screen
         for paddle in [playerPaddleObj, opponentPaddleObj]:
