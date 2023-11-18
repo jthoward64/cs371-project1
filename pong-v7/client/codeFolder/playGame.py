@@ -218,7 +218,7 @@ def playGame(
                 pygame.draw.rect(screen, GREY, i)
 
             # ==== Ball Logic =====================================================================
-            ball.updatePos()
+            ball.updatePos(deltaTime)
 
             # If the ball makes it past the edge of the screen, update score, etc.
             if ball.rect.x > screenWidth:
