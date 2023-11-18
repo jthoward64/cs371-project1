@@ -166,6 +166,11 @@ class GameInfo:
                 "wins": self.right_data.get("wins", 0),
             }
 
+            self.ready = {
+                'left':False,
+                'right':False,
+            }
+
             self.starting_direction = random.choice(["left", "right"])
 
             self.game_running = False
@@ -205,8 +210,6 @@ class GameInfo:
             # Prevent us from incrementing where we already have
             if not self.game_running:
                 return
-            
-            self.game_running = False
 
             self.reset_game()
 
