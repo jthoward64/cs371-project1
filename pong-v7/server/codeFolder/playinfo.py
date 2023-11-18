@@ -1,7 +1,9 @@
 import random
 import threading as th
 from typing import Literal, Tuple, TypedDict
+
 from helpers.database import Database as db
+
 
 class BallInfo(TypedDict):
     x: int
@@ -123,7 +125,10 @@ class GameInfo:
         """Updates the game data"""
         with self.shared_lock:
             self.shared_data["sync"] = data["sync"]
-            self.shared_data["ball"] = data["ball"]
+            if player == self.starting_direction:
+                # We only want one client deciding the ball's position, let's use the
+                # starting direction to decide which one
+                self.shared_data["ball"] = data["ball"]
         if player == "left":
             with self.left_lock:
                 self.left_data["paddle"] = data["paddle"]
@@ -167,8 +172,8 @@ class GameInfo:
             }
 
             self.ready = {
-                'left':False,
-                'right':False,
+                "left": False,
+                "right": False,
             }
 
             self.starting_direction = random.choice(["left", "right"])
@@ -204,7 +209,7 @@ class GameInfo:
         with self.shared_lock:
             return self.user["left"] == user or self.user["right"] == user
 
-    def increment_win(self, player: str, database:db):
+    def increment_win(self, player: str, database: db):
         """Increments the Wins in a Player"""
         with self.shared_lock:
             # Prevent us from incrementing where we already have

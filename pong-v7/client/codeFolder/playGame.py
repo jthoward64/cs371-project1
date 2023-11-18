@@ -218,7 +218,9 @@ def playGame(
                 pygame.draw.rect(screen, GREY, i)
 
             # ==== Ball Logic =====================================================================
-            ball.updatePos(deltaTime)
+            if starting_direction == playerPaddle:
+                # Only the starting direction should be updating the ball's position
+                ball.updatePos(deltaTime)
 
             # If the ball makes it past the edge of the screen, update score, etc.
             if ball.rect.x > screenWidth:
