@@ -6,17 +6,17 @@
   "configurations": [
     {
       "name": "Start Server",
-      "cwd": "${workspaceFolder}/pong",
+      "cwd": "${workspaceFolder}/server",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/pong-v7/server/main.py"
+      "program": "${workspaceFolder}/server/main.py"
     },
     {
       "name": "Start Client",
-      "cwd": "${workspaceFolder}/pong-v7/client",
+      "cwd": "${workspaceFolder}/client",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/pong-v7/client/client.py"
+      "program": "${workspaceFolder}/client/client.py"
     }
   ]
 }
