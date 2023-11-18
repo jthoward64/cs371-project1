@@ -105,7 +105,6 @@ class GameApi:
             right_player_initials = message.get("right_player", "N/A")
             game_code = message.get("game_code", None)
             starting_direction = message.get("starting_direction", None)
-            wins = message.get("wins", {})
             if game_code is None:
                 return "Invalid message from server (game_code was None)"
             elif starting_direction is None:

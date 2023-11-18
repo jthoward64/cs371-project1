@@ -71,6 +71,31 @@ class Database:
                 return False, "Failed to Create User"
 
             return True, "Success"
+    
+    def grab_initial(self, username: str) -> Tuple[bool, str, str]:
+        """Returns the number of wins currently in the database"""
+
+        with self._connect as conn:
+            cursor = conn.cursor()
+
+            new_query = "SELECT initials FROM users WHERE username = ?;"
+
+            try:
+                cursor.execute(new_query, (username,))
+            except Error as new_error:
+                print(f"Failed to validate: ", new_error)
+                return False, "Failed to Grab", ''
+
+            try:
+                result = cursor.fetchone()
+            except Error as new_error:
+                print(f"Failed to fetch: ", new_error)
+                return False, "Failed to Fetch", ''
+
+            if result is None:
+                return False, "Initial does not exist", ''
+
+            return True, "Success", result[0]
 
     def update_wins(self, username: str, wins: int) -> Tuple[bool, str]:
         """Increments the number of wins"""

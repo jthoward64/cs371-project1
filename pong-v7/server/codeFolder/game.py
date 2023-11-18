@@ -128,10 +128,12 @@ class GameServer:
                     shut_client = True
                     control.close()
                     continue
+                
+                # Grab our initals
+                _, _, initials = database.grab_initial(new_message['username'])
 
                 # Update our username
                 username = new_message["username"]
-                initials = new_message["initials"]
 
                 # Inform Client of Success, add to Player List
                 player_type = self.game_info.set_player(username, initials)
