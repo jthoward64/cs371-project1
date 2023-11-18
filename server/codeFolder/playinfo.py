@@ -1,3 +1,10 @@
+# =================================================================================================
+# Contributing Authors:	    Michael Stacy, Tag Howard, Juliann Hyatt
+# Email Addresses:          jmst231@uky.edu, jtho264@uky.edu, jnhy222@uky.edu
+# Date:                     
+# Purpose:                  
+# Misc:
+# =================================================================================================
 import random
 import threading as th
 from typing import Literal, Optional, Tuple, TypedDict
