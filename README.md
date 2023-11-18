@@ -23,6 +23,10 @@ Once running you can access the leaderboard at [http://localhost:80/leaderboard.
 
 Just run `client/client.py` to run the client, you can change the server address either by directly editing `client/codeFolder/settings.py` or by passing the server address as a command line argument (see `client.py --help` for more info)
 
+### Server:
+
+Just run `server/main.py` to run the client. It does not accept any arguments and will serve it's lobby on port 4000, the actual game traffic goes on a dynamically assigned port.
+
 ## Versioning
 
 Github Link: [https://github.com/jthoward64/cs371-project1](https://github.com/jthoward64/cs371-project1)
