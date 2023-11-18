@@ -130,7 +130,7 @@ def playGame(
 
     while True:
         # Wiping the screen
-        screen.fill((0, 0, 0))
+        screen.fill((0, 50, 0))
 
         if startedGame is False:
             startTest = game_api.start_game()
@@ -296,21 +296,7 @@ def playGame(
         pygame.draw.rect(screen, WHITE, topWall)
         pygame.draw.rect(screen, WHITE, bottomWall)
         scoreRect = updateScore(lScore, rScore, screen, WHITE, scoreFont)
-        pygame.display.update(
-            [
-                topWall,
-                bottomWall,
-                ball.rect,
-                leftPaddle.rect,
-                rightPaddle.rect,
-                scoreRect,
-                winMessage,
-                gameMessage,
-                restartHolder,
-                leftMessage,
-                rightMessage,
-            ]
-        )
+        pygame.display.update()
 
         # =========================================================================================
 
