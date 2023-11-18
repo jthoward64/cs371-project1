@@ -45,7 +45,6 @@ class SendGameInfo(TypedDict):
     ball: BallInfo
     score: SendScore
     sync: int
-    wins: SendWins
 
 
 class GameInfo:
@@ -96,11 +95,7 @@ class GameInfo:
                     "lScore": self.left_data["score"],
                     "rScore": self.right_data["score"],
                 },
-                "sync": self.shared_data["sync"],
-                "wins": {
-                    "left_player": self.left_data["wins"],
-                    "right_player": self.right_data["wins"],
-                },
+                "sync": self.shared_data["sync"]
             }
 
             return new_info
@@ -119,12 +114,13 @@ class GameInfo:
                 self.right_data["paddle"] = data["paddle"]
                 self.right_data["score"] = data["rScore"]
 
-    def start_game(self, player: str) -> bool:
+    def start_game(self, player: str) -> Tuple[bool, dict]:
         """Starts the Game Sequence"""
         with self.shared_lock:
             self.ready[player] = True
             self.game_running = self.ready["left"] and self.ready["right"]
-            return self.game_running
+            wins = {"left_player": self.left_data["wins"], "right_player": self.right_data["wins"]}
+            return self.game_running, wins
 
     def reset_start(self) -> None:
         """Resets the Start Sequence"""

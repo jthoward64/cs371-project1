@@ -177,7 +177,7 @@ class GameServer:
                 message["game_code"] = self.code
 
                 # Are clients ready to start?
-                start: bool = self.game_info.start_game(player)
+                start, message['wins'] = self.game_info.start_game(player)
 
                 control.send(
                     {"request": "start_game", "return": start, "message": message}

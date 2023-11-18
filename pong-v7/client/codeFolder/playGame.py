@@ -147,6 +147,8 @@ def playGame(
             startedGame = True
             lInitial = startTest["left_player_initials"]
             rInitial = startTest["right_player_initials"]
+            lWins = startTest["left_wins"]
+            rWins = startTest["right_wins"]
             starting_direction = startTest["starting_direction"]
 
         # Blit the bottomMessage
@@ -177,42 +179,7 @@ def playGame(
         # Send your server update here at the end of the game loop to sync your game with your
         # opponent's game
 
-        # Only grab an update if the game is currently running
-        if running:
-            game_state = game_api.grab_game()
-
-            if isinstance(game_state, str):
-                print(game_state)
-                messagebox.showerror("Error", game_state)
-                pygame.quit()
-                return
-
-            if game_state == False:
-                # Game over
-                return
-
-            if playerPaddle == "right":
-                opponentPaddleObj.rect.y = game_state["left_paddle"]["y"]
-                opponentPaddleObj.moving = game_state["left_paddle"]["moving"]
-            elif playerPaddle == "left":
-                opponentPaddleObj.rect.y = game_state["right_paddle"]["y"]
-                opponentPaddleObj.moving = game_state["right_paddle"]["moving"]
-
-            lScore = game_state["left_score"]
-            rScore = game_state["right_score"]
-            ball.rect.x = game_state["ball"]["x"]
-            ball.rect.y = game_state["ball"]["y"]
-            ball.xVel = game_state["ball"]["x_vel"]
-            ball.yVel = game_state["ball"]["y_vel"]
-            lWins = game_state["left_wins"]
-            rWins = game_state["right_wins"]
-            sync = game_state["sync"]
-
-            if ball.xVel == 0:
-                ball.reset(starting_direction)
-
-            leftTextScore = bottomFont.render(f"{lInitial}: {lWins}", True, WHITE)
-            rightTextScore = bottomFont.render(f"{rInitial}: {rWins}", True, WHITE)
+        ########################################################################
 
         # =========================================================================================
 
@@ -308,7 +275,7 @@ def playGame(
                 messagebox.showerror("Error", "Server Disconnected")
                 pygame.quit()
                 return
-
+            
         # =========================================================================================
 
         # Drawing the player's new location
@@ -334,3 +301,48 @@ def playGame(
             ]
         )
         clock.tick(60)
+            
+        # =========================================================================================
+
+        # Only grab an update if the game is currently running
+        if running:
+            game_state = game_api.grab_game()
+
+            if isinstance(game_state, str):
+                print(game_state)
+                messagebox.showerror("Error", game_state)
+                pygame.quit()
+                return
+
+            if game_state == False:
+                # Game over
+                running = False
+                sync = 0
+                lScore = 0
+                rScore = 0
+                continue
+
+            if playerPaddle == "right":
+                opponentPaddleObj.rect.y = game_state["left_paddle"]["y"]
+                opponentPaddleObj.moving = game_state["left_paddle"]["moving"]
+            elif playerPaddle == "left":
+                opponentPaddleObj.rect.y = game_state["right_paddle"]["y"]
+                opponentPaddleObj.moving = game_state["right_paddle"]["moving"]
+
+            lScore = game_state["left_score"]
+            rScore = game_state["right_score"]
+            ball.rect.x = game_state["ball"]["x"]
+            ball.rect.y = game_state["ball"]["y"]
+            ball.xVel = game_state["ball"]["x_vel"]
+            ball.yVel = game_state["ball"]["y_vel"]
+            lWins = game_state["left_wins"]
+            rWins = game_state["right_wins"]
+            sync = game_state["sync"]
+
+            if ball.xVel == 0:
+                ball.reset(starting_direction)
+
+            leftTextScore = bottomFont.render(f"{lInitial}: {lWins}", True, WHITE)
+            rightTextScore = bottomFont.render(f"{rInitial}: {rWins}", True, WHITE)
+
+        # =========================================================================================
