@@ -128,7 +128,7 @@ class GameInfo:
             }
 
             return new_info
-        
+
     # Author:        Michael Stacy
     # Purpose:       To update the server from the client
     # Pre:           Player String, Data Dictionary
@@ -146,8 +146,12 @@ class GameInfo:
                 self.left_data["paddle"] = data["paddle"]
             elif player == "right":
                 self.right_data["paddle"] = data["paddle"]
-            self.left_data["score"] = data["lScore"]
-            self.right_data["score"] = data["rScore"]
+
+            # Update the score (only if it's higher to avoid sync issues)
+            if data["lScore"] > self.left_data["score"]:
+                self.left_data["score"] = data["lScore"]
+            if data["rScore"] > self.right_data["score"]:
+                self.right_data["score"] = data["rScore"]
 
     # Author:        Michael Stacy
     # Purpose:       To start the game request

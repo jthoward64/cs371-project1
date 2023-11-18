@@ -233,13 +233,15 @@ def playGame(
 
             # If the ball makes it past the edge of the screen, update score, etc.
             if ball.rect.x > screenWidth:
+                # if starting_direction == playerPaddle:
                 lScore += 1
-                pointSound.play()
                 ball.reset(nowGoing="left")
-            elif ball.rect.x < 0:
-                rScore += 1
                 pointSound.play()
+            elif ball.rect.x < 0:
+                # if starting_direction == playerPaddle:
+                rScore += 1
                 ball.reset(nowGoing="right")
+                pointSound.play()
 
             # If the ball hits a paddle
             if ball.rect.colliderect(playerPaddleObj.rect):
