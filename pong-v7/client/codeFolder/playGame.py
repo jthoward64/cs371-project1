@@ -149,6 +149,8 @@ def playGame(
             rInitial = startTest["right_player_initials"]
             lWins = startTest["left_wins"]
             rWins = startTest["right_wins"]
+            leftTextScore = bottomFont.render(f"{lInitial}: {lWins}", True, WHITE)
+            rightTextScore = bottomFont.render(f"{rInitial}: {rWins}", True, WHITE)
             starting_direction = startTest["starting_direction"]
 
         # Blit the bottomMessage
@@ -185,6 +187,7 @@ def playGame(
 
         # Time since last frame in milliseconds
         deltaTime = clock.tick(60)
+        print(deltaTime)
         paddlePixelsPerSecond = 200
         paddleSpeed: int = int(paddlePixelsPerSecond * (deltaTime / 1000.0))
 
@@ -345,8 +348,5 @@ def playGame(
 
             if ball.xVel == 0:
                 ball.reset(starting_direction)
-
-            leftTextScore = bottomFont.render(f"{lInitial}: {lWins}", True, WHITE)
-            rightTextScore = bottomFont.render(f"{rInitial}: {rWins}", True, WHITE)
 
         # =========================================================================================
