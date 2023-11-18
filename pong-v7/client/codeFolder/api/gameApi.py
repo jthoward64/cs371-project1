@@ -13,6 +13,13 @@ class GameMeta(TypedDict):
     right_player_initials: str
     game_code: str
     starting_direction: Literal["left", "right"]
+
+
+class StartGameMeta(TypedDict):
+    left_player_initials: str
+    right_player_initials: str
+    game_code: str
+    starting_direction: Literal["left", "right"]
     left_wins: int
     right_wins: int
 
@@ -99,24 +106,16 @@ class GameApi:
             game_code = message.get("game_code", None)
             starting_direction = message.get("starting_direction", None)
             wins = message.get("wins", {})
-            left_wins = wins.get("left_player", None)
-            right_wins = wins.get("right_player", None)
             if game_code is None:
                 return "Invalid message from server (game_code was None)"
             elif starting_direction is None:
                 return "Invalid message from server (starting_direction was None)"
-            elif left_wins is None:
-                return "Invalid message from server (left_wins was None)"
-            elif right_wins is None:
-                return "Invalid message from server (right_wins was None)"
             else:
                 return {
                     "left_player_initials": left_player_initials,
                     "right_player_initials": right_player_initials,
                     "game_code": game_code,
                     "starting_direction": starting_direction,
-                    "left_wins": left_wins,
-                    "right_wins": right_wins,
                 }
         else:
             return response

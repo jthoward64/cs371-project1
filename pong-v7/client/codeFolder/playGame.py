@@ -25,7 +25,7 @@ def playGame(
 ) -> None:
     game_metadata = game_api.game_info()
     if isinstance(game_metadata, str):
-        print("Server Disconnected")
+        print(f"Server Disconnected: {game_metadata}")
         pygame.quit()
         return
     game_code = game_metadata["game_code"]
