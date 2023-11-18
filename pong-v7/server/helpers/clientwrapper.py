@@ -24,6 +24,10 @@ from .settings import RECEIVER_SIZE
 class ClientWrapper:
     connection_open: bool = True
 
+    # Author:        Michael Stacy
+    # Purpose:       To simplify the SSL Socket Control
+    # Pre:           SSLSocket
+    # Post:          None
     def __init__(self, connection: SSLSocket) -> None:
         """Creates a new ClientWrapper to handle the SSLSocket Connection"""
         self.client = connection
@@ -47,12 +51,20 @@ class ClientWrapper:
 
         return True
 
+    # Author:        Michael Stacy
+    # Purpose:       To receive messages from the SSLSocket
+    # Pre:           None
+    # Post:          Dictionary Items
     def recv(self) -> Optional[dict]:
         """Attempts to Send the Message to the Server"""
         new_message = self._decode_message()
 
         return new_message
 
+    # Author:        Michael Stacy
+    # Purpose:       To encode the data
+    # Pre:           Message Dict
+    # Post:          Encoded Bytes
     def _encode_message(self, message: dict) -> Optional[bytes]:
         try:
             # Convert to Binary
@@ -63,6 +75,10 @@ class ClientWrapper:
 
         return binary
 
+    # Author:        Michael Stacy
+    # Purpose:       To decode a message
+    # Pre:           None
+    # Post:          Dictionary Data
     def _decode_message(self) -> Optional[dict]:
         try:
             # Decode
@@ -87,6 +103,10 @@ class ClientWrapper:
 
         return message
 
+    # Author:        Michael Stacy
+    # Purpose:       To close the SSL Socket
+    # Pre:           None
+    # Post:          None
     def close(self) -> None:
         self.client.close()
         self.connection_open = False

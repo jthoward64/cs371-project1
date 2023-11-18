@@ -22,6 +22,10 @@ assets_dir = path.join(current_dir, "..", "assets")
 
 
 class Image(tk.Frame):
+    # Author:        Michael Stacy
+    # Purpose:       To create an image for Tkinter
+    # Pre:           Tk Widget, Label images, Tk Image
+    # Post:          None
     def __init__(self, parent: tk.Widget, label_image: tk.Image) -> None:
         super().__init__(parent)
 
@@ -32,6 +36,10 @@ class Image(tk.Frame):
 
 
 class Label(tk.Frame):
+    # Author:        Michael Stacy
+    # Purpose:       To create an label
+    # Pre:           Various Tk Widgets, Label Names, Label Text
+    # Post:          None
     def __init__(self, parent: tk.Widget, label_name: str, label_text: str) -> None:
         super().__init__(parent)
 
@@ -45,6 +53,10 @@ class Label(tk.Frame):
 
 
 class TextBox(tk.Frame):
+    # Author:        Michael Stacy
+    # Purpose:       To create a TextBox
+    # Pre:           Parent, Label Name, Label Text
+    # Post:          None
     def __init__(self, parent: tk.Widget, label_name: str, label_text: str) -> None:
         super().__init__(parent)
 
@@ -64,6 +76,10 @@ class TextBox(tk.Frame):
 
 
 class TwoButton(tk.Frame):
+    # Author:        Michael Stacy
+    # Purpose:       Create our Two Buttons
+    # Pre:           Parent, Left_Text, Left_Button, Right_Text, Right_Button
+    # Post:          None
     def __init__(
         self,
         parent: tk.Widget,
@@ -94,6 +110,10 @@ class TwoButton(tk.Frame):
 
 
 class MainMenu(tk.Frame):
+    # Author:        Michael Stacy
+    # Purpose:       To create our MainMenu
+    # Pre:           Parent TK TK
+    # Post:          None
     def __init__(self, parent: tk.Tk) -> None:
         super().__init__(parent)
 
@@ -117,6 +137,10 @@ class MainMenu(tk.Frame):
 
 
 class CodeMenu(tk.Frame):
+    # Author:        Michael Stacy
+    # Purpose:       To control the Code Menu
+    # Pre:           Parent
+    # Post:          None
     def __init__(self, parent: tk.Tk) -> None:
         super().__init__(parent)
 
@@ -135,6 +159,10 @@ class CodeMenu(tk.Frame):
 
 
 class CreateMenu(tk.Frame):
+    # Author:        Michael Stacy
+    # Purpose:       Create the Menu
+    # Pre:           Parent
+    # Post:          None
     def __init__(self, parent: tk.Tk) -> None:
         super().__init__(parent)
 
@@ -163,6 +191,10 @@ class CreateMenu(tk.Frame):
 class MainWindow(tk.Tk):
     game_api: Optional[GameApi] = None
 
+    # Author:        Michael Stacy
+    # Purpose:       To create the Main Window
+    # Pre:           None
+    # Post:          None
     def __init__(self):
         super().__init__()
 
@@ -231,6 +263,10 @@ class MainWindow(tk.Tk):
         # Start by setting to Login Page
         self.change_menu(self.main_frame)
 
+    # Author:        Michael Stacy
+    # Purpose:       Game Connection
+    # Pre:           Port
+    # Post:          Failed to Connect or Success
     def game_connect(self, port: int) -> Optional[str]:
         """Attempts to join the Game Server"""
         game_server = Connection(port)
@@ -274,6 +310,10 @@ class MainWindow(tk.Tk):
 
         return None
 
+    # Author:        Michael Stacy
+    # Purpose:       Change our Menu
+    # Pre:           Union Frame
+    # Post:          None
     def change_menu(self, frame: Union[MainMenu, CreateMenu, CodeMenu]) -> None:
         """Change the Frame Menu"""
         self.main_frame.pack_forget()
@@ -282,6 +322,10 @@ class MainWindow(tk.Tk):
 
         frame.pack(side="top", fill="both", expand=True)
 
+    # Author:        Michael Stacy
+    # Purpose:       Login and Validate the User Client
+    # Pre:           String Username, Password
+    # Post:          None
     def login(self, username: str, password: str) -> None:
         """Send a Request to the Server for Login Validation"""
         # Send the server our login
@@ -308,6 +352,10 @@ class MainWindow(tk.Tk):
         self.password = password
         self.change_menu(frame=self.code_frame)
 
+    # Author:        Michael Stacy
+    # Purpose:       To join a game
+    # Pre:           Code String
+    # Post:          None
     def join(self, code: str) -> None:
         """Send a Request to the Server to Join a Game"""
         print(f"Attempting to Join game. Code: ({code})")
@@ -324,6 +372,10 @@ class MainWindow(tk.Tk):
         if not self.game_connect(new_message["message"]):
             self.code_error.label.config(text="Error: could not connect to game server")
 
+    # Author:        Michael Stacy
+    # Purpose:       To make a game
+    # Pre:           None
+    # Post:          None
     def make(self) -> None:
         """Send a Request to the Server to Make a Game"""
         print(f"Attempting to make game.")
@@ -344,6 +396,10 @@ class MainWindow(tk.Tk):
         if not self.game_connect(new_message["message"]):
             self.code_error.label.config(text="Error: could not connect to game server")
 
+    # Author:        Michael Stacy
+    # Purpose:       To create an account
+    # Pre:           Username, Password, Confirmation Password, Initials
+    # Post:          None
     def create(self, username: str, password: str, confirm: str, initials: str) -> None:
         """Send a Request to the Server to Create an Account"""
         print(

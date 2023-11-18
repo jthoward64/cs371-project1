@@ -1,19 +1,23 @@
+# =================================================================================================
+# Contributing Authors:	    Tag Howard, John Michael Stacy, Juliann Hyatt
+# Email Addresses:          jtho264@uky.edu, jmst231@uky.edu, jnhy222@uky.edu
+# Date:                     November 7th, 2023
+# Purpose:                  The API Documentation from Server to Client and Client to Server
+# Misc:
+# =================================================================================================
 from email import message
 from typing import Literal, Optional, TypedDict, Union
 
 from ..sockethelper import Connection
 
-
 class JoinGameResponse(TypedDict):
     player: Literal["left_player", "right_player", "spectate"]
-
 
 class GameMeta(TypedDict):
     left_player_initials: str
     right_player_initials: str
     game_code: str
     starting_direction: Literal["left", "right"]
-
 
 class StartGameMeta(TypedDict):
     left_player_initials: str
@@ -23,12 +27,10 @@ class StartGameMeta(TypedDict):
     left_wins: int
     right_wins: int
 
-
 class PaddleInfo(TypedDict):
     x: int
     y: int
     moving: Optional[Literal["up", "down"]]
-
 
 class BallInfo(TypedDict):
     x: int
@@ -45,13 +47,15 @@ class GameInfo(TypedDict):
     right_score: int
     sync: int
 
-
 class GameApi:
     connection: Connection
-
     def __init__(self, connection: Connection):
         self.connection = connection
 
+    # Author:      Tag Howard
+    # Purpose:     Send and Check if we get a response
+    # Pre:         Request String, Data Dictionary, Check Bool
+    # Post:        String Message or Dictionary Data
     def send_and_check(
         self, request: str, data: Optional[dict], checkOk: bool = True
     ) -> Union[dict, str]:
@@ -77,6 +81,10 @@ class GameApi:
             print("Failed to send request to server")
             return "Failed to send request to server"
 
+    # Author:      Tag Howard
+    # Purpose:     Join a Game
+    # Pre:         Username and Password
+    # Post:        String Message or Dictionary Data
     def join_game(self, username: str, password: str) -> Union[JoinGameResponse, str]:
         response = self.send_and_check(
             "join_game",
@@ -95,6 +103,10 @@ class GameApi:
         else:
             return response
 
+    # Author:      Tag Howard
+    # Purpose:     Game Info Grab
+    # Pre:         None
+    # Post:        String Message or Dictionary Data
     def game_info(self) -> Union[GameMeta, str]:
         response = self.send_and_check("game_info", None)
         if isinstance(response, dict):
@@ -117,6 +129,10 @@ class GameApi:
         else:
             return response
 
+    # Author:      Tag Howard
+    # Purpose:     Start Game Request
+    # Pre:         None
+    # Post:        String Message or Dictionary Data
     def start_game(self) -> Union[StartGameMeta, Literal[False], str]:
         """
         Returns GameInfoResponse if successful and ready to play, False if not ready to play, and str if error
@@ -154,6 +170,10 @@ class GameApi:
         else:
             return response
 
+    # Author:      Tag Howard
+    # Purpose:     To grab the current game environment
+    # Pre:         None
+    # Post:        String Message or Dictionary Data
     def grab_game(self) -> Union[GameInfo, str, Literal[False]]:
         response = self.send_and_check("grab_game", None, False)
 
@@ -249,6 +269,10 @@ class GameApi:
         else:
             return response
 
+    # Author:      Tag Howard
+    # Purpose:     To update the server on the game
+    # Pre:         Paddle, Left Score, Right Score, Sync, Ball
+    # Post:        Success Bool
     def update_game(
         self,
         own_paddle: PaddleInfo,

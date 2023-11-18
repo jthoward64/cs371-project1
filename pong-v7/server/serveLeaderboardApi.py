@@ -1,6 +1,6 @@
 # =================================================================================================
-# Contributing Authors:	    Tag Howard, Name Here, Name Here
-# Email Addresses:          jtho264@uky.edu, Email Here, Email Here
+# Contributing Authors:	    Tag Howard, John Michael Stacy, Juliann Hyatt
+# Email Addresses:          jtho264@uky.edu, jmst231@uky.edu, jnhy222@uky.edu
 # Date:                     November 7th, 2023
 # Purpose:                  Serve leaderboard JSON to the client
 # Misc:
@@ -12,9 +12,12 @@ from os import path
 
 from helpers.database import Database
 
-
+# Author:        Tag Howard
+# Purpose:       To serve the Leaderboard
+# Pre:           HTTPServer
+# Post:          None
 class LeaderboardApi(BaseHTTPRequestHandler):
-    def do_GET(self):
+    def do_GET(self) -> None:
         """Returns the Top 10 Leaderboard"""
         db = Database()
 

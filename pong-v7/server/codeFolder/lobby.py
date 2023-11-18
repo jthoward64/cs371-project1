@@ -35,6 +35,10 @@ from .client import Client
 
 
 class LobbyServer:
+    # Author:        Michael Stacy
+    # Purpose:       To run the Lobby Server Thread to allow clients to connect to games
+    # Pre:           None
+    # Post:          None
     def __init__(self) -> None:
         """Creates the Lobby Server"""
         self.lobby = ServerSocket(MAIN_PORT)
@@ -91,6 +95,10 @@ class LobbyServer:
         for process in self.game_info.game_process:
             process.join()
 
+    # Author:        Michael Stacy
+    # Purpose:       To shut down the server when SIGTERM and SIGKILL are done
+    # Pre:           Optional Signal/Frame
+    # Post:          None
     def signal_shutdown(self, signal: int, frame: Optional[FrameType]) -> None:
         """Handles the signal for shutting down"""
         self.shut_down.set()

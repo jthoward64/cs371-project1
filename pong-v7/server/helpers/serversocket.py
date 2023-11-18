@@ -25,7 +25,6 @@ from .settings import (
     SOCKET_KIND,
 )
 
-
 class ServerSocket:
     # Is our connection open?
     connection_open: bool = False
@@ -33,11 +32,19 @@ class ServerSocket:
     # Our port number
     port: int
 
+    # Author:        Michael Stacy
+    # Purpose:       To simplify the Socket Connection and Bind the Server
+    # Pre:           Port Int
+    # Post:          None
     def __init__(self, port: int) -> None:
         """Create a new connection to the server"""
         # Bind the server
         self.bind(port)
 
+    # Author:        Michael Stacy
+    # Purpose:       To set up the binding and SSL encryption
+    # Pre:           Port Int
+    # Post:          Bool
     def bind(self, port: int) -> bool:
         try:
             # Create our Socket and Bind it
@@ -77,6 +84,10 @@ class ServerSocket:
         self.connection_open = True
         return True
 
+    # Author:        Michael Stacy
+    # Purpose:       Accepts an incoming client connection
+    # Pre:           None
+    # Post:          SSL Socket or None
     def accept(self) -> Optional[SSLSocket]:
         """Attempts to accept an incoming connection"""
         try:
@@ -90,6 +101,10 @@ class ServerSocket:
 
         return new_socket
 
+    # Author:        Michael Stacy
+    # Purpose:       Closes the Server Socket
+    # Pre:           None
+    # Post:          None
     def close(self) -> None:
         """Closes our connection"""
         self.client.close()

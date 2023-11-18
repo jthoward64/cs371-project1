@@ -29,6 +29,10 @@ from .game import GameServer
 
 
 class Client:
+    # Author:        Michael Stacy
+    # Purpose:       To create the Thread Client
+    # Pre:           ClientWrapper Socket, Shut_Down Event, Game Info
+    # Post:          None
     def __init__(
         self, connection: ClientWrapper, shut_down: Event, game_info: GameInformation
     ) -> None:
@@ -56,6 +60,10 @@ class Client:
 
         self.run_thread()
 
+    # Author:        Michael Stacy
+    # Purpose:       Returns the number of wins using the Database
+    # Pre:           None
+    # Post:          None
     def grab_wins(self) -> None:
         success, error_message, wins = self.database.grab_wins(self.username)
         if not success:
@@ -65,6 +73,10 @@ class Client:
         if wins is not None:
             self.wins = wins
 
+    # Author:        Michael Stacy
+    # Purpose:       To try validating the login
+    # Pre:           Request Dictionary
+    # Post:          None
     def try_login(self, request: dict) -> None:
         """Returns True if Login Successful"""
         if "username" not in request or "password" not in request:
@@ -91,6 +103,10 @@ class Client:
 
         self.connection.send({"request": "login", "return": True, "message": "Success"})
 
+    # Author:        Michael Stacy
+    # Purpose:       To create an account for the client
+    # Pre:           Dict Request
+    # Post:          None
     def create_account(self, request: dict) -> None:
         """Attempts to create account"""
         if (
@@ -121,6 +137,10 @@ class Client:
 
         self.connection.send({"request": "login", "return": True, "message": "Success"})
 
+    # Author:        Michael Stacy
+    # Purpose:       To create a game process
+    # Pre:           None Needed
+    # Post:          None
     def create_game(self, request: dict) -> None:
         """Attempts to create a new game instance"""
 
@@ -149,6 +169,10 @@ class Client:
             {"request": "create_game", "return": True, "message": game_server_port}
         )
 
+    # Author:        Michael Stacy
+    # Purpose:       To join a game server
+    # Pre:           Request Data Dict
+    # Post:          None
     def join_game(self, request: dict) -> None:
         """Informs Client to Start Game if Exists"""
         # Check if Code exists
@@ -184,6 +208,10 @@ class Client:
             {"request": "join_game", "return": True, "message": new_port}
         )
 
+    # Author:        Michael Stacy
+    # Purpose:       To run the Client Thread
+    # Pre:           None
+    # Post:          None
     def run_thread(self) -> None:
         """Our main function for the Client Thread"""
         while not self.shut_down.is_set():

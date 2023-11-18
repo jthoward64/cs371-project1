@@ -1,8 +1,8 @@
 # =================================================================================================
-# Contributing Authors:	    Tag Howard, Name Here, Name Here
-# Email Addresses:          jtho264@uky.edu, Email Here, Email Here
+# Contributing Authors:	    Tag Howard, John Michael Stacy, Juliann Hyatt
+# Email Addresses:          jtho264@uky.edu, jmst231@uky.edu, jnhy222@uky.edu
 # Date:                     November 7th, 2023
-# Purpose:                  Serve ../HTML/leaderboard.html to the client
+# Purpose:                  Serve leaderboard JSON to the client
 # Misc:
 # =================================================================================================
 
@@ -12,7 +12,10 @@ from os import path
 helpers_dir = path.abspath(path.dirname(__file__))
 html_dir = path.join(helpers_dir, "HTML")
 
-
+# Author:        Tag Howard
+# Purpose:       To serve the Leaderboard
+# Pre:           HTTPServer
+# Post:          None
 class Leaderboard(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=html_dir, **kwargs)

@@ -1,3 +1,11 @@
+# =================================================================================================
+# Contributing Authors:	    Tag Howard, John Michael Stacy, Juliann Hyatt
+# Email Addresses:          jtho264@uky.edu, jmst231@uky.edu, jnhy222@uky.edu
+# Date:                     November 7th, 2023
+# Purpose:                  Main Function
+# Misc:
+# =================================================================================================
+
 # Our user interface
 from codeFolder.interface import MainWindow
 

@@ -28,6 +28,10 @@ from .playinfo import GameInfo
 
 
 class GameServer:
+    # Author:        Michael Stacy
+    # Purpose:       Our game process to run the game
+    # Pre:           New Code String, Shut Down Event, Pipe to Send back Port Number
+    # Post:          None
     # new_game = mp.Process(target=GameServer, args=(new_code, new_port, self.shut_down, self.game_info))
     def __init__(self, new_code: str, shut_down: Event, port_pipe: Connection) -> None:
         """Creates the Lobby Server"""
@@ -84,6 +88,10 @@ class GameServer:
         for thread in self.thread_list:
             thread.join()
 
+    # Author:        Michael Stacy
+    # Purpose:       Our Client Thread Control
+    # Pre:           ClientWrapper
+    # Post:          None
     def client(self, control: ClientWrapper) -> None:
         """Handles the Client Connections"""
         # Game Information

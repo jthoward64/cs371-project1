@@ -20,6 +20,12 @@ assets_dir = path.join(current_dir, "..", "assets")
 # This is the main game loop.  For the most part, you will not need to modify this.  The sections
 # where you should add to the code are marked.  Feel free to change any part of this project
 # to suit your needs.
+
+
+# Author:        Juliann Hyatt, Michael Stacy, Tag Howard
+# Purpose:       Our main Pygame Controller
+# Pre:           ScreenWidth and Height Int, Client Connection
+# Post:          None
 def playGame(screenWidth: int, screenHeight: int, client: Connection) -> None:
     # Pygame inits
     pygame.mixer.pre_init(44100, -16, 2, 2048)

@@ -1,3 +1,11 @@
+# =================================================================================================
+# Contributing Authors:	    Tag Howard, John Michael Stacy, Juliann Hyatt
+# Email Addresses:          jtho264@uky.edu, jmst231@uky.edu, jnhy222@uky.edu
+# Date:                     November 7th, 2023
+# Purpose:                  Our Pygame Controller
+# Misc:
+# =================================================================================================
+
 import socket
 import sys
 import time
@@ -17,6 +25,10 @@ assets_dir = path.join(current_dir, "..", "assets")
 # This is the main game loop.  For the most part, you will not need to modify this.  The sections
 # where you should add to the code are marked.  Feel free to change any part of this project
 # to suit your needs.
+# Author:        Juliann Hyatt, Michael Stacy, Tag Howard
+# Purpose:       Our main Pygame Controller
+# Pre:           ScreenWidth and Height Int, PlayerPaddle String, Game_API
+# Post:          None
 def playGame(
     screenWidth: int,
     screenHeight: int,
@@ -179,14 +191,6 @@ def playGame(
 
             elif event.type == pygame.KEYUP:
                 playerPaddleObj.moving = None
-
-        # =========================================================================================
-        # Send your server update here at the end of the game loop to sync your game with your
-        # opponent's game
-
-        ########################################################################
-
-        # =========================================================================================
 
         # Time since last frame in milliseconds
         deltaTime = clock.tick(60)

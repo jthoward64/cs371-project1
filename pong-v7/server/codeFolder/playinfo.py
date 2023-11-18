@@ -71,6 +71,10 @@ default_player_data: PlayerData = {
 
 
 class GameInfo:
+    # Author:        Michael Stacy
+    # Purpose:       To create our game server data model
+    # Pre:           None
+    # Post:          None
     def __init__(self) -> None:
         self.game_data: None = None
 
@@ -105,6 +109,10 @@ class GameInfo:
         # Initials of the Players
         self.initials = {"left": "", "right": ""}
 
+    # Author:        Michael Stacy
+    # Purpose:       To send game information to the client
+    # Pre:           None
+    # Post:          Sends off the Game Information via a Socket Connection API
     def grab_game(self) -> SendGameInfo:
         """Returns the current game data"""
         with self.shared_lock and self.left_lock and self.right_lock:
@@ -120,7 +128,11 @@ class GameInfo:
             }
 
             return new_info
-
+        
+    # Author:        Michael Stacy
+    # Purpose:       To update the server from the client
+    # Pre:           Player String, Data Dictionary
+    # Post:          None
     def update_game(self, player: str, data: dict) -> None:
         """Updates the game data"""
         with self.shared_lock:
@@ -137,6 +149,10 @@ class GameInfo:
             self.left_data["score"] = data["lScore"]
             self.right_data["score"] = data["rScore"]
 
+    # Author:        Michael Stacy
+    # Purpose:       To start the game request
+    # Pre:           Player String
+    # Post:          Returns a Yes or No and Dictionary
     def start_game(self, player: str) -> Tuple[bool, dict]:
         """Starts the Game Sequence"""
         with self.shared_lock:
@@ -148,6 +164,10 @@ class GameInfo:
             }
             return self.game_running, wins
 
+    # Author:        Michael Stacy
+    # Purpose:       To reset the game start
+    # Pre:           None
+    # Post:          None
     def reset_start(self) -> None:
         """Resets the Start Sequence"""
         with self.shared_lock:
@@ -156,6 +176,10 @@ class GameInfo:
                 "right": False,
             }
 
+    # Author:        Michael Stacy
+    # Purpose:       To reset the game state
+    # Pre:           None
+    # Post:          None
     def reset_game(self) -> None:
         with self.shared_lock and self.left_lock and self.right_lock:
             self.shared_data = default_shared_data
@@ -179,6 +203,10 @@ class GameInfo:
 
             self.game_running = False
 
+    # Author:        Michael Stacy
+    # Purpose:       To select the player's option for connecting
+    # Pre:           None
+    # Post:          Which player they are String
     def set_player(self, user: str, initials: str) -> Optional[str]:
         with self.shared_lock:
             if self.user["left"] == "":
@@ -192,23 +220,43 @@ class GameInfo:
 
             return None
 
+    # Author:        Michael Stacy
+    # Purpose:       To return the player information (Initials)
+    # Pre:           None
+    # Post:          String Initials
     def grab_players(self) -> Tuple[str, str]:
         with self.shared_lock:
             return self.initials["left"], self.initials["right"]
 
+    # Author:        Tag Howard
+    # Purpose:       Returns the starting direction
+    # Pre:           None
+    # Post:          Direction String
     def grab_starting_direction(self) -> str:
         with self.shared_lock:
             return self.starting_direction
 
+    # Author:        Michael Stacy
+    # Purpose:       Do we continue the game?
+    # Pre:           None
+    # Post:          Bool True or False
     def continue_game(self) -> bool:
         with self.shared_lock:
             return self.game_running
 
+    # Author:        Michael Stacy
+    # Purpose:       Player Check to see if they're the left or right player
+    # Pre:           None
+    # Post:          Bool True or False
     def player_check(self, user: str) -> bool:
         with self.shared_lock:
             return self.user["left"] == user or self.user["right"] == user
 
-    def increment_win(self, player: str, database: db):
+    # Author:        Michael Stacy, Tag Howard
+    # Purpose:       To increment the number of wins and reset the game
+    # Pre:           Player String, Database
+    # Post:          None
+    def increment_win(self, player: str, database: db) -> None:
         """Increments the Wins in a Player"""
         with self.shared_lock:
             # Prevent us from incrementing where we already have

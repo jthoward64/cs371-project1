@@ -12,6 +12,7 @@ import json
 # Module to create a Server Socket
 import socket
 import ssl
+
 import traceback
 from ssl import SSLSocket
 
@@ -31,6 +32,10 @@ class Connection:
     # Our port number
     port: int
 
+    # Author:        Michael Stacy, Tag Howard
+    # Purpose:       Our socket controller
+    # Pre:           Port Number
+    # Post:          None
     def __init__(self, port: int) -> None:
         """Create a new connection to the server"""
         try:
@@ -70,6 +75,10 @@ class Connection:
         self.port = port
         self.connection_open = True
 
+    # Author:        Juliann Hyatt, Michael Stacy, Tag Howard
+    # Purpose:       Send a message to the server
+    # # Pre:           Data
+    # # Post:          Success Send
     def send(self, message: dict) -> bool:
         if not self.connection_open:
             print(
@@ -96,12 +105,20 @@ class Connection:
 
         return True
 
+    # Author:        Juliann Hyatt, Michael Stacy, Tag Howard
+    # Purpose:       Receive Data
+    # Pre:           None
+    # Post:          Data Dictionary
     def recv(self) -> Optional[dict]:
         """Attempts to Send the Message to the Server"""
         new_message = self.decode_message()
 
         return new_message
 
+    # Author:        Juliann Hyatt, Michael Stacy, Tag Howard
+    # Purpose:       Encoding Message
+    # Pre:           Message
+    # Post:          Bytes
     def encode_message(self, message: dict) -> Optional[bytes]:
         try:
             # Convert to Binary
@@ -112,6 +129,10 @@ class Connection:
 
         return binary
 
+    # Author:        Juliann Hyatt, Michael Stacy, Tag Howard
+    # Purpose:       Decode the Message
+    # Pre:           None
+    # Post:          Optional Data Dict
     def decode_message(self) -> Optional[dict]:
         if not self.connection_open:
             print(

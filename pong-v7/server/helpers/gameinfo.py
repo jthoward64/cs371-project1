@@ -20,6 +20,10 @@ from typing import Dict, List, Literal, Optional, Union
 class GameInformation:
     _lock = Lock()
 
+    # Author:        Michael Stacy
+    # Purpose:       Holds our list of game processes and game codes
+    # Pre:           None
+    # Post:          None
     def __init__(self) -> None:
         # 'CodeHere': Port Number
         self.game_codes: Dict[str, Optional[int]] = {}
@@ -27,6 +31,10 @@ class GameInformation:
         # Our List of Game Processes
         self.game_process: List[Process] = []
 
+    # Author:        Michael Stacy
+    # Purpose:       Generates a random game code
+    # Pre:           None
+    # Post:          Game Code
     def generate_code(self) -> str:
         """Generate a Random Game Code"""
         # Grab the list of ascii characters and digits
@@ -43,6 +51,10 @@ class GameInformation:
 
         return new_code
 
+    # Author:        Michael Stacy
+    # Purpose:       Checks if we have a port already in the game list and returns it
+    # Pre:           Code String
+    # Post:          Port or False
     def check_code(self, code: str) -> Union[Optional[int], Literal[False]]:
         """Check if a code exists"""
         with self._lock:
@@ -51,6 +63,10 @@ class GameInformation:
 
         return False
 
+    # Author:        Michael Stacy
+    # Purpose:       Adds a code to our list
+    # Pre:           String Code, Port Int
+    # Post:          Success
     def add_code(self, code: str, port: int) -> bool:
         """Adds a Game Code to the List"""
         if self.check_code(code) == False:
@@ -61,6 +77,10 @@ class GameInformation:
 
         return True
 
+    # Author:        Michael Stacy
+    # Purpose:       Removes a code from our list of codes
+    # Pre:           String Code
+    # Post:          None
     def remove_code(self, code: str) -> None:
         """Removes the Game Code"""
         if self.check_code(code) is None:

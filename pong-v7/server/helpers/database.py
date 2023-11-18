@@ -20,12 +20,20 @@ DATABASE_PATH: str = path.join(current_dir, "..", "database", "holder.db")
 
 
 class Database:
+    # Author:        Michael Stacy
+    # Purpose:       To establish our connection to the database
+    # Pre:           None
+    # Post:          None
     def __init__(self) -> None:
         # Create the Connector
         self._connect = connector.connect(DATABASE_PATH)
 
         print("Connected to Database")
 
+    # Author:        Michael Stacy
+    # Purpose:       Returns whether the Username and Password are correct
+    # Pre:           String Username/Password
+    # Post:          A success bool and string message
     def validate_user(self, username: str, password: str) -> Tuple[bool, str]:
         """Validates if a user exists and if the password is correct"""
 
@@ -54,6 +62,10 @@ class Database:
 
             return True, "Success"
 
+    # Author:        Michael Stacy
+    # Purpose:       To create a new user account
+    # Pre:           String Username/Password/Initials
+    # Post:          A success and string message
     def create_user(
         self, username: str, password: str, initials: str
     ) -> Tuple[bool, str]:
@@ -72,6 +84,10 @@ class Database:
 
             return True, "Success"
     
+    # Author:        Michael Stacy
+    # Purpose:       To grab the initials of the user
+    # Pre:           String Username
+    # Post:          Tuple success, message, and string of initial
     def grab_initial(self, username: str) -> Tuple[bool, str, str]:
         """Returns the number of wins currently in the database"""
 
@@ -97,6 +113,10 @@ class Database:
 
             return True, "Success", result[0]
 
+    # Author:        Michael Stacy
+    # Purpose:       To update the number of wins of the user
+    # Pre:           String Username, Int Wins
+    # Post:          Success Bool, Message String
     def update_wins(self, username: str, wins: int) -> Tuple[bool, str]:
         """Increments the number of wins"""
         with self._connect as conn:
@@ -113,6 +133,10 @@ class Database:
 
             return True, "Success"
 
+    # Author:        Michael Stacy
+    # Purpose:       To grab the number of wins
+    # Pre:           String Username
+    # Post:          Success Bool, String Message, Wins Int
     def grab_wins(self, username: str) -> Tuple[bool, str, int]:
         """Returns the number of wins currently in the database"""
 
@@ -138,6 +162,10 @@ class Database:
 
             return True, "Success", result[0]
 
+    # Author:        Michael Stacy
+    # Purpose:       To grab the top players of the database
+    # Pre:           None
+    # Post:          A dictionary of items or none
     def grab_leaderboard(self) -> Union[dict, None]:
         """Returns a Dictionary of Top Players"""
         with self._connect as conn:
