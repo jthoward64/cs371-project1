@@ -1,9 +1,7 @@
 import random
 import threading as th
 from typing import Literal, Tuple, TypedDict
-
 from helpers.database import Database as db
-
 
 class BallInfo(TypedDict):
     x: int
@@ -201,12 +199,14 @@ class GameInfo:
         with self.shared_lock:
             return self.user["left"] == user or self.user["right"] == user
 
-    def increment_win(self, player: str):
+    def increment_win(self, player: str, database:db):
         """Increments the Wins in a Player"""
         with self.shared_lock:
             # Prevent us from incrementing where we already have
             if not self.game_running:
                 return
+            
+            self.game_running = False
 
             self.reset_game()
 
@@ -219,7 +219,7 @@ class GameInfo:
                 with self.right_lock:
                     self.right_data["wins"] += 1
 
-            success, message, wins_number = self.database.grab_wins(username)
+            success, message, wins_number = database.grab_wins(username)
 
             if not success:
                 print(f"Error: unable to grab wins,", message)
@@ -227,7 +227,7 @@ class GameInfo:
 
             wins_number += 1
 
-            success, message = self.database.update_wins(username, wins_number)
+            success, message = database.update_wins(username, wins_number)
 
             if not success:
                 print("Error: unable to update wins: ", message)
