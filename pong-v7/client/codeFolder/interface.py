@@ -15,7 +15,6 @@ from .api.gameApi import GameApi
 from .playGame import playGame
 from .settings import MAIN_PORT, WINDOW_HEIGHT, WINDOW_WIDTH
 from .sockethelper import Connection
-from .spectateGame import playGame as spectateGame
 
 current_dir = path.abspath(path.dirname(__file__))
 assets_dir = path.join(current_dir, "..", "assets")
