@@ -13,6 +13,8 @@ class GameMeta(TypedDict):
     right_player_initials: str
     game_code: str
     starting_direction: Literal["left", "right"]
+    left_wins: int
+    right_wins: int
 
 
 class PaddleInfo(TypedDict):
@@ -34,8 +36,6 @@ class GameInfo(TypedDict):
     ball: BallInfo
     left_score: int
     right_score: int
-    left_wins: int
-    right_wins: int
     sync: int
 
 
@@ -98,16 +98,25 @@ class GameApi:
             right_player_initials = message.get("right_player", "N/A")
             game_code = message.get("game_code", None)
             starting_direction = message.get("starting_direction", None)
+            wins = message.get("wins", {})
+            left_wins = wins.get("left_player", None)
+            right_wins = wins.get("right_player", None)
             if game_code is None:
                 return "Invalid message from server (game_code was None)"
             elif starting_direction is None:
                 return "Invalid message from server (starting_direction was None)"
+            elif left_wins is None:
+                return "Invalid message from server (left_wins was None)"
+            elif right_wins is None:
+                return "Invalid message from server (right_wins was None)"
             else:
                 return {
                     "left_player_initials": left_player_initials,
                     "right_player_initials": right_player_initials,
                     "game_code": game_code,
                     "starting_direction": starting_direction,
+                    "left_wins": left_wins,
+                    "right_wins": right_wins,
                 }
         else:
             return response
@@ -126,16 +135,25 @@ class GameApi:
                 right_player_initials = message.get("right_player", "N/A")
                 game_code = message.get("game_code", None)
                 starting_direction = message.get("starting_direction", None)
+                wins = message.get("wins", {})
+                left_wins = wins.get("left_player", None)
+                right_wins = wins.get("right_player", None)
                 if game_code is None:
                     return "Invalid response from server (game_code was None)"
                 elif starting_direction is None:
                     return "Invalid response from server (starting_direction was None)"
+                elif left_wins is None:
+                    return "Invalid message from server (left_wins was None)"
+                elif right_wins is None:
+                    return "Invalid message from server (right_wins was None)"
                 else:
                     return {
                         "left_player_initials": left_player_initials,
                         "right_player_initials": right_player_initials,
                         "game_code": game_code,
                         "starting_direction": starting_direction,
+                        "left_wins": left_wins,
+                        "right_wins": right_wins,
                     }
         else:
             return response
@@ -153,7 +171,6 @@ class GameApi:
             ball = message.get("ball", {})
             score = message.get("score", {})
             sync = message.get("sync", None)
-            wins = message.get("wins", {})
             if (
                 left_paddle is None
                 or right_paddle is None
@@ -175,8 +192,6 @@ class GameApi:
                 ball_y_vel = ball.get("yVel", None)
                 left_score = score.get("lScore", None)
                 right_score = score.get("rScore", None)
-                left_wins = wins.get("left_player", None)
-                right_wins = wins.get("right_player", None)
                 sync = sync
 
                 if (
@@ -192,8 +207,6 @@ class GameApi:
                     or ball_y_vel is None
                     or left_score is None
                     or right_score is None
-                    or left_wins is None
-                    or right_wins is None
                     or sync is None
                 ):
                     return "Invalid message from server (missing data)"
@@ -235,8 +248,6 @@ class GameApi:
                         },
                         "left_score": left_score,
                         "right_score": right_score,
-                        "left_wins": left_wins,
-                        "right_wins": right_wins,
                         "sync": sync,
                     }
         else:

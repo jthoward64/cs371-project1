@@ -183,14 +183,19 @@ def playGame(
 
         # =========================================================================================
 
+        # Time since last frame in milliseconds
+        deltaTime = clock.tick(60)
+        paddlePixelsPerSecond = 200
+        paddleSpeed: int = int(paddlePixelsPerSecond * (deltaTime / 1000.0))
+
         # Update the player paddle and opponent paddle's location on the screen
         for paddle in [playerPaddleObj, opponentPaddleObj]:
             if paddle.moving == "down":
                 if paddle.rect.bottomleft[1] < screenHeight - 10:
-                    paddle.rect.y += paddle.speed
+                    paddle.rect.y += paddleSpeed
             elif paddle.moving == "up":
                 if paddle.rect.topleft[1] > 10:
-                    paddle.rect.y -= paddle.speed
+                    paddle.rect.y -= paddleSpeed
 
         # If the game is over, display the win message
         if lScore > 4 or rScore > 4:
@@ -275,7 +280,7 @@ def playGame(
                 messagebox.showerror("Error", "Server Disconnected")
                 pygame.quit()
                 return
-            
+
         # =========================================================================================
 
         # Drawing the player's new location
@@ -300,8 +305,7 @@ def playGame(
                 rightMessage,
             ]
         )
-        clock.tick(60)
-            
+
         # =========================================================================================
 
         # Only grab an update if the game is currently running
@@ -335,8 +339,6 @@ def playGame(
             ball.rect.y = game_state["ball"]["y"]
             ball.xVel = game_state["ball"]["x_vel"]
             ball.yVel = game_state["ball"]["y_vel"]
-            lWins = game_state["left_wins"]
-            rWins = game_state["right_wins"]
             sync = game_state["sync"]
 
             if ball.xVel == 0:
