@@ -186,7 +186,7 @@ def playGame(
         # Time since last frame in milliseconds
         deltaTime = clock.tick(60)
         paddlePixelsPerSecond = 200
-        paddleSpeed: int = int(paddlePixelsPerSecond * (deltaTime / 1000.0))
+        paddleSpeed: int = paddlePixelsPerSecond * (deltaTime // 1000)
 
         # Update the player paddle and opponent paddle's location on the screen
         for paddle in [playerPaddleObj, opponentPaddleObj]:
@@ -203,7 +203,7 @@ def playGame(
             winText = "Player 1 Wins! " if lScore > 4 else "Player 2 Wins! "
             textSurface = winFont.render(winText, False, WHITE, (0, 0, 0))
             textRect = textSurface.get_rect()
-            textRect.center = (int(screenWidth / 2), int(screenHeight / 2))
+            textRect.center = (screenWidth // 2, screenHeight // 2)
             winMessage = screen.blit(textSurface, textRect)
 
             # Add our message to restart the game

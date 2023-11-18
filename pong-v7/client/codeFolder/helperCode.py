@@ -45,7 +45,7 @@ class Ball:
 
     def hitPaddle(self, paddleCenter: int) -> None:
         self.xVel *= -1
-        self.yVel = (self.rect.center[1] - paddleCenter) // 2
+        self.yVel = (self.rect.center[1] - paddleCenter) // 3
 
     def hitWall(self) -> None:
         self.yVel *= -1

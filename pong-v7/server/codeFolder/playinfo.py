@@ -81,9 +81,6 @@ class GameInfo:
         # Initials of the Players
         self.initials = {"left": "", "right": ""}
 
-        # Win Counter
-        self.wins = {"left": 0, "right": 0}
-
     def grab_game(self) -> SendGameInfo:
         """Returns the current game data"""
         with self.shared_lock and self.left_lock and self.right_lock:
@@ -95,7 +92,7 @@ class GameInfo:
                     "lScore": self.left_data["score"],
                     "rScore": self.right_data["score"],
                 },
-                "sync": self.shared_data["sync"]
+                "sync": self.shared_data["sync"],
             }
 
             return new_info
@@ -119,7 +116,10 @@ class GameInfo:
         with self.shared_lock:
             self.ready[player] = True
             self.game_running = self.ready["left"] and self.ready["right"]
-            wins = {"left_player": self.left_data["wins"], "right_player": self.right_data["wins"]}
+            wins = {
+                "left_player": self.left_data["wins"],
+                "right_player": self.right_data["wins"],
+            }
             return self.game_running, wins
 
     def reset_start(self) -> None:
@@ -148,7 +148,7 @@ class GameInfo:
                     "moving": "",
                 },
                 "score": 0,
-                "wins": 0,
+                "wins": self.left_data["wins"],
             }
             self.right_data = {
                 "paddle": {
@@ -157,7 +157,7 @@ class GameInfo:
                     "moving": "",
                 },
                 "score": 0,
-                "wins": 0,
+                "wins": self.right_data["wins"],
             }
 
             self.starting_direction = random.choice(["left", "right"])
@@ -203,7 +203,6 @@ class GameInfo:
             self.reset_game()
 
             username = self.user[player]
-            self.wins[player] += 1
 
             if player == "left":
                 with self.left_lock:
