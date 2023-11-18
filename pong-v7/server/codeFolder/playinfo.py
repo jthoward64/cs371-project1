@@ -129,14 +129,13 @@ class GameInfo:
                 # We only want one client deciding the ball's position, let's use the
                 # starting direction to decide which one
                 self.shared_data["ball"] = data["ball"]
-        if player == "left":
-            with self.left_lock:
+        with self.left_lock and self.right_lock:
+            if player == "left":
                 self.left_data["paddle"] = data["paddle"]
-                self.left_data["score"] = data["lScore"]
-        elif player == "right":
-            with self.right_lock:
+            elif player == "right":
                 self.right_data["paddle"] = data["paddle"]
-                self.right_data["score"] = data["rScore"]
+            self.left_data["score"] = data["lScore"]
+            self.right_data["score"] = data["rScore"]
 
     def start_game(self, player: str) -> Tuple[bool, dict]:
         """Starts the Game Sequence"""
