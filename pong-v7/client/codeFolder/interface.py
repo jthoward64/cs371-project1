@@ -231,7 +231,7 @@ class MainWindow(tk.Tk):
         # Start by setting to Login Page
         self.change_menu(self.main_frame)
 
-    def game_connect(self, port: int) -> bool:
+    def game_connect(self, port: int) -> Optional[str]:
         """Attempts to join the Game Server"""
         game_server = Connection(port)
 
@@ -241,11 +241,11 @@ class MainWindow(tk.Tk):
                 "Failed to connect to game server. Please check that the server is reachable and that you have configured the client correctly. Configuration can be set in settings.py or by passing an argument (see '--help' for more information).",
                 parent=self,
             )
-            return False
+            return "Failed to Connect"
 
         # Check if the connection is established
         if not game_server.connection_open:
-            return False
+            return "Failed to Connect"
 
         self.game_api = GameApi(game_server)
 
@@ -257,24 +257,22 @@ class MainWindow(tk.Tk):
         if isinstance(join_game_response, str):
             print(f"Error: {join_game_response}")
             self.code_error.label.config(text=join_game_response)
-            return False
+            return
 
         self.withdraw()
         try:
-            if join_game_response["player"] == "spectate":
-                spectateGame(WINDOW_WIDTH, WINDOW_HEIGHT, self.game_api)
-            elif join_game_response["player"] == "right_player":
+            if join_game_response["player"] == "right_player":
                 playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "right", self.game_api)
             elif join_game_response["player"] == "left_player":
                 playGame(WINDOW_WIDTH, WINDOW_HEIGHT, "left", self.game_api)
             else:
                 print("Error, player is not a valid value")
                 self.code_error.label.config(text="Error: player is not a valid value")
-                return False
+                return "Error: player is not a valid value"
         finally:
             self.deiconify()
 
-        return True
+        return None
 
     def change_menu(self, frame: Union[MainMenu, CreateMenu, CodeMenu]) -> None:
         """Change the Frame Menu"""

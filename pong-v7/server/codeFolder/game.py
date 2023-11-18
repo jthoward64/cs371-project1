@@ -128,9 +128,9 @@ class GameServer:
                     shut_client = True
                     control.close()
                     continue
-                
+
                 # Grab our initals
-                _, _, initials = database.grab_initial(new_message['username'])
+                _, _, initials = database.grab_initial(new_message["username"])
 
                 # Update our username
                 username = new_message["username"]
@@ -138,8 +138,17 @@ class GameServer:
                 # Inform Client of Success, add to Player List
                 player_type = self.game_info.set_player(username, initials)
 
-                if player_type == "spectate":
-                    player = "spectate"
+                if player_type is None:
+                    control.send(
+                        {
+                            "request": "join_game",
+                            "return": False,
+                            "message": "Game is Full",
+                        }
+                    )
+                    shut_client = True
+                    control.close()
+                    continue
                 else:
                     player = "left" if player_type == "left_player" else "right"
 
@@ -179,7 +188,7 @@ class GameServer:
                 message["game_code"] = self.code
 
                 # Are clients ready to start?
-                start, message['wins'] = self.game_info.start_game(player)
+                start, message["wins"] = self.game_info.start_game(player)
 
                 control.send(
                     {"request": "start_game", "return": start, "message": message}

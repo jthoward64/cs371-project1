@@ -1,6 +1,6 @@
 import random
 import threading as th
-from typing import Literal, Tuple, TypedDict
+from typing import Literal, Optional, Tuple, TypedDict
 
 from helpers.database import Database as db
 
@@ -179,7 +179,7 @@ class GameInfo:
 
             self.game_running = False
 
-    def set_player(self, user: str, initials: str) -> str:
+    def set_player(self, user: str, initials: str) -> Optional[str]:
         with self.shared_lock:
             if self.user["left"] == "":
                 self.user["left"] = user
@@ -190,7 +190,7 @@ class GameInfo:
                 self.initials["right"] = initials
                 return "right_player"
 
-            return "spectate"
+            return None
 
     def grab_players(self) -> Tuple[str, str]:
         with self.shared_lock:
