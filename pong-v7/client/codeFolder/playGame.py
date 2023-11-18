@@ -43,7 +43,9 @@ def playGame(
     bottomFont = pygame.font.Font(None, 24)
     restartFont = pygame.font.Font(None, 32)
     pointSound = pygame.mixer.Sound(path.join(assets_dir, "sounds", "point.wav"))
+    pointSound.set_volume(0.5)
     bounceSound = pygame.mixer.Sound(path.join(assets_dir, "sounds", "bounce.wav"))
+    bounceSound.set_volume(0.75)
 
     # Display objects
     screen = pygame.display.set_mode((screenWidth, screenHeight))
@@ -187,7 +189,6 @@ def playGame(
 
         # Time since last frame in milliseconds
         deltaTime = clock.tick(60)
-        print(deltaTime)
         paddlePixelsPerSecond = 200
         paddleSpeed: int = int(paddlePixelsPerSecond * (deltaTime / 1000.0))
 
@@ -228,19 +229,19 @@ def playGame(
             # If the ball makes it past the edge of the screen, update score, etc.
             if ball.rect.x > screenWidth:
                 lScore += 1
-                # pointSound.play()
+                pointSound.play()
                 ball.reset(nowGoing="left")
             elif ball.rect.x < 0:
                 rScore += 1
-                # pointSound.play()
+                pointSound.play()
                 ball.reset(nowGoing="right")
 
             # If the ball hits a paddle
             if ball.rect.colliderect(playerPaddleObj.rect):
-                # bounceSound.play()
+                bounceSound.play()
                 ball.hitPaddle(playerPaddleObj.rect.center[1])
             elif ball.rect.colliderect(opponentPaddleObj.rect):
-                # bounceSound.play()
+                bounceSound.play()
                 ball.hitPaddle(opponentPaddleObj.rect.center[1])
 
             # If the ball hits a wall
