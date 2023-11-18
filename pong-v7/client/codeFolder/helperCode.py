@@ -40,7 +40,7 @@ class Ball:
         self.startYpos = rect.y
 
     def updatePos(self, deltaTime: int) -> None:
-        self.rect.x += int(self.xVel * (deltaTime / 1000))
+        self.rect.x += int(self.xVel * (deltaTime / 1000) * 60)
         self.rect.y += self.yVel
 
     def hitPaddle(self, paddleCenter: int) -> None:
