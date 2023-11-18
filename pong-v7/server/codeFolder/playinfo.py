@@ -148,7 +148,7 @@ class GameInfo:
                     "moving": "",
                 },
                 "score": 0,
-                "wins": self.left_data["wins"],
+                "wins": self.left_data.get("wins", 0),
             }
             self.right_data = {
                 "paddle": {
@@ -157,7 +157,7 @@ class GameInfo:
                     "moving": "",
                 },
                 "score": 0,
-                "wins": self.right_data["wins"],
+                "wins": self.right_data.get("wins", 0),
             }
 
             self.starting_direction = random.choice(["left", "right"])
