@@ -196,7 +196,7 @@ def playGame(
         # Update the player paddle and opponent paddle's location on the screen
         for paddle in [playerPaddleObj, opponentPaddleObj]:
             if paddle.moving == "down":
-                if paddle.rect.bottomleft[1] < screenHeight - 10:
+                if paddle.rect.bottomleft[1] < screenHeight - 50:
                     paddle.rect.y += paddleSpeed
             elif paddle.moving == "up":
                 if paddle.rect.topleft[1] > 10:
