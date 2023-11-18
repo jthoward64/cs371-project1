@@ -47,20 +47,44 @@ class SendGameInfo(TypedDict):
     sync: int
 
 
+default_shared_data: SharedGameInfo = {
+    "ball": {
+        "x": 0,
+        "y": 0,
+        "xVel": 0,
+        "yVel": 0,
+    },
+    "sync": 0,
+}
+
+default_paddle: PaddleInfo = {
+    "x": 0,
+    "y": 0,
+    "moving": "",
+}
+
+default_player_data: PlayerData = {
+    "paddle": default_paddle,
+    "score": 0,
+    "wins": 0,
+}
+
+
 class GameInfo:
     def __init__(self) -> None:
         self.game_data: None = None
 
         # Lock for basic game data
         self.shared_lock = th.Lock()
-        self.shared_data: SharedGameInfo
+        self.shared_data: SharedGameInfo = default_shared_data
         self.starting_direction: Literal["left", "right"]
 
         # Lock for the player's data
         self.left_lock = th.Lock()
-        self.left_data: PlayerData
+
+        self.left_data: PlayerData = default_player_data
         self.right_lock = th.Lock()
-        self.right_data: PlayerData
+        self.right_data: PlayerData = default_player_data
 
         self.database = db()
 
@@ -132,30 +156,14 @@ class GameInfo:
 
     def reset_game(self) -> None:
         with self.shared_lock and self.left_lock and self.right_lock:
-            self.shared_data = {
-                "ball": {
-                    "x": 0,
-                    "y": 0,
-                    "xVel": 0,
-                    "yVel": 0,
-                },
-                "sync": 0,
-            }
+            self.shared_data = default_shared_data
             self.left_data = {
-                "paddle": {
-                    "x": 0,
-                    "y": 0,
-                    "moving": "",
-                },
+                "paddle": default_paddle,
                 "score": 0,
                 "wins": self.left_data.get("wins", 0),
             }
             self.right_data = {
-                "paddle": {
-                    "x": 0,
-                    "y": 0,
-                    "moving": "",
-                },
+                "paddle": default_paddle,
                 "score": 0,
                 "wins": self.right_data.get("wins", 0),
             }
