@@ -120,7 +120,7 @@ class GameApi:
         else:
             return response
 
-    def start_game(self) -> Union[GameMeta, Literal[False], str]:
+    def start_game(self) -> Union[StartGameMeta, Literal[False], str]:
         """
         Returns GameInfoResponse if successful and ready to play, False if not ready to play, and str if error
         """
