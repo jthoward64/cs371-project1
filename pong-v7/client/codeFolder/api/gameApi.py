@@ -77,12 +77,10 @@ class GameApi:
             print("Failed to send request to server")
             return "Failed to send request to server"
 
-    def join_game(
-        self, username: str, password: str, initials: str
-    ) -> Union[JoinGameResponse, str]:
+    def join_game(self, username: str, password: str) -> Union[JoinGameResponse, str]:
         response = self.send_and_check(
             "join_game",
-            {"username": username, "password": password, "initials": initials},
+            {"username": username, "password": password},
         )
         if isinstance(response, dict):
             request = response.get("message", None)

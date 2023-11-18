@@ -252,9 +252,7 @@ class MainWindow(tk.Tk):
         # Success, close the socket
         self.server_socket.close()
 
-        join_game_response = self.game_api.join_game(
-            self.username, self.password, self.create_frame.initials.box.get()
-        )
+        join_game_response = self.game_api.join_game(self.username, self.password)
 
         if isinstance(join_game_response, str):
             print(f"Error: {join_game_response}")
@@ -377,7 +375,7 @@ class MainWindow(tk.Tk):
         if new_message["return"] == False:
             self.create_error.label.config(text=new_message["error"])
             return
-        
+
         self.username = username
         self.password = password
 
